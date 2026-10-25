@@ -16,6 +16,7 @@ import (
 	"casal/internal/auth"
 	"casal/internal/config"
 	"casal/internal/httpx"
+	"casal/internal/push"
 )
 
 func main() {
@@ -65,6 +66,22 @@ func run(log *slog.Logger) error {
 		return err
 	}
 	auth.NewHandler(authSvc, log, cfg.CookieSecure).Routes(mux)
+	requireUser := auth.Require(authSvc)
+
+	// push (antecipado: valida os avisos no celular antes de casal e lembretes)
+	if cfg.VAPIDPublicKey != "" && cfg.VAPIDPrivateKey != "" {
+		pushSvc := push.NewService(
+			push.NewPostgresRepo(db),
+			push.NewWebPushSender(cfg.VAPIDSubject, cfg.VAPIDPublicKey, cfg.VAPIDPrivateKey),
+			log,
+		)
+		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
+	} else {
+		log.Warn("VAPID não configurado: rode go run ./cmd/vapid e preencha o .env")
+	}
+
+	// página de teste do PWA
+	mux.Handle("GET /", http.FileServer(http.Dir("web")))
 
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,

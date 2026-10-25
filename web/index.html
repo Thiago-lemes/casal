@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <title>Casal: teste de push</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 28rem; margin: 2rem auto; padding: 0 1rem; }
+    input, button { font-size: 1rem; padding: .6rem; width: 100%; box-sizing: border-box; margin-bottom: .5rem; }
+    pre { background: #f3f3f3; padding: .75rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Teste de push</h1>
+  <form id="login">
+    <input id="email" type="email" placeholder="e-mail" required>
+    <input id="password" type="password" placeholder="senha" required>
+    <button>Entrar</button>
+  </form>
+  <p><button id="enable">Ativar avisos</button></p>
+  <p><button id="test">Enviar teste para mim</button></p>
+  <pre id="log"></pre>
+  <script src="/app.js"></script>
+</body>
+</html>

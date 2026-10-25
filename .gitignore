@@ -1,0 +1,6 @@
+.env
+/bin/
+*.log
+# cookies dos testes com curl
+ana.txt
+bia.txt

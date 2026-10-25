@@ -1,0 +1,6 @@
+{
+  "go.formatTool": "gofmt",
+  "editor.formatOnSave": true,
+  "go.lintTool": "staticcheck",
+  "go.testFlags": ["-count=1"]
+}

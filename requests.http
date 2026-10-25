@@ -1,0 +1,22 @@
+@host = http://localhost:8080
+
+### saúde
+GET {{host}}/healthz
+
+### cadastro
+POST {{host}}/v1/auth/register
+Content-Type: application/json
+
+{"email": "ana@exemplo.com", "name": "Ana", "password": "senha-forte-123"}
+
+### quem sou eu
+GET {{host}}/v1/me
+
+### login
+POST {{host}}/v1/auth/login
+Content-Type: application/json
+
+{"email": "ana@exemplo.com", "password": "senha-forte-123"}
+
+### sair
+POST {{host}}/v1/auth/logout

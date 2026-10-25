@@ -13,6 +13,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib" // registra o driver "pgx" no database/sql
 
+	"casal/internal/auth"
 	"casal/internal/config"
 	"casal/internal/httpx"
 )
@@ -57,6 +58,13 @@ func run(log *slog.Logger) error {
 		}
 		httpx.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 	})
+
+	// contas e sessões
+	authSvc, err := auth.NewService(auth.NewPostgresRepo(db), cfg.SessionTTL)
+	if err != nil {
+		return err
+	}
+	auth.NewHandler(authSvc, log, cfg.CookieSecure).Routes(mux)
 
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,

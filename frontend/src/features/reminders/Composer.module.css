@@ -1,0 +1,107 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  animation: fade var(--dur-base) var(--ease-out);
+}
+
+.sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+
+.title {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-4);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.group {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* opções como alvos de toque; o rádio nativo fica visível e acessível */
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border: 2px solid var(--color-line);
+  border-radius: var(--radius-m);
+  cursor: pointer;
+}
+
+.option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-wash);
+}
+
+.option input {
+  accent-color: var(--color-accent);
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  .sheet {
+    inset: 50% auto auto 50%;
+    width: min(32rem, 92vw);
+    border-radius: var(--radius-m);
+    transform: translate(-50%, -50%);
+    animation: fade var(--dur-base) var(--ease-out);
+  }
+}

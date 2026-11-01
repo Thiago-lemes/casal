@@ -1,0 +1,60 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.band {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-5) var(--space-5);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-date);
+  line-height: 0.95;
+}
+
+.form {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--space-6) var(--space-5);
+  margin-inline: auto;
+}
+
+.title {
+  font-size: var(--text-2xl);
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.switch {
+  color: var(--color-text-soft);
+}
+
+@media (min-width: 48rem) {
+  .page {
+    grid-template-rows: none;
+    grid-template-columns: minmax(18rem, 5fr) 6fr;
+  }
+  .band {
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-7);
+  }
+  .brand {
+    font-size: 7rem;
+  }
+  .form {
+    align-self: center;
+    padding: var(--space-7);
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "nav": { "today": "Today", "routine": "Routine", "home": "Home", "more": "More", "main": "Main navigation" },
+  "routineSoon": "Coming soon",
+  "actions": { "tryAgain": "Try again", "cancel": "Cancel", "close": "Close" },
+  "settings": {
+    "title": "Preferences",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language",
+    "signOut": "Sign out"
+  },
+  "errors": {
+    "invalid": "Check the details and try again.",
+    "unauthorized": "Your session ended. Sign in again.",
+    "forbidden": "You do not have access to this.",
+    "not_found": "We could not find what you are looking for.",
+    "conflict": "This already changed. Refresh and try again.",
+    "rate_limited": "Too many attempts in a row. Wait a moment and try again.",
+    "upstream": "An outside service failed. Try again in a moment.",
+    "network": "No connection. Check your internet and try again.",
+    "unknown": "Something went wrong. Try again."
+  }
+}

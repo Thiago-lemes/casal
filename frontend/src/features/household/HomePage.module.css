@@ -1,0 +1,44 @@
+.page {
+  display: grid;
+  gap: var(--space-6);
+  max-width: 40rem;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-5) var(--space-6);
+}
+
+.title {
+  font-size: var(--text-date);
+  line-height: 0.95;
+  overflow-wrap: anywhere;
+}
+
+.invite {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.subtitle {
+  font-size: var(--text-xl);
+}
+
+.lead {
+  color: var(--color-text-soft);
+  max-width: 46ch;
+}
+
+.token {
+  display: block;
+  max-width: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 2px dashed var(--color-line);
+  border-radius: var(--radius-m);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: 500;
+}

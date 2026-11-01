@@ -1,0 +1,25 @@
+{
+  "nav": { "today": "Hoje", "routine": "Rotina", "home": "Casa", "more": "Mais", "main": "Navegação principal" },
+  "routineSoon": "Em breve",
+  "actions": { "tryAgain": "Tentar de novo", "cancel": "Cancelar", "close": "Fechar" },
+  "settings": {
+    "title": "Preferências",
+    "theme": "Tema",
+    "themeSystem": "Sistema",
+    "themeLight": "Claro",
+    "themeDark": "Escuro",
+    "language": "Idioma",
+    "signOut": "Sair da conta"
+  },
+  "errors": {
+    "invalid": "Confira os dados e tente de novo.",
+    "unauthorized": "Sua sessão acabou. Entre de novo.",
+    "forbidden": "Você não tem acesso a isso.",
+    "not_found": "Não encontramos o que você procura.",
+    "conflict": "Isso já mudou. Atualize e tente de novo.",
+    "rate_limited": "Muitas tentativas seguidas. Espere um pouco e tente de novo.",
+    "upstream": "Um serviço externo falhou. Tente de novo em instantes.",
+    "network": "Sem conexão. Verifique a internet e tente de novo.",
+    "unknown": "Algo deu errado. Tente de novo."
+  }
+}

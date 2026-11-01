@@ -1,0 +1,32 @@
+{
+  "greeting": "Hi, {{name}}",
+  "pendingCount_one": "{{count}} pending reminder",
+  "pendingCount_other": "{{count}} pending reminders",
+  "emptyTitle": "The day is clear",
+  "emptyBody": "Leave a reminder for yourself or your partner. It arrives as a notification at the set time.",
+  "newReminder": "New reminder",
+  "from": "{{name}} left this",
+  "fromYou": "You left this",
+  "forPartner": "For {{name}}",
+  "late": "Overdue",
+  "resolve": "Check off",
+  "resolved": "Done at {{time}}",
+  "snooze": "Snooze",
+  "snooze10": "10 minutes",
+  "snooze60": "1 hour",
+  "snoozeTomorrow": "Tomorrow morning",
+  "cancelReminder": "Delete",
+  "composer": {
+    "title": "New reminder",
+    "body": "What should we remember?",
+    "bodyPlaceholder": "Take the meal prep out of the freezer",
+    "to": "For",
+    "me": "Me",
+    "when": "When",
+    "inOneHour": "In 1 hour",
+    "tonight": "Tonight",
+    "tomorrowMorning": "Tomorrow morning",
+    "create": "Create reminder"
+  },
+  "loadError": "Could not load your reminders"
+}

@@ -1,0 +1,32 @@
+{
+  "greeting": "Oi, {{name}}",
+  "pendingCount_one": "{{count}} lembrete pendente",
+  "pendingCount_other": "{{count}} lembretes pendentes",
+  "emptyTitle": "O dia está livre",
+  "emptyBody": "Deixe um lembrete para você ou para a outra pessoa. Ele chega como aviso no horário marcado.",
+  "newReminder": "Novo lembrete",
+  "from": "{{name}} deixou",
+  "fromYou": "Você deixou",
+  "forPartner": "Para {{name}}",
+  "late": "Atrasado",
+  "resolve": "Dar baixa",
+  "resolved": "Resolvido às {{time}}",
+  "snooze": "Adiar",
+  "snooze10": "10 minutos",
+  "snooze60": "1 hora",
+  "snoozeTomorrow": "Amanhã de manhã",
+  "cancelReminder": "Apagar",
+  "composer": {
+    "title": "Novo lembrete",
+    "body": "O que lembrar?",
+    "bodyPlaceholder": "Tirar a marmita do freezer",
+    "to": "Para quem",
+    "me": "Eu",
+    "when": "Quando",
+    "inOneHour": "Daqui a 1 hora",
+    "tonight": "Hoje à noite",
+    "tomorrowMorning": "Amanhã de manhã",
+    "create": "Criar lembrete"
+  },
+  "loadError": "Não deu para carregar os lembretes"
+}

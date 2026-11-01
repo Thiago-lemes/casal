@@ -1,0 +1,59 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  padding: 0 var(--space-4);
+  border: 2px solid transparent;
+  border-radius: var(--radius-m);
+  font-family: var(--font-text);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button[aria-busy='true'] {
+  cursor: progress;
+}
+
+/* ação principal: campo de laranja com tinta escura */
+.primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.primary:hover:not(:disabled) {
+  background: var(--color-accent-press);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-line);
+}
+.secondary:hover:not(:disabled) {
+  border-color: var(--color-text-soft);
+}
+
+.quiet {
+  background: transparent;
+  color: var(--color-accent-text);
+  padding: 0 var(--space-3);
+}
+.quiet:hover:not(:disabled) {
+  background: var(--color-accent-wash);
+}

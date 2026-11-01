@@ -1,0 +1,112 @@
+.item {
+  display: grid;
+  grid-template-rows: 1fr;
+  margin-bottom: var(--space-3);
+}
+
+/* a etiqueta recortada: um entalhe no meio da borda de entrada, sem borda colorida */
+.label {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5.25rem 1fr;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-m);
+  -webkit-mask: radial-gradient(circle 9px at 0 50%, transparent 97%, #000 100%);
+  mask: radial-gradient(circle 9px at 0 50%, transparent 97%, #000 100%);
+}
+
+.time {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  line-height: 1;
+  padding-top: 0.15rem;
+}
+
+.time[data-late] {
+  color: var(--color-accent-text);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.text {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.late {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* carimbo de baixa: ocupa a etiqueta com a hora da resolução */
+.stamp {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  animation: stamp var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+/* fecha a etiqueta e puxa a lista para cima */
+.item[data-phase='leaving'] {
+  animation: leave var(--dur-base) var(--ease-out) both;
+}
+
+.item[data-phase='leaving'] .label {
+  overflow: hidden;
+}
+
+@keyframes leave {
+  to {
+    grid-template-rows: 0fr;
+    margin-bottom: 0;
+    opacity: 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  .label {
+    grid-template-columns: 6.5rem 1fr;
+  }
+}

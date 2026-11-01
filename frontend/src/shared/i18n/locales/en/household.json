@@ -1,0 +1,17 @@
+{
+  "setup": {
+    "title": "Set up your couple",
+    "lead": "Reminders live in your couple. Create yours now and invite your partner later, or join with an invite.",
+    "create": "Create the couple",
+    "joinTitle": "Got an invite?",
+    "token": "Invite code",
+    "join": "Join the couple"
+  },
+  "invite": {
+    "action": "Invite partner",
+    "title": "Invite to your couple",
+    "lead": "Send this code. It is valid for 7 days and only one person can use it.",
+    "copy": "Copy code",
+    "copied": "Code copied"
+  }
+}

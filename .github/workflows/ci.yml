@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: casal
+          POSTGRES_PASSWORD: ci-owner-password
+          POSTGRES_DB: casal_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U casal -d casal_test"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      PGPASSWORD: ci-owner-password
+      OWNER_URL: postgres://casal:ci-owner-password@localhost:5432/casal_test?sslmode=disable
+      APP_URL: postgres://casal_app:ci-app-password@localhost:5432/casal_test?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Ferramentas
+        run: |
+          go install github.com/pressly/goose/v3/cmd/goose@v3.29.0
+          go install honnef.co/go/tools/cmd/staticcheck@2026.2.2
+
+      - name: Formatação, vet e staticcheck
+        run: |
+          test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+          go vet ./...
+          staticcheck ./...
+
+      - name: Banco de teste (papel limitado + migrações)
+        run: |
+          psql -h localhost -U casal -d casal_test -v ON_ERROR_STOP=1 \
+            -c "CREATE ROLE casal_app LOGIN PASSWORD 'ci-app-password'" \
+            -c "GRANT CONNECT ON DATABASE casal_test TO casal_app" \
+            -c "GRANT USAGE ON SCHEMA public TO casal_app"
+          goose -dir migrations postgres "$OWNER_URL" up
+
+      # -race só funciona com cgo, que o Linux do CI tem
+      - name: Testes como dono do banco
+        run: TEST_DATABASE_URL="$OWNER_URL" go test -race ./... -count=1
+
+      - name: Testes como casal_app (RLS ligado, como em produção)
+        run: TEST_DATABASE_URL="$APP_URL" go test -race ./... -count=1

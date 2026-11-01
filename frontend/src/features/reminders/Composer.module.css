@@ -1,5 +1,6 @@
 .overlay {
   position: fixed;
+  z-index: 20;
   inset: 0;
   background: rgb(0 0 0 / 0.5);
   animation: fade var(--dur-base) var(--ease-out);
@@ -7,6 +8,7 @@
 
 .sheet {
   position: fixed;
+  z-index: 21;
   inset: auto 0 0 0;
   max-height: 92dvh;
   overflow-y: auto;

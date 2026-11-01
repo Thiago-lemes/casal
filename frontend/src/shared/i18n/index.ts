@@ -14,10 +14,15 @@ void i18n
     resources,
     fallbackLng: 'pt-BR',
     supportedLngs: [...LANGUAGES],
-    nonExplicitSupportedLngs: true, // "pt" e "en-US" caem em pt-BR e en
+    load: 'currentOnly',
+    ns: ['common', 'auth', 'today', 'household'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
-    detection: { order: ['localStorage', 'navigator'], caches: ['localStorage'], lookupLocalStorage: 'casal.lang' },
+    detection: {
+      // "pt", "pt-PT", "en-US" etc. caem em pt-BR e en
+      convertDetectedLanguage: (lng: string) => (lng.toLowerCase().startsWith('en') ? 'en' : 'pt-BR'),
+      order: ['localStorage', 'navigator'], caches: ['localStorage'], lookupLocalStorage: 'casal.lang',
+    },
   })
 
 i18n.on('languageChanged', (lng) => {

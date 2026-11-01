@@ -12,7 +12,14 @@
   font-weight: 700;
   font-size: var(--text-date);
   line-height: 0.95;
-  text-transform: capitalize;
+}
+
+.weekday {
+  display: inline-block;
+}
+
+.weekday::first-letter {
+  text-transform: uppercase;
 }
 
 .greeting {

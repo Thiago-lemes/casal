@@ -29,7 +29,7 @@ export function TodayPage() {
       <header className={styles.band}>
         <div>
           <p className={styles.date}>
-            {weekday}
+            <span className={styles.weekday}>{weekday}</span>
             <br />
             {day} {month}
           </p>

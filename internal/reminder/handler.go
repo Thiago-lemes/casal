@@ -1,18 +1,13 @@
 package reminder
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
-	"regexp"
 	"time"
 
-	"casal/internal/auth"
-	"casal/internal/household"
 	"casal/internal/httpx"
+	"casal/internal/identity"
 )
-
-var uuidRe = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 
 type Handler struct {
 	svc *Service
@@ -34,101 +29,87 @@ func (h *Handler) Routes(mux *http.ServeMux, requireUser, requireHousehold httpx
 	mux.Handle("DELETE /v1/reminders/{id}", wrap(h.cancel))
 }
 
-// ids devolve o usuário e o casal da requisição (já validados pelos middlewares).
-func ids(r *http.Request) (userID, householdID string) {
-	u, _ := auth.UserFromContext(r.Context())
-	hid, _ := household.IDFromContext(r.Context())
-	return u.ID, hid
-}
-
 func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		RecipientID string    `json:"recipient_id"`
 		Body        string    `json:"body"`
 		RemindAt    time.Time `json:"remind_at"`
 	}
-	if err := httpx.Decode(w, r, &in); err != nil {
-		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
+	if !httpx.Bind(w, r, &in) {
 		return
 	}
-	uid, hid := ids(r)
-	out, err := h.svc.Create(r.Context(), hid, uid, in.RecipientID, in.Body, in.RemindAt)
+	p, _ := identity.From(r.Context())
+	out, err := h.svc.Create(r.Context(), p.HouseholdID, p.UserID, in.RecipientID, in.Body, in.RemindAt)
 	if err != nil {
-		h.fail(w, err)
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	httpx.JSON(w, http.StatusCreated, out)
 }
 
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
-	uid, hid := ids(r)
-	out, err := h.svc.List(r.Context(), hid, uid)
+	p, _ := identity.From(r.Context())
+	out, err := h.svc.List(r.Context(), p.HouseholdID, p.UserID)
 	if err != nil {
-		h.fail(w, err)
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	httpx.JSON(w, http.StatusOK, out)
 }
 
 func (h *Handler) resolve(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	if !uuidRe.MatchString(id) {
-		httpx.Error(w, http.StatusNotFound, ErrNotFound.Error())
+	id, ok := h.idParam(w, r)
+	if !ok {
 		return
 	}
-	uid, hid := ids(r)
-	out, err := h.svc.Resolve(r.Context(), hid, id, uid)
+	p, _ := identity.From(r.Context())
+	out, err := h.svc.Resolve(r.Context(), p.HouseholdID, id, p.UserID)
 	if err != nil {
-		h.fail(w, err)
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	httpx.JSON(w, http.StatusOK, out)
 }
 
 func (h *Handler) snooze(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	if !uuidRe.MatchString(id) {
-		httpx.Error(w, http.StatusNotFound, ErrNotFound.Error())
+	id, ok := h.idParam(w, r)
+	if !ok {
 		return
 	}
 	var in struct {
 		Minutes int `json:"minutes"`
 	}
-	if err := httpx.Decode(w, r, &in); err != nil {
-		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
+	if !httpx.Bind(w, r, &in) {
 		return
 	}
-	uid, hid := ids(r)
-	out, err := h.svc.Snooze(r.Context(), hid, id, uid, in.Minutes)
+	p, _ := identity.From(r.Context())
+	out, err := h.svc.Snooze(r.Context(), p.HouseholdID, id, p.UserID, in.Minutes)
 	if err != nil {
-		h.fail(w, err)
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	httpx.JSON(w, http.StatusOK, out)
 }
 
 func (h *Handler) cancel(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	if !uuidRe.MatchString(id) {
-		httpx.Error(w, http.StatusNotFound, ErrNotFound.Error())
+	id, ok := h.idParam(w, r)
+	if !ok {
 		return
 	}
-	uid, hid := ids(r)
-	if err := h.svc.Cancel(r.Context(), hid, id, uid); err != nil {
-		h.fail(w, err)
+	p, _ := identity.From(r.Context())
+	if err := h.svc.Cancel(r.Context(), p.HouseholdID, id, p.UserID); err != nil {
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) fail(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, ErrInvalidInput):
-		httpx.Error(w, http.StatusBadRequest, err.Error())
-	case errors.Is(err, ErrNotFound):
-		httpx.Error(w, http.StatusNotFound, err.Error())
-	default:
-		h.log.Error("erro em reminder", "err", err)
-		httpx.Error(w, http.StatusInternalServerError, "erro interno")
+// idParam lê o {id} da URL. Um id malformado responde 404, igual a "não existe".
+func (h *Handler) idParam(w http.ResponseWriter, r *http.Request) (string, bool) {
+	id := r.PathValue("id")
+	if !httpx.IsUUID(id) {
+		httpx.Fail(w, r, h.log, ErrNotFound)
+		return "", false
 	}
+	return id, true
 }

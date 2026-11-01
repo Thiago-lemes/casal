@@ -46,7 +46,7 @@ func Recover(log *slog.Logger) Middleware {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if rec := recover(); rec != nil {
-					log.Error("panic", "err", rec, "path", r.URL.Path)
+					log.Error("panic", "err", rec, "path", r.URL.Path, "request_id", RequestIDFrom(r.Context()))
 					Error(w, http.StatusInternalServerError, "erro interno")
 				}
 			}()
@@ -71,7 +71,7 @@ func Logging(log *slog.Logger) Middleware {
 			start := time.Now()
 			rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
 			next.ServeHTTP(rec, r)
-			log.Info("request", "method", r.Method, "path", r.URL.Path,
+			log.Info("request", "request_id", RequestIDFrom(r.Context()), "method", r.Method, "path", r.URL.Path,
 				"status", rec.status, "dur", time.Since(start).String())
 		})
 	}

@@ -170,3 +170,66 @@ func TestPasswordHashingHonorsContext(t *testing.T) {
 		t.Errorf("sem vaga e com contexto cancelado, esperava context.Canceled, veio %v", err)
 	}
 }
+
+func (f *fakeRepo) DeleteUserSessions(_ context.Context, userID string) error {
+	for h, s := range f.sessions {
+		if s.userID == userID {
+			delete(f.sessions, h)
+		}
+	}
+	return nil
+}
+
+func (f *fakeRepo) DeleteExpiredSessions(_ context.Context, now time.Time) (int64, error) {
+	var n int64
+	for h, s := range f.sessions {
+		if !s.expires.After(now) {
+			delete(f.sessions, h)
+			n++
+		}
+	}
+	return n, nil
+}
+
+func TestLogoutAllEndsEverySession(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+	u, phone, err := svc.Register(ctx, "ana@exemplo.com", "Ana", "senha-forte-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, laptop, err := svc.Login(ctx, "ana@exemplo.com", "senha-forte-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := svc.LogoutAll(ctx, u.ID); err != nil {
+		t.Fatal(err)
+	}
+	for name, tk := range map[string]string{"celular": phone, "notebook": laptop} {
+		if _, err := svc.UserFromToken(ctx, tk); err == nil {
+			t.Errorf("a sessão do %s deveria ter acabado", name)
+		}
+	}
+}
+
+func TestPurgeExpiredKeepsLiveSessions(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+	base := time.Now()
+	svc.now = func() time.Time { return base }
+	_, old, _ := svc.Register(ctx, "ana@exemplo.com", "Ana", "senha-forte-123")
+	svc.now = func() time.Time { return base.Add(30 * time.Minute) }
+	_, fresh, _ := svc.Login(ctx, "ana@exemplo.com", "senha-forte-123")
+
+	svc.now = func() time.Time { return base.Add(80 * time.Minute) } // a 1ª (1h) venceu, a 2ª ainda não
+	n, err := svc.PurgeExpired(ctx)
+	if err != nil || n != 1 {
+		t.Fatalf("esperava 1 sessão apagada, veio %d (%v)", n, err)
+	}
+	if _, err := svc.UserFromToken(ctx, fresh); err != nil {
+		t.Errorf("a sessão viva deveria continuar: %v", err)
+	}
+	if _, err := svc.UserFromToken(ctx, old); err == nil {
+		t.Error("a sessão vencida deveria ter sumido")
+	}
+}

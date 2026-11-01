@@ -56,3 +56,6 @@ Content-Type: application/json
 
 ### lembrete: cancelar (só quem criou)
 DELETE {{host}}/v1/reminders/ID-DO-LEMBRETE
+
+### sair de todos os aparelhos
+POST {{host}}/v1/auth/logout-all

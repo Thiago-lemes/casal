@@ -3,16 +3,19 @@ package push
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/url"
 	"strings"
+
+	"casal/internal/apperr"
 )
 
 var (
-	ErrNoDevices           = errors.New("nenhum aparelho com avisos ativos")
-	ErrInvalidSubscription = errors.New("assinatura inválida")
+	ErrNoDevices           = apperr.New(apperr.Conflict, "nenhum aparelho com avisos ativos")
+	ErrInvalidSubscription = apperr.New(apperr.Invalid, "assinatura inválida")
+	// ErrDelivery é o que o cliente vê quando o serviço de push recusa ou falha; o detalhe vai só para o log.
+	ErrDelivery = apperr.New(apperr.Upstream, "não consegui enviar o aviso")
 )
 
 type Subscription struct {
@@ -79,13 +82,13 @@ func (s *Service) Notify(ctx context.Context, userID, title, body string) error 
 			_ = s.repo.DeleteEndpoint(ctx, sub.Endpoint)
 		case err != nil:
 			if firstErr == nil {
-				firstErr = err
+				firstErr = fmt.Errorf("%w: %v", ErrDelivery, err)
 			}
 		case status >= 400:
 			// 403 da Apple costuma ser problema no token VAPID (por exemplo, o "sub")
 			s.log.Warn("serviço de push recusou", "status", status, "host", hostOf(sub.Endpoint))
 			if firstErr == nil {
-				firstErr = fmt.Errorf("serviço de push respondeu %d", status)
+				firstErr = fmt.Errorf("%w: serviço de push respondeu %d", ErrDelivery, status)
 			}
 		}
 	}

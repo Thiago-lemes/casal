@@ -1,12 +1,11 @@
 package push
 
 import (
-	"errors"
 	"log/slog"
 	"net/http"
 
-	"casal/internal/auth"
 	"casal/internal/httpx"
+	"casal/internal/identity"
 )
 
 type Handler struct {
@@ -40,14 +39,13 @@ func (h *Handler) subscribe(w http.ResponseWriter, r *http.Request) {
 			Auth   string `json:"auth"`
 		} `json:"keys"`
 	}
-	if err := httpx.Decode(w, r, &in); err != nil {
-		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
+	if !httpx.Bind(w, r, &in) {
 		return
 	}
-	u, _ := auth.UserFromContext(r.Context())
+	p, _ := identity.From(r.Context())
 	sub := Subscription{Endpoint: in.Endpoint, P256dh: in.Keys.P256dh, Auth: in.Keys.Auth}
-	if err := h.svc.Subscribe(r.Context(), u.ID, sub, r.UserAgent()); err != nil {
-		h.fail(w, err)
+	if err := h.svc.Subscribe(r.Context(), p.UserID, sub, r.UserAgent()); err != nil {
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -57,13 +55,16 @@ func (h *Handler) unsubscribe(w http.ResponseWriter, r *http.Request) {
 	var in struct {
 		Endpoint string `json:"endpoint"`
 	}
-	if err := httpx.Decode(w, r, &in); err != nil || in.Endpoint == "" {
-		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
+	if !httpx.Bind(w, r, &in) {
 		return
 	}
-	u, _ := auth.UserFromContext(r.Context())
-	if err := h.svc.Unsubscribe(r.Context(), u.ID, in.Endpoint); err != nil {
-		h.fail(w, err)
+	if in.Endpoint == "" {
+		httpx.Error(w, http.StatusBadRequest, "informe o endpoint")
+		return
+	}
+	p, _ := identity.From(r.Context())
+	if err := h.svc.Unsubscribe(r.Context(), p.UserID, in.Endpoint); err != nil {
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -71,22 +72,10 @@ func (h *Handler) unsubscribe(w http.ResponseWriter, r *http.Request) {
 
 // test manda um aviso para os aparelhos da própria pessoa. Útil para validar o push.
 func (h *Handler) test(w http.ResponseWriter, r *http.Request) {
-	u, _ := auth.UserFromContext(r.Context())
-	if err := h.svc.Notify(r.Context(), u.ID, "Teste", "Funcionou! Este aviso veio do servidor."); err != nil {
-		h.fail(w, err)
+	p, _ := identity.From(r.Context())
+	if err := h.svc.Notify(r.Context(), p.UserID, "Teste", "Funcionou! Este aviso veio do servidor."); err != nil {
+		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *Handler) fail(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, ErrInvalidSubscription):
-		httpx.Error(w, http.StatusBadRequest, err.Error())
-	case errors.Is(err, ErrNoDevices):
-		httpx.Error(w, http.StatusConflict, err.Error())
-	default:
-		h.log.Warn("erro em push", "err", err)
-		httpx.Error(w, http.StatusBadGateway, "não consegui enviar o aviso")
-	}
 }

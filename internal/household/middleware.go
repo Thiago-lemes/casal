@@ -1,41 +1,31 @@
 package household
 
 import (
-	"context"
-	"errors"
+	"log/slog"
 	"net/http"
 
-	"casal/internal/auth"
 	"casal/internal/httpx"
+	"casal/internal/identity"
 )
 
-type ctxKey struct{}
-
-func IDFromContext(ctx context.Context) (string, bool) {
-	id, ok := ctx.Value(ctxKey{}).(string)
-	return id, ok
-}
-
 // RequireHousehold deve vir depois de auth.Require. Descobre o casal da pessoa
-// logada e o coloca no contexto: é daqui que vem o household_id de todas as consultas.
-func RequireHousehold(svc *Service) httpx.Middleware {
+// logada e o coloca no contexto (identity.Principal): é daqui que vem o household_id
+// de todas as consultas.
+func RequireHousehold(svc *Service, log *slog.Logger) httpx.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			u, ok := auth.UserFromContext(r.Context())
+			p, ok := identity.From(r.Context())
 			if !ok {
 				httpx.Error(w, http.StatusUnauthorized, "faça login")
 				return
 			}
-			id, err := svc.HouseholdOf(r.Context(), u.ID)
-			if errors.Is(err, ErrNoHousehold) {
-				httpx.Error(w, http.StatusForbidden, err.Error())
-				return
-			}
+			id, err := svc.HouseholdOf(r.Context(), p.UserID)
 			if err != nil {
-				httpx.Error(w, http.StatusInternalServerError, "erro interno")
+				httpx.Fail(w, r, log, err) // ErrNoHousehold vira 403; o resto, 500 com log
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKey{}, id)))
+			p.HouseholdID = id
+			next.ServeHTTP(w, r.WithContext(identity.With(r.Context(), p)))
 		})
 	}
 }

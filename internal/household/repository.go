@@ -6,16 +6,17 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgconn"
+	"casal/internal/apperr"
+	"casal/internal/db"
 )
 
 const MaxMembers = 2
 
 var (
-	ErrNoHousehold        = errors.New("você ainda não tem um casal")
-	ErrAlreadyInHousehold = errors.New("você já pertence a um casal")
-	ErrInviteInvalid      = errors.New("convite inválido, expirado ou já usado")
-	ErrHouseholdFull      = errors.New("o casal já tem duas pessoas")
+	ErrNoHousehold        = apperr.New(apperr.Forbidden, "você ainda não tem um casal")
+	ErrAlreadyInHousehold = apperr.New(apperr.Conflict, "você já pertence a um casal")
+	ErrInviteInvalid      = apperr.New(apperr.NotFound, "convite inválido, expirado ou já usado")
+	ErrHouseholdFull      = apperr.New(apperr.Conflict, "o casal já tem duas pessoas")
 )
 
 type Member struct {
@@ -31,16 +32,13 @@ type Repository interface {
 	IsMember(ctx context.Context, householdID, userID string) (bool, error)
 	CreateInvite(ctx context.Context, householdID, createdBy, tokenHash string, expiresAt time.Time) error
 	AcceptInvite(ctx context.Context, tokenHash, userID string, now time.Time) (string, error)
+	// DeleteStaleInvites apaga convites usados ou vencidos há mais de olderThan.
+	DeleteStaleInvites(ctx context.Context, now time.Time, olderThan time.Duration) (int64, error)
 }
 
 type PostgresRepo struct{ db *sql.DB }
 
 func NewPostgresRepo(db *sql.DB) *PostgresRepo { return &PostgresRepo{db: db} }
-
-func isUniqueViolation(err error) bool {
-	var pgErr *pgconn.PgError
-	return errors.As(err, &pgErr) && pgErr.Code == "23505"
-}
 
 func (r *PostgresRepo) CreateHousehold(ctx context.Context, userID string) (string, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -55,7 +53,7 @@ func (r *PostgresRepo) CreateHousehold(ctx context.Context, userID string) (stri
 	}
 	if _, err := tx.ExecContext(ctx,
 		`INSERT INTO household_members (household_id, user_id) VALUES ($1, $2)`, id, userID); err != nil {
-		if isUniqueViolation(err) {
+		if db.IsUniqueViolation(err) {
 			return "", ErrAlreadyInHousehold
 		}
 		return "", err
@@ -155,7 +153,7 @@ func (r *PostgresRepo) AcceptInvite(ctx context.Context, tokenHash, userID strin
 
 	if _, err := tx.ExecContext(ctx,
 		`INSERT INTO household_members (household_id, user_id) VALUES ($1, $2)`, householdID, userID); err != nil {
-		if isUniqueViolation(err) {
+		if db.IsUniqueViolation(err) {
 			return "", ErrAlreadyInHousehold
 		}
 		return "", err
@@ -169,4 +167,15 @@ func (r *PostgresRepo) AcceptInvite(ctx context.Context, tokenHash, userID strin
 		return "", err
 	}
 	return householdID, nil
+}
+
+func (r *PostgresRepo) DeleteStaleInvites(ctx context.Context, now time.Time, olderThan time.Duration) (int64, error) {
+	cutoff := now.Add(-olderThan)
+	res, err := r.db.ExecContext(ctx, `
+		DELETE FROM household_invites
+		WHERE expires_at <= $1 OR (accepted_at IS NOT NULL AND accepted_at <= $1)`, cutoff)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
 }

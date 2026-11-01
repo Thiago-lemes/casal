@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"casal/internal/auth"
 	"casal/internal/testutil"
+	"casal/internal/token"
 )
 
 func TestOnlyOneInviteTakesTheLastSlot(t *testing.T) {
@@ -24,7 +24,7 @@ func TestOnlyOneInviteTakesTheLastSlot(t *testing.T) {
 	// dois convites válidos para a mesma vaga
 	tokens := []string{"token-um", "token-dois"}
 	for _, tk := range tokens {
-		if err := repo.CreateInvite(ctx, hh, owner, auth.HashToken(tk), time.Now().Add(time.Hour)); err != nil {
+		if err := repo.CreateInvite(ctx, hh, owner, token.Hash(tk), time.Now().Add(time.Hour)); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -35,7 +35,7 @@ func TestOnlyOneInviteTakesTheLastSlot(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			_, errs[i] = repo.AcceptInvite(ctx, auth.HashToken(tokens[i]), who, time.Now())
+			_, errs[i] = repo.AcceptInvite(ctx, token.Hash(tokens[i]), who, time.Now())
 		}()
 	}
 	wg.Wait()

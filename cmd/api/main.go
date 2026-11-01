@@ -2,23 +2,13 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"log/slog"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib" // registra o driver "pgx" no database/sql
-
-	"casal/internal/auth"
+	"casal/internal/app"
 	"casal/internal/config"
-	"casal/internal/household"
-	"casal/internal/httpx"
-	"casal/internal/push"
-	"casal/internal/reminder"
 )
 
 func main() {
@@ -34,106 +24,7 @@ func run(log *slog.Logger) error {
 	if err != nil {
 		return err
 	}
-
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
-	db, err := sql.Open("pgx", cfg.DatabaseURL)
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(30 * time.Minute)
-
-	pingCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	if err := db.PingContext(pingCtx); err != nil {
-		return err
-	}
-
-	if !cfg.CookieSecure {
-		log.Warn("COOKIE_SECURE=false: use apenas em desenvolvimento local")
-	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		if err := db.PingContext(r.Context()); err != nil {
-			httpx.Error(w, http.StatusServiceUnavailable, "banco indisponível")
-			return
-		}
-		httpx.JSON(w, http.StatusOK, map[string]string{"status": "ok"})
-	})
-
-	// contas e sessões
-	authSvc, err := auth.NewService(auth.NewPostgresRepo(db), cfg.SessionTTL)
-	if err != nil {
-		return err
-	}
-	auth.NewHandler(authSvc, log, auth.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
-	requireUser := auth.Require(authSvc)
-
-	// casal e convite
-	householdSvc := household.NewService(household.NewPostgresRepo(db))
-	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
-
-	// push, com o notificador de log como alternativa quando o VAPID não está configurado
-	var notifier reminder.Notifier = logNotifier{log}
-	if cfg.VAPIDPublicKey != "" && cfg.VAPIDPrivateKey != "" {
-		pushSvc := push.NewService(
-			push.NewPostgresRepo(db),
-			push.NewWebPushSender(cfg.VAPIDSubject, cfg.VAPIDPublicKey, cfg.VAPIDPrivateKey),
-			log,
-		)
-		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
-		notifier = pushSvc
-	} else {
-		log.Warn("VAPID não configurado: avisos só no log. Rode go run ./cmd/vapid e preencha o .env")
-	}
-
-	// lembretes e agendador (para junto com o servidor, pelo mesmo ctx)
-	requireHousehold := household.RequireHousehold(householdSvc)
-	reminderRepo := reminder.NewPostgresRepo(db)
-	reminder.NewHandler(reminder.NewService(reminderRepo, householdSvc), log).
-		Routes(mux, requireUser, requireHousehold)
-	go reminder.NewWorker(reminderRepo, notifier, log).Run(ctx)
-
-	// página de teste do PWA
-	mux.Handle("GET /", http.FileServer(http.Dir("web")))
-
-	srv := &http.Server{
-		Addr: cfg.HTTPAddr,
-		Handler: httpx.Chain(mux,
-			httpx.Recover(log),
-			httpx.Logging(log),
-			httpx.SecurityHeaders(cfg.CookieSecure), // CookieSecure indica que o site é servido por HTTPS
-			httpx.Timeout(15*time.Second),
-		),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      30 * time.Second,
-		IdleTimeout:       60 * time.Second,
-		MaxHeaderBytes:    1 << 16,
-	}
-	go func() {
-		<-ctx.Done()
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		_ = srv.Shutdown(shutdownCtx)
-	}()
-
-	log.Info("servidor iniciado", "addr", cfg.HTTPAddr)
-	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
-	}
-	return nil
-}
-
-// logNotifier só escreve no log; usado enquanto o push não está configurado.
-type logNotifier struct{ log *slog.Logger }
-
-func (n logNotifier) Notify(_ context.Context, userID, title, body string) error {
-	n.log.Info("notificação (simulada)", "user", userID, "title", title, "body", body)
-	return nil
+	return app.Run(ctx, cfg, log)
 }

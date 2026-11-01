@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"casal/internal/auth"
+	"casal/internal/token"
 )
 
 // Embute a interface: só implementamos o que o teste usa. Chamar outro método causa panic.
@@ -39,7 +39,7 @@ func TestInviteStoresOnlyTheHash(t *testing.T) {
 	if _, ok := repo.invites[raw]; ok {
 		t.Error("o token bruto não pode ser guardado")
 	}
-	if _, ok := repo.invites[auth.HashToken(raw)]; !ok {
+	if _, ok := repo.invites[token.Hash(raw)]; !ok {
 		t.Error("o hash do token deveria ter sido guardado")
 	}
 	if !expires.After(time.Now().Add(6 * 24 * time.Hour)) {

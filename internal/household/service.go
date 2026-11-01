@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"casal/internal/auth"
+	"casal/internal/token"
 )
 
 const inviteTTL = 7 * 24 * time.Hour
@@ -51,7 +51,7 @@ func (s *Service) Invite(ctx context.Context, householdID, userID string) (strin
 	if len(members) >= MaxMembers {
 		return "", time.Time{}, ErrHouseholdFull
 	}
-	raw, hash, err := auth.NewToken()
+	raw, hash, err := token.New()
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -63,5 +63,11 @@ func (s *Service) Invite(ctx context.Context, householdID, userID string) (strin
 }
 
 func (s *Service) Accept(ctx context.Context, userID, rawToken string) (string, error) {
-	return s.repo.AcceptInvite(ctx, auth.HashToken(rawToken), userID, s.now())
+	return s.repo.AcceptInvite(ctx, token.Hash(rawToken), userID, s.now())
+}
+
+// PurgeStaleInvites apaga os convites que já não servem para nada (usados ou vencidos há 30 dias).
+// Rode periodicamente.
+func (s *Service) PurgeStaleInvites(ctx context.Context) (int64, error) {
+	return s.repo.DeleteStaleInvites(ctx, s.now(), 30*24*time.Hour)
 }

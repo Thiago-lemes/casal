@@ -6,7 +6,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgconn"
+	"casal/internal/apperr"
+	"casal/internal/db"
 )
 
 type User struct {
@@ -17,10 +18,10 @@ type User struct {
 }
 
 var (
-	ErrEmailTaken         = errors.New("e-mail já cadastrado")
-	ErrNotFound           = errors.New("não encontrado")
-	ErrInvalidCredentials = errors.New("e-mail ou senha inválidos")
-	ErrInvalidInput       = errors.New("dados inválidos")
+	ErrEmailTaken         = apperr.New(apperr.Conflict, "e-mail já cadastrado")
+	ErrNotFound           = apperr.New(apperr.NotFound, "não encontrado")
+	ErrInvalidCredentials = apperr.New(apperr.Unauthorized, "e-mail ou senha inválidos")
+	ErrInvalidInput       = apperr.New(apperr.Invalid, "dados inválidos")
 )
 
 // Repository é o que o service precisa do banco. Em testes, troque por um fake.
@@ -30,6 +31,8 @@ type Repository interface {
 	CreateSession(ctx context.Context, userID, tokenHash string, expiresAt time.Time) error
 	UserBySession(ctx context.Context, tokenHash string, now time.Time) (User, error)
 	DeleteSession(ctx context.Context, tokenHash string) error
+	DeleteUserSessions(ctx context.Context, userID string) error
+	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -44,8 +47,7 @@ func (r *PostgresRepo) CreateUser(ctx context.Context, email, name, passwordHash
 		RETURNING id, email, name, timezone`,
 		email, name, passwordHash).Scan(&u.ID, &u.Email, &u.Name, &u.Timezone)
 
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == "23505" { // unique_violation
+	if db.IsUniqueViolation(err) {
 		return User{}, ErrEmailTaken
 	}
 	return u, err
@@ -87,4 +89,19 @@ func (r *PostgresRepo) UserBySession(ctx context.Context, tokenHash string, now 
 func (r *PostgresRepo) DeleteSession(ctx context.Context, tokenHash string) error {
 	_, err := r.db.ExecContext(ctx, `DELETE FROM sessions WHERE token_hash = $1`, tokenHash)
 	return err
+}
+
+// DeleteUserSessions encerra todas as sessões da pessoa (todos os aparelhos).
+func (r *PostgresRepo) DeleteUserSessions(ctx context.Context, userID string) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM sessions WHERE user_id = $1`, userID)
+	return err
+}
+
+// DeleteExpiredSessions apaga as sessões vencidas e devolve quantas eram.
+func (r *PostgresRepo) DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error) {
+	res, err := r.db.ExecContext(ctx, `DELETE FROM sessions WHERE expires_at <= $1`, now)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
 }

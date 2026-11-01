@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"strconv"
 	"strings"
@@ -55,19 +54,4 @@ func VerifyPassword(password, encoded string) bool {
 		return false
 	}
 	return subtle.ConstantTimeCompare(got, want) == 1
-}
-
-// NewToken gera um token aleatório para o cookie e o hash que vai para o banco.
-func NewToken() (raw, hash string, err error) {
-	b := make([]byte, 32)
-	if _, err = rand.Read(b); err != nil {
-		return "", "", err
-	}
-	raw = base64.RawURLEncoding.EncodeToString(b)
-	return raw, HashToken(raw), nil
-}
-
-func HashToken(raw string) string {
-	sum := sha256.Sum256([]byte(raw))
-	return hex.EncodeToString(sum[:])
 }

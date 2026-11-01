@@ -2,10 +2,8 @@ package testutil
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -32,10 +30,11 @@ func OpenDB(t *testing.T) *sql.DB {
 func NewUser(t *testing.T, db *sql.DB, tag string) string {
 	t.Helper()
 	var id string
-	email := fmt.Sprintf("%s-%d@teste.local", tag, time.Now().UnixNano())
+	// o sufixo aleatório vem do banco: pacotes de teste rodam em paralelo no mesmo banco
 	if err := db.QueryRow(
-		`INSERT INTO users (email, name, password_hash) VALUES ($1, $2, 'x') RETURNING id`,
-		email, "Teste "+tag).Scan(&id); err != nil {
+		`INSERT INTO users (email, name, password_hash)
+		 VALUES ($1 || '-' || gen_random_uuid() || '@teste.local', $2, 'x') RETURNING id`,
+		tag, "Teste "+tag).Scan(&id); err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { db.Exec(`DELETE FROM users WHERE id = $1`, id) })

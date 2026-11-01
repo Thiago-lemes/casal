@@ -6,12 +6,13 @@ import (
 	"errors"
 	"time"
 
+	"casal/internal/apperr"
 	"casal/internal/db"
 )
 
 var (
-	ErrInvalidInput = errors.New("dados inválidos")
-	ErrNotFound     = errors.New("lembrete não encontrado")
+	ErrInvalidInput = apperr.New(apperr.Invalid, "dados inválidos")
+	ErrNotFound     = apperr.New(apperr.NotFound, "lembrete não encontrado")
 )
 
 type Reminder struct {

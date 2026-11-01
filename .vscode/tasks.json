@@ -1,0 +1,94 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // sobe o Postgres, garante o papel do app e aplica as migrações
+      "label": "dev: banco",
+      "type": "shell",
+      "command": "node scripts/dev-db.mjs",
+      "presentation": { "reveal": "silent", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev: instalar dependências do front",
+      "type": "npm",
+      "script": "install",
+      "path": "frontend",
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      // servidor de desenvolvimento do front (Vite, http://localhost:5173); fica rodando em segundo plano
+      "label": "dev: vite",
+      "type": "npm",
+      "script": "dev",
+      "path": "frontend",
+      "dependsOn": ["dev: instalar dependências do front"],
+      "isBackground": true,
+      "options": { "env": { "NO_COLOR": "1" } },
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^$" },
+        "background": {
+          "activeOnStart": true,
+          // tolerantes a códigos de cor, caso o terminal os mantenha
+          "beginsPattern": "VITE.{0,12}v\\d",
+          "endsPattern": "Local.{0,12}:"
+        }
+      }
+    },
+    {
+      // usado pelo F5 composto: o navegador só abre quando o Vite está pronto E o backend já responde
+      "label": "dev: aguardar backend",
+      "type": "shell",
+      "command": "node scripts/wait-http.mjs http://localhost:8080/healthz 90",
+      "presentation": { "reveal": "silent", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev: front pronto",
+      "dependsOn": ["dev: vite", "dev: aguardar backend"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    },
+    {
+      // encerra o Vite (e qualquer tarefa em segundo plano) quando a depuração termina
+      "label": "dev: parar tarefas",
+      "type": "shell",
+      "command": "echo ${input:terminarTarefas}",
+      "presentation": { "reveal": "never" },
+      "problemMatcher": []
+    },
+    {
+      "label": "check: lint e testes",
+      "type": "shell",
+      "command": "make check",
+      "group": "test",
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "test: unitários (back)",
+      "type": "shell",
+      "command": "go test ./... -count=1",
+      "group": "test",
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "test: front",
+      "type": "npm",
+      "script": "test",
+      "path": "frontend",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "terminarTarefas",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    }
+  ]
+}

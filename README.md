@@ -16,13 +16,41 @@ lembretes entre o casal e avisos por Web Push, mesmo com o app fechado.
 
 ## Rodar em desenvolvimento
 
+### Pelo VS Code (F5)
+
+Uma vez, na raiz do projeto:
+
+```bash
+cp .env.example .env              # ajuste as senhas
+go run ./cmd/vapid                # gera as chaves do push; cole no .env (opcional no começo)
+```
+
+Depois, **F5** com a configuração **Casal: Backend + Frontend**. Ela, nesta ordem:
+
+1. sobe o Postgres (Docker), garante o papel `casal_app` e aplica as migrações (`scripts/dev-db.mjs`);
+2. compila e roda a API com o depurador, lendo o `.env` (`http://localhost:8080`);
+3. sobe o Vite e, quando o backend já responde, abre o Edge com depurador (`http://localhost:5173`).
+
+Breakpoints funcionam no Go e no TypeScript. Parar a depuração encerra tudo. O Vite repassa `/v1` para a API,
+então o cookie de sessão funciona sem CORS.
+
+Também há configurações separadas: **Backend (Go)**, **Frontend (Edge)** e **Frontend (Chrome)**.
+Se o F5 não começar pelo composto, escolha-o uma vez na lista de execução; o VS Code lembra.
+
+Requisitos extras: Docker aberto, Node 22+, `goose` e `dlv` no PATH
+(`go install github.com/go-delve/delve/cmd/dlv@latest`). O front instala as dependências sozinho na primeira vez.
+A porta 5173 é fixa: se outro Vite já a ocupa, o F5 falha avisando, em vez de abrir o servidor errado.
+
+### Pelo terminal
+
 ```bash
 cp .env.example .env        # ajuste as senhas
 make db-up                  # sobe o Postgres em Docker
 make db-role                # cria o papel limitado casal_app (o app conecta com ele)
 make migrate-up             # cria as tabelas
 go run ./cmd/vapid          # gera as chaves do push; cole no .env (opcional no começo)
-make run                    # http://localhost:8080
+make run                    # API em http://localhost:8080
+cd frontend && npm install && npm run dev    # front em http://localhost:5173
 ```
 
 As chamadas de exemplo estão em [requests.http](requests.http) (extensão REST Client do VS Code).

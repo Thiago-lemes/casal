@@ -1,0 +1,60 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // API em Go com depurador. Lê o .env, roda a partir da raiz (a pasta web/ é relativa a ela)
+      // e, antes, garante o banco: Postgres no ar, papel casal_app e migrações.
+      "name": "Backend (Go)",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/cmd/api",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "preLaunchTask": "dev: banco",
+      "presentation": { "group": "1_casal", "order": 2 }
+    },
+    {
+      // Sobe o Vite em segundo plano e abre o Edge com depurador (breakpoints no TypeScript).
+      // O Vite repassa /v1 para o backend em :8080, então o cookie de sessão funciona sem CORS.
+      "name": "Frontend (Edge)",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "dev: vite",
+      "postDebugTask": "dev: parar tarefas",
+      "presentation": { "group": "1_casal", "order": 3 }
+    },
+    {
+      // igual ao anterior, mas só abre o navegador quando o backend já responde (usado pelo composto)
+      "name": "Frontend (Edge) após o backend",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "dev: front pronto",
+      "postDebugTask": "dev: parar tarefas",
+      "presentation": { "hidden": true }
+    },
+    {
+      "name": "Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "dev: vite",
+      "postDebugTask": "dev: parar tarefas",
+      "presentation": { "group": "1_casal", "order": 4 }
+    }
+  ],
+  "compounds": [
+    {
+      // F5: banco + backend + front, tudo de uma vez. Parar um para os outros.
+      "name": "Casal: Backend + Frontend",
+      "configurations": ["Backend (Go)", "Frontend (Edge) após o backend"],
+      "stopAll": true,
+      "presentation": { "group": "1_casal", "order": 1 }
+    }
+  ]
+}

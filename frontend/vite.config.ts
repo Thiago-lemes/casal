@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url'
 export default defineConfig({
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: {
+    // porta fixa: o F5 abre o navegador nela; se estiver ocupada, falha em vez de subir em outra
+    port: 5173,
+    strictPort: true,
     // mesma origem em desenvolvimento: o cookie de sessão funciona sem CORS
     proxy: { '/v1': 'http://localhost:8080', '/healthz': 'http://localhost:8080' },
   },

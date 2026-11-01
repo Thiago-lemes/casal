@@ -15,6 +15,7 @@ import (
 
 	"casal/internal/auth"
 	"casal/internal/config"
+	"casal/internal/household"
 	"casal/internal/httpx"
 	"casal/internal/push"
 )
@@ -67,6 +68,10 @@ func run(log *slog.Logger) error {
 	}
 	auth.NewHandler(authSvc, log, cfg.CookieSecure).Routes(mux)
 	requireUser := auth.Require(authSvc)
+
+	// casal e convite
+	householdSvc := household.NewService(household.NewPostgresRepo(db))
+	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
 
 	// push (antecipado: valida os avisos no celular antes de casal e lembretes)
 	if cfg.VAPIDPublicKey != "" && cfg.VAPIDPrivateKey != "" {

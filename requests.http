@@ -20,3 +20,18 @@ Content-Type: application/json
 
 ### sair
 POST {{host}}/v1/auth/logout
+
+### casal: criar
+POST {{host}}/v1/household
+
+### casal: ver membros
+GET {{host}}/v1/household
+
+### casal: gerar convite
+POST {{host}}/v1/household/invites
+
+### casal: aceitar convite (logado como a outra pessoa)
+POST {{host}}/v1/household/invites/accept
+Content-Type: application/json
+
+{"token": "COLE-O-TOKEN-AQUI"}

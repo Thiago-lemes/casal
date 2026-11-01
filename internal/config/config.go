@@ -10,7 +10,8 @@ import (
 type Config struct {
 	DatabaseURL     string
 	HTTPAddr        string
-	CookieSecure    bool
+	CookieSecure    bool // cookie só por HTTPS; desligue apenas em desenvolvimento local
+	TrustProxy      bool // confia no X-Forwarded-For (só atrás de um proxy seu)
 	SessionTTL      time.Duration
 	VAPIDPublicKey  string
 	VAPIDPrivateKey string
@@ -29,11 +30,14 @@ func Load() (Config, error) {
 		return Config{}, fmt.Errorf("DATABASE_URL é obrigatória")
 	}
 
-	secure, err := strconv.ParseBool(getenv("COOKIE_SECURE", "false"))
-	if err != nil {
-		return Config{}, fmt.Errorf("COOKIE_SECURE inválida: %w", err)
+	var err error
+	// o padrão é o seguro: quem esquece de configurar em produção não expõe o cookie
+	if cfg.CookieSecure, err = parseBool("COOKIE_SECURE", true); err != nil {
+		return Config{}, err
 	}
-	cfg.CookieSecure = secure
+	if cfg.TrustProxy, err = parseBool("TRUST_PROXY", false); err != nil {
+		return Config{}, err
+	}
 
 	hours, err := strconv.Atoi(getenv("SESSION_TTL_HOURS", "720"))
 	if err != nil || hours <= 0 {
@@ -42,6 +46,14 @@ func Load() (Config, error) {
 	cfg.SessionTTL = time.Duration(hours) * time.Hour
 
 	return cfg, nil
+}
+
+func parseBool(key string, fallback bool) (bool, error) {
+	v, err := strconv.ParseBool(getenv(key, strconv.FormatBool(fallback)))
+	if err != nil {
+		return false, fmt.Errorf("%s inválida: %w", key, err)
+	}
+	return v, nil
 }
 
 func getenv(key, fallback string) string {

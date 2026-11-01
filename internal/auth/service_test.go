@@ -158,3 +158,15 @@ func TestExpiredSession(t *testing.T) {
 		t.Error("uma sessão expirada não deveria valer")
 	}
 }
+
+func TestPasswordHashingHonorsContext(t *testing.T) {
+	svc := newTestService(t)
+	for i := 0; i < cap(svc.hashSlots); i++ {
+		svc.hashSlots <- struct{}{} // ocupa todas as vagas
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, _, err := svc.Register(ctx, "ana@exemplo.com", "Ana", "senha-forte-123"); !errors.Is(err, context.Canceled) {
+		t.Errorf("sem vaga e com contexto cancelado, esperava context.Canceled, veio %v", err)
+	}
+}

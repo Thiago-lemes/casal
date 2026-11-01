@@ -53,6 +53,10 @@ func run(log *slog.Logger) error {
 		return err
 	}
 
+	if !cfg.CookieSecure {
+		log.Warn("COOKIE_SECURE=false: use apenas em desenvolvimento local")
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.PingContext(r.Context()); err != nil {
@@ -67,7 +71,7 @@ func run(log *slog.Logger) error {
 	if err != nil {
 		return err
 	}
-	auth.NewHandler(authSvc, log, cfg.CookieSecure).Routes(mux)
+	auth.NewHandler(authSvc, log, auth.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
 	requireUser := auth.Require(authSvc)
 
 	// casal e convite
@@ -99,9 +103,18 @@ func run(log *slog.Logger) error {
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
 
 	srv := &http.Server{
-		Addr:              cfg.HTTPAddr,
-		Handler:           httpx.Chain(mux, httpx.Recover(log), httpx.Logging(log)),
+		Addr: cfg.HTTPAddr,
+		Handler: httpx.Chain(mux,
+			httpx.Recover(log),
+			httpx.Logging(log),
+			httpx.SecurityHeaders(cfg.CookieSecure), // CookieSecure indica que o site é servido por HTTPS
+			httpx.Timeout(15*time.Second),
+		),
 		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		MaxHeaderBytes:    1 << 16,
 	}
 	go func() {
 		<-ctx.Done()

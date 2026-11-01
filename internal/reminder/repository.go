@@ -25,6 +25,7 @@ type Reminder struct {
 	Status        string     `json:"status"`
 	SentAt        *time.Time `json:"sent_at,omitempty"`
 	ResolvedAt    *time.Time `json:"resolved_at,omitempty"`
+	Attempts      int        `json:"-"` // quantas vezes o agendador já tentou avisar
 }
 
 type Repository interface {
@@ -33,8 +34,6 @@ type Repository interface {
 	Resolve(ctx context.Context, householdID, id, userID string, now time.Time) (Reminder, error)
 	Snooze(ctx context.Context, householdID, id, userID string, remindAt time.Time) (Reminder, error)
 	Cancel(ctx context.Context, householdID, id, userID string) error
-	// ProcessDue pega até limit lembretes vencidos, chama fn para cada um e os marca como enviados.
-	ProcessDue(ctx context.Context, now time.Time, limit int, fn func(context.Context, Reminder) error) (int, error)
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -43,7 +42,7 @@ func NewPostgresRepo(db *sql.DB) *PostgresRepo { return &PostgresRepo{db: db} }
 
 // Colunas lidas em todas as consultas. O JOIN em users é só leitura, para mostrar o nome.
 const cols = `r.id, r.household_id, r.created_by, u.name, r.recipient_id, r.body,
-	r.remind_at, r.status, r.sent_at, r.resolved_at`
+	r.remind_at, r.status, r.sent_at, r.resolved_at, r.attempts`
 
 type scanner interface{ Scan(dest ...any) error }
 
@@ -51,7 +50,7 @@ func scan(s scanner) (Reminder, error) {
 	var r Reminder
 	var sent, resolved sql.NullTime
 	err := s.Scan(&r.ID, &r.HouseholdID, &r.CreatedBy, &r.CreatedByName, &r.RecipientID,
-		&r.Body, &r.RemindAt, &r.Status, &sent, &resolved)
+		&r.Body, &r.RemindAt, &r.Status, &sent, &resolved, &r.Attempts)
 	if err != nil {
 		return Reminder{}, err
 	}
@@ -126,7 +125,7 @@ func (p *PostgresRepo) Resolve(ctx context.Context, householdID, id, userID stri
 func (p *PostgresRepo) Snooze(ctx context.Context, householdID, id, userID string, remindAt time.Time) (Reminder, error) {
 	return p.update(ctx, householdID, `
 		WITH upd AS (
-			UPDATE reminders SET status = 'scheduled', remind_at = $4, sent_at = NULL
+			UPDATE reminders SET status = 'scheduled', remind_at = $4, sent_at = NULL, claimed_until = NULL, attempts = 0
 			WHERE id = $1 AND household_id = $2 AND recipient_id = $3
 			  AND status IN ('scheduled', 'sent')
 			RETURNING *
@@ -166,49 +165,51 @@ func (p *PostgresRepo) Cancel(ctx context.Context, householdID, id, userID strin
 	})
 }
 
-// ProcessDue atravessa todos os casais, por isso roda no escopo de sistema.
-func (p *PostgresRepo) ProcessDue(ctx context.Context, now time.Time, limit int, fn func(context.Context, Reminder) error) (int, error) {
-	count := 0
+// Claim reserva até limit lembretes vencidos por lease e devolve os reservados.
+// A transação é curta: só marca a reserva. O envio acontece depois, fora dela.
+// SKIP LOCKED e a reserva impedem que dois agendadores peguem o mesmo lembrete.
+// Atravessa todos os casais, por isso roda no escopo de sistema.
+func (p *PostgresRepo) Claim(ctx context.Context, now time.Time, limit int, lease time.Duration) ([]Reminder, error) {
+	var out []Reminder
 	err := db.InTx(ctx, p.db, db.Scope{System: true}, func(tx *sql.Tx) error {
 		rows, err := tx.QueryContext(ctx, `
-			SELECT `+cols+`
-			FROM reminders r JOIN users u ON u.id = r.created_by
-			WHERE r.status = 'scheduled' AND r.remind_at <= $1
-			ORDER BY r.remind_at
-			LIMIT $2
-			FOR UPDATE OF r SKIP LOCKED`, now, limit)
+			WITH picked AS (
+				SELECT id FROM reminders
+				WHERE status = 'scheduled' AND remind_at <= $1
+				  AND (claimed_until IS NULL OR claimed_until <= $1)
+				ORDER BY remind_at
+				LIMIT $2
+				FOR UPDATE SKIP LOCKED
+			), upd AS (
+				UPDATE reminders r SET claimed_until = $3, attempts = r.attempts + 1
+				FROM picked WHERE r.id = picked.id
+				RETURNING r.*
+			)
+			SELECT `+cols+` FROM upd r JOIN users u ON u.id = r.created_by
+			ORDER BY r.remind_at`, now, limit, now.Add(lease))
 		if err != nil {
 			return err
 		}
-		var due []Reminder
+		defer rows.Close()
 		for rows.Next() {
 			r, err := scan(rows)
 			if err != nil {
-				rows.Close()
 				return err
 			}
-			due = append(due, r)
+			out = append(out, r)
 		}
-		if err := rows.Err(); err != nil {
-			rows.Close()
-			return err
-		}
-		rows.Close() // precisa fechar antes de usar a transação de novo
-
-		for _, r := range due {
-			if err := fn(ctx, r); err != nil {
-				return err
-			}
-			if _, err := tx.ExecContext(ctx,
-				`UPDATE reminders SET status = 'sent', sent_at = $2 WHERE id = $1`, r.ID, now); err != nil {
-				return err
-			}
-		}
-		count = len(due)
-		return nil
+		return rows.Err()
 	})
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
+	return out, err
+}
+
+// MarkSent conclui o lembrete. Só vale se ele ainda estiver agendado: se a pessoa
+// resolveu, adiou ou cancelou durante o envio, essa ação prevalece.
+func (p *PostgresRepo) MarkSent(ctx context.Context, id string, now time.Time) error {
+	return db.InTx(ctx, p.db, db.Scope{System: true}, func(tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, `
+			UPDATE reminders SET status = 'sent', sent_at = $2, claimed_until = NULL
+			WHERE id = $1 AND status = 'scheduled'`, id, now)
+		return err
+	})
 }

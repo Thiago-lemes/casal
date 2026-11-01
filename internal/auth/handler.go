@@ -4,19 +4,37 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"casal/internal/httpx"
 )
 
+// Options reúne os ajustes de segurança do handler.
+type Options struct {
+	CookieSecure bool
+	TrustProxy   bool // confia no X-Forwarded-For para identificar o IP
+}
+
 type Handler struct {
 	svc    *Service
 	log    *slog.Logger
 	secure bool
+	opts   Options
+
+	// limites contra força bruta, em memória: por IP e, no login, também por e-mail
+	registerByIP *httpx.Limiter
+	loginByIP    *httpx.Limiter
+	loginByEmail *httpx.Limiter
 }
 
-func NewHandler(svc *Service, log *slog.Logger, cookieSecure bool) *Handler {
-	return &Handler{svc: svc, log: log, secure: cookieSecure}
+func NewHandler(svc *Service, log *slog.Logger, opts Options) *Handler {
+	return &Handler{
+		svc: svc, log: log, secure: opts.CookieSecure, opts: opts,
+		registerByIP: httpx.NewLimiter(5, 2*time.Minute),  // 5 cadastros seguidos, depois 1 a cada 2 min
+		loginByIP:    httpx.NewLimiter(20, 6*time.Second), // 20 tentativas seguidas, depois 10 por minuto
+		loginByEmail: httpx.NewLimiter(5, 3*time.Minute),  // 5 tentativas por conta, depois 1 a cada 3 min
+	}
 }
 
 func (h *Handler) Routes(mux *http.ServeMux) {
@@ -33,6 +51,9 @@ type credentials struct {
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
+	if !h.allow(w, h.registerByIP, httpx.ClientIP(r, h.opts.TrustProxy)) {
+		return
+	}
 	var in credentials
 	if err := httpx.Decode(w, r, &in); err != nil {
 		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
@@ -48,9 +69,15 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
+	if !h.allow(w, h.loginByIP, httpx.ClientIP(r, h.opts.TrustProxy)) {
+		return
+	}
 	var in credentials
 	if err := httpx.Decode(w, r, &in); err != nil {
 		httpx.Error(w, http.StatusBadRequest, "JSON inválido")
+		return
+	}
+	if !h.allow(w, h.loginByEmail, strings.ToLower(strings.TrimSpace(in.Email))) {
 		return
 	}
 	u, token, err := h.svc.Login(r.Context(), in.Email, in.Password)
@@ -99,4 +126,13 @@ func (h *Handler) fail(w http.ResponseWriter, err error) {
 		h.log.Error("erro em auth", "err", err)
 		httpx.Error(w, http.StatusInternalServerError, "erro interno")
 	}
+}
+
+// allow gasta uma tentativa da chave; se o limite acabou, já responde 429.
+func (h *Handler) allow(w http.ResponseWriter, l *httpx.Limiter, key string) bool {
+	ok, retry := l.Allow(key)
+	if !ok {
+		httpx.TooManyRequests(w, retry)
+	}
+	return ok
 }

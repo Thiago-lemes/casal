@@ -38,3 +38,13 @@ db-role:
 		-c "DO \$$\$$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'casal_app') THEN CREATE ROLE casal_app LOGIN PASSWORD '$(APP_DB_PASSWORD)'; END IF; END \$$\$$;" \
 		-c "GRANT CONNECT ON DATABASE $(DB_NAME) TO casal_app;" \
 		-c "GRANT USAGE ON SCHEMA public TO casal_app;"
+
+TEST_DB=casal_test
+TEST_URL=postgres://$(DB_USER):$(DB_PASSWORD)@localhost:5432/$(TEST_DB)?sslmode=disable
+
+test-db:
+	-docker compose exec db createdb -U $(DB_USER) $(TEST_DB)
+	goose -dir $(MIGRATIONS) postgres "$(TEST_URL)" up
+
+test-integration: test-db
+	TEST_DATABASE_URL="$(TEST_URL)" go test ./... -count=1

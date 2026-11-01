@@ -35,3 +35,24 @@ POST {{host}}/v1/household/invites/accept
 Content-Type: application/json
 
 {"token": "COLE-O-TOKEN-AQUI"}
+
+### lembrete: criar (recipient_id = id de quem recebe; vazio = você mesmo)
+POST {{host}}/v1/reminders
+Content-Type: application/json
+
+{"recipient_id": "ID-DA-OUTRA-PESSOA", "body": "tirar a marmita do freezer", "remind_at": "2026-11-01T22:00:00Z"}
+
+### lembrete: listar
+GET {{host}}/v1/reminders
+
+### lembrete: marcar como feito (só o destinatário)
+POST {{host}}/v1/reminders/ID-DO-LEMBRETE/resolve
+
+### lembrete: adiar
+POST {{host}}/v1/reminders/ID-DO-LEMBRETE/snooze
+Content-Type: application/json
+
+{"minutes": 10}
+
+### lembrete: cancelar (só quem criou)
+DELETE {{host}}/v1/reminders/ID-DO-LEMBRETE

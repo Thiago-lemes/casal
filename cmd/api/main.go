@@ -18,6 +18,7 @@ import (
 	"casal/internal/household"
 	"casal/internal/httpx"
 	"casal/internal/push"
+	"casal/internal/reminder"
 )
 
 func main() {
@@ -73,7 +74,8 @@ func run(log *slog.Logger) error {
 	householdSvc := household.NewService(household.NewPostgresRepo(db))
 	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
 
-	// push (antecipado: valida os avisos no celular antes de casal e lembretes)
+	// push, com o notificador de log como alternativa quando o VAPID não está configurado
+	var notifier reminder.Notifier = logNotifier{log}
 	if cfg.VAPIDPublicKey != "" && cfg.VAPIDPrivateKey != "" {
 		pushSvc := push.NewService(
 			push.NewPostgresRepo(db),
@@ -81,9 +83,17 @@ func run(log *slog.Logger) error {
 			log,
 		)
 		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
+		notifier = pushSvc
 	} else {
-		log.Warn("VAPID não configurado: rode go run ./cmd/vapid e preencha o .env")
+		log.Warn("VAPID não configurado: avisos só no log. Rode go run ./cmd/vapid e preencha o .env")
 	}
+
+	// lembretes e agendador (para junto com o servidor, pelo mesmo ctx)
+	requireHousehold := household.RequireHousehold(householdSvc)
+	reminderRepo := reminder.NewPostgresRepo(db)
+	reminder.NewHandler(reminder.NewService(reminderRepo, householdSvc), log).
+		Routes(mux, requireUser, requireHousehold)
+	go reminder.NewWorker(reminderRepo, notifier, log).Run(ctx)
 
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
@@ -104,5 +114,13 @@ func run(log *slog.Logger) error {
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
+	return nil
+}
+
+// logNotifier só escreve no log; usado enquanto o push não está configurado.
+type logNotifier struct{ log *slog.Logger }
+
+func (n logNotifier) Notify(_ context.Context, userID, title, body string) error {
+	n.log.Info("notificação (simulada)", "user", userID, "title", title, "body", body)
 	return nil
 }

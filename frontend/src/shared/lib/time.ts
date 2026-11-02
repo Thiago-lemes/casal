@@ -32,3 +32,15 @@ export function quickTimes(now = new Date()) {
 export function minutesUntilTomorrowMorning(now = new Date()): number {
   return Math.max(1, Math.min(1440, Math.round((quickTimes(now).tomorrowMorning.getTime() - now.getTime()) / 60000)))
 }
+
+/** Hora separada do AM/PM (em idiomas de 24 h, `period` vem vazio), para dar destaque só à hora. */
+export function formatTimeParts(iso: string, lang: string, timeZone?: string): { clock: string; period: string } {
+  const parts = new Intl.DateTimeFormat(lang, { hour: 'numeric', minute: '2-digit', timeZone }).formatToParts(new Date(iso))
+  const period = parts.find((p) => p.type === 'dayPeriod')?.value ?? ''
+  const clock = parts
+    .filter((p) => p.type !== 'dayPeriod')
+    .map((p) => p.value)
+    .join('')
+    .trim()
+  return { clock: /^\d:/.test(clock) && !period ? `0${clock}` : clock, period }
+}

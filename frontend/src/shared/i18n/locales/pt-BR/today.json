@@ -28,5 +28,28 @@
     "tomorrowMorning": "Amanhã de manhã",
     "create": "Criar lembrete"
   },
-  "loadError": "Não deu para carregar os lembretes"
+  "loadError": "Não deu para carregar os lembretes",
+  "listTitle": "Para fazer",
+  "counts": {
+    "pending": "Pendentes",
+    "overdue": "Atrasados",
+    "done": "Feitos hoje"
+  },
+  "ring": {
+    "title": "O dia",
+    "label": "{{done}} de {{total}} lembretes de hoje resolvidos",
+    "caption": "{{done}} de {{total}} resolvidos",
+    "clear": "Nada marcado para hoje"
+  },
+  "calendar": {
+    "prev": "Mês anterior",
+    "next": "Próximo mês",
+    "busy": "Dia {{day}}, com lembrete pendente"
+  },
+  "week": {
+    "title": "Baixas na semana",
+    "total_one": "{{count}} no total",
+    "total_other": "{{count}} no total",
+    "day": "{{day}}: {{count}}"
+  }
 }

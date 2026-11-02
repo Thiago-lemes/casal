@@ -1,0 +1,45 @@
+.total {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-2);
+  height: 9rem;
+}
+
+.col {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: center;
+  gap: var(--space-1);
+  min-height: 0;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+}
+
+/* a coluna de barras cresce de baixo para cima dentro da linha 1fr */
+.bar {
+  align-self: end;
+  width: 100%;
+  max-width: 2.25rem;
+  background: var(--color-line);
+  border-radius: var(--radius-s);
+  transition: height var(--dur-base) var(--ease-out);
+}
+
+.bar[data-today] {
+  background: var(--color-accent);
+}
+
+.day {
+  color: var(--color-text-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}

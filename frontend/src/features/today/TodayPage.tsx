@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, EmptyState, Skeleton } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { useHousehold } from '@/features/household/hooks'
+import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
 import { ReminderLabel } from '@/features/reminders/ReminderLabel'
-import { usePendingReminders, useReminderActions } from '@/features/reminders/hooks'
+import { useReminderActions, useReminders } from '@/features/reminders/hooks'
+import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
+import { DayRing } from './widgets/DayRing'
+import { MonthCalendar } from './widgets/MonthCalendar'
+import { WeekBars } from './widgets/WeekBars'
 import styles from './TodayPage.module.css'
 
 export function TodayPage() {
@@ -14,36 +19,62 @@ export function TodayPage() {
   const { t: tc } = useTranslation('common')
   const me = useMe().data
   const household = useHousehold().data
-  const reminders = usePendingReminders(Boolean(household))
+  const reminders = useReminders(Boolean(household))
   const actions = useReminderActions()
   const [composing, setComposing] = useState(false)
+
+  const all = reminders.data
+  const pending = useMemo(
+    () => (all ?? []).filter(isPending).sort((a, b) => a.remind_at.localeCompare(b.remind_at)),
+    [all],
+  )
+  const stats = useMemo(() => dayStats(all ?? []), [all])
+  const week = useMemo(() => weekSeries(all ?? []), [all])
+  const busy = useMemo(() => busyDays(all ?? []), [all])
 
   if (!me || !household) return null
 
   const partner = household.members.find((m) => m.id !== me.id)
   const { weekday, day, month } = formatLongDate(new Date(), i18n.language, me.timezone)
-  const count = reminders.data?.length ?? 0
+  const dueTotal = stats.doneToday + stats.dueToday
 
   return (
-    <>
-      <header className={styles.band}>
-        <div>
+    <div className={styles.page}>
+      <header className={styles.day}>
+        <div className={styles.dayTop}>
           <p className={styles.date}>
             <span className={styles.weekday}>{weekday}</span>
             <br />
             {day} {month}
           </p>
-          <p className={styles.greeting}>
-            {t('greeting', { name: me.name })}
-            {reminders.isSuccess && count > 0 && ` · ${t('pendingCount', { count })}`}
-          </p>
+          <Button variant="primary" className={styles.cta} onClick={() => setComposing(true)}>
+            {t('newReminder')}
+          </Button>
         </div>
-        <Button variant="primary" className={styles.cta} onClick={() => setComposing(true)}>
-          {t('newReminder')}
-        </Button>
+        <p className={styles.greeting}>{t('greeting', { name: me.name })}</p>
+        <dl className={styles.counts}>
+          <div>
+            <dt>{t('counts.pending')}</dt>
+            <dd>{stats.pending}</dd>
+          </div>
+          <div>
+            <dt>{t('counts.overdue')}</dt>
+            <dd>{stats.overdue}</dd>
+          </div>
+          <div>
+            <dt>{t('counts.done')}</dt>
+            <dd>{stats.doneToday}</dd>
+          </div>
+        </dl>
       </header>
 
-      <section className={styles.list} aria-live="polite">
+      <div className={styles.ring}>
+        <DayRing progress={stats.progress} done={stats.doneToday} total={dueTotal} />
+      </div>
+
+      <section className={styles.list} aria-live="polite" aria-label={t('listTitle')}>
+        <h2 className={styles.listTitle}>{t('listTitle')}</h2>
+
         {reminders.isPending && (
           <div className={styles.skeletons}>
             <Skeleton />
@@ -54,13 +85,11 @@ export function TodayPage() {
         {reminders.isError && (
           <EmptyState
             title={t('loadError')}
-            action={
-              <Button onClick={() => void reminders.refetch()}>{tc('actions.tryAgain')}</Button>
-            }
+            action={<Button onClick={() => void reminders.refetch()}>{tc('actions.tryAgain')}</Button>}
           />
         )}
 
-        {reminders.isSuccess && count === 0 && (
+        {reminders.isSuccess && pending.length === 0 && (
           <EmptyState
             title={t('emptyTitle')}
             body={t('emptyBody')}
@@ -72,16 +101,23 @@ export function TodayPage() {
           />
         )}
 
-        {reminders.isSuccess && count > 0 && (
+        {reminders.isSuccess && pending.length > 0 && (
           <ul>
-            {reminders.data.map((r) => (
+            {pending.map((r) => (
               <ReminderLabel key={r.id} reminder={r} me={me} partnerName={partner?.name} actions={actions} />
             ))}
           </ul>
         )}
       </section>
 
+      <div className={styles.calendar}>
+        <MonthCalendar busy={busy} />
+      </div>
+      <div className={styles.week}>
+        <WeekBars week={week} />
+      </div>
+
       <Composer open={composing} onOpenChange={setComposing} me={me} partner={partner} actions={actions} />
-    </>
+    </div>
   )
 }

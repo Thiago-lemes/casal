@@ -1,0 +1,71 @@
+.nav {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.step {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  line-height: 1;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.step:hover {
+  background: var(--color-bg);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.dow {
+  padding-bottom: var(--space-2);
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.cell {
+  padding: 2px 0;
+  text-align: center;
+}
+
+.day {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+}
+
+.day[data-today] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 700;
+}
+
+/* ponto sob o número: o dia tem lembrete pendente */
+.day[data-busy]::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-text);
+}
+
+.day[data-today][data-busy]::after {
+  background: var(--color-on-accent);
+}

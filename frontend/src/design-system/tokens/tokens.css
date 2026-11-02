@@ -26,6 +26,7 @@
 
   --radius-s: 6px;
   --radius-m: 12px;
+  --radius-l: 24px;
   --radius-pill: 999px;
 
   --tap: 2.75rem; /* 44px */
@@ -37,7 +38,7 @@
   --dur-base: 220ms;
 
   /* modo claro (padrão) */
-  --c-ground: #f3f4f6;
+  --c-ground: #e9ebef;
   --c-surface: #ffffff;
   --c-ink: #1b1d22;
   --c-ink-soft: #565b66;
@@ -55,11 +56,11 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --c-ground: #15171b;
-    --c-surface: #1e2127;
+    --c-ground: #101216;
+    --c-surface: #1b1e24;
     --c-ink: #f1f2f4;
     --c-ink-soft: #a6abb6;
-    --c-line: #2d3139;
+    --c-line: #323741;
     --c-orange: #ff8a3d;
     --c-orange-press: #ff9f5f;
     --c-orange-text: #ff9a55;
@@ -73,11 +74,11 @@
 }
 
 :root[data-theme='dark'] {
-  --c-ground: #15171b;
-  --c-surface: #1e2127;
+  --c-ground: #101216;
+  --c-surface: #1b1e24;
   --c-ink: #f1f2f4;
   --c-ink-soft: #a6abb6;
-  --c-line: #2d3139;
+  --c-line: #323741;
   --c-orange: #ff8a3d;
   --c-orange-press: #ff9f5f;
   --c-orange-text: #ff9a55;
@@ -93,6 +94,7 @@
   /* papéis */
   --color-bg: var(--c-ground);
   --color-surface: var(--c-surface);
+  --color-card: var(--c-surface);
   --color-text: var(--c-ink);
   --color-text-soft: var(--c-ink-soft);
   --color-line: var(--c-line);

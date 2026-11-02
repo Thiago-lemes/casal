@@ -28,5 +28,28 @@
     "tomorrowMorning": "Tomorrow morning",
     "create": "Create reminder"
   },
-  "loadError": "Could not load your reminders"
+  "loadError": "Could not load your reminders",
+  "listTitle": "To do",
+  "counts": {
+    "pending": "Pending",
+    "overdue": "Overdue",
+    "done": "Done today"
+  },
+  "ring": {
+    "title": "The day",
+    "label": "{{done}} of {{total}} reminders for today resolved",
+    "caption": "{{done}} of {{total}} resolved",
+    "clear": "Nothing set for today"
+  },
+  "calendar": {
+    "prev": "Previous month",
+    "next": "Next month",
+    "busy": "Day {{day}}, with a pending reminder"
+  },
+  "week": {
+    "title": "Check-offs this week",
+    "total_one": "{{count}} in total",
+    "total_other": "{{count}} in total",
+    "day": "{{day}}: {{count}}"
+  }
 }

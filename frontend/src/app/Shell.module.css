@@ -54,10 +54,18 @@
 }
 
 @media (min-width: 48rem) {
+  /* o trilho é o campo de laranja; o conteúdo é uma folha com o canto de dentro arredondado */
   .shell {
     display: grid;
     grid-template-columns: var(--rail-w) 1fr;
     padding-bottom: 0;
+    background: var(--color-accent);
+  }
+
+  .main {
+    min-height: 100dvh;
+    background: var(--color-bg);
+    border-radius: var(--radius-l) 0 0 var(--radius-l);
   }
 
   .nav {
@@ -66,8 +74,9 @@
     inset: auto;
     height: 100dvh;
     padding: var(--space-6) var(--space-4);
+    background: transparent;
+    color: var(--color-on-accent);
     border-top: 0;
-    border-right: 1px solid var(--color-line);
   }
 
   .brand {
@@ -88,18 +97,29 @@
   .link {
     place-content: center start;
     height: var(--tap);
-    padding: 0 var(--space-3);
-    border-radius: var(--radius-m);
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-pill);
+    color: var(--color-on-accent);
     font-size: var(--text-md);
     text-align: left;
   }
 
+  .link:hover:not([aria-disabled='true']) {
+    background: rgb(21 23 27 / 0.12);
+  }
+
   .link:global(.active) {
-    background: var(--color-accent-wash);
+    background: var(--color-on-accent);
+    color: var(--color-on-dark);
     box-shadow: none;
+  }
+
+  .link[aria-disabled='true'] {
+    opacity: 0.85;
   }
 
   .soon {
     display: block;
+    color: inherit;
   }
 }

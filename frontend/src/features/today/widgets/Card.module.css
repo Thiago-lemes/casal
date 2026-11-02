@@ -1,0 +1,24 @@
+.card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  background: var(--color-card);
+  border-radius: var(--radius-l);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 2rem;
+}
+
+.title {
+  font-family: var(--font-text);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.2;
+}

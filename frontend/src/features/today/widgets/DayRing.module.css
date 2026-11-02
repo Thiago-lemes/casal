@@ -1,0 +1,52 @@
+.wrap {
+  position: relative;
+  width: min(100%, 11rem);
+  margin-inline: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+}
+
+.track,
+.value {
+  fill: none;
+  stroke-width: 14;
+}
+
+.track {
+  stroke: var(--color-line);
+}
+
+.value {
+  stroke: var(--color-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur-base) var(--ease-out);
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+}
+
+.clear {
+  font-family: var(--font-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-soft);
+  text-align: center;
+  max-width: 6rem;
+  line-height: 1.2;
+}
+
+.caption {
+  text-align: center;
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}

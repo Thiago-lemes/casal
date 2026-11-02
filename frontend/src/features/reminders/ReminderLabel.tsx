@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
-import { formatTime, isPast, minutesUntilTomorrowMorning } from '@/shared/lib/time'
+import { formatTime, formatTimeParts, isPast, minutesUntilTomorrowMorning } from '@/shared/lib/time'
 import type { Reminder } from './api'
 import type { useReminderActions } from './hooks'
 import styles from './ReminderLabel.module.css'
@@ -34,7 +34,7 @@ export function ReminderLabel({ reminder, me, partnerName, actions }: Props) {
   const mine = reminder.recipient_id === me.id
   const creator = reminder.created_by === me.id ? t('fromYou') : t('from', { name: reminder.created_by_name })
   const late = isPast(reminder.remind_at)
-  const time = formatTime(reminder.remind_at, i18n.language, me.timezone)
+  const time = formatTimeParts(reminder.remind_at, i18n.language, me.timezone)
 
   function fail(err: unknown) {
     setPhase('idle')
@@ -74,7 +74,8 @@ export function ReminderLabel({ reminder, me, partnerName, actions }: Props) {
     >
       <div className={styles.label}>
         <p className={styles.time} data-late={late || undefined}>
-          {time}
+          {time.clock}
+          {time.period && <small className={styles.period}>{time.period}</small>}
         </p>
         <div className={styles.body}>
           <p className={styles.text}>{reminder.body}</p>

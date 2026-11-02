@@ -25,6 +25,16 @@
   font-size: var(--text-2xl);
   line-height: 1;
   padding-top: 0.15rem;
+  white-space: nowrap;
+}
+
+.period {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-soft);
 }
 
 .time[data-late] {

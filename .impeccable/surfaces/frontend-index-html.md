@@ -10,26 +10,29 @@ related_targets: []
 Mode: Operate. Mobile first, desktop strong. Dark and light themes, pt-BR and en.
 
 ## Job and audience
-One person of a couple living together, phone in hand, wanting to know in seconds what the day asks and to leave a note for the other. Success: open the app, read the day, resolve or create a reminder in two taps.
+One person of a couple living together, wanting to know in seconds what the day asks and to leave a note for the other. Success: open the app, read the day, resolve or create a reminder in two taps.
+
+## User-pinned reference (the brief wins)
+The user supplied three dashboard references (a dark fintech bento, a hospital dashboard in light and dark, a utility dashboard): a saturated brand-colour sidebar with a rounded inner corner, a page ground slightly different from the cards, large rounded cards in a bento grid, a month calendar widget, a progress ring, a bar chart with the current bar highlighted, pill buttons, circular avatars. Reproduce that structure in orange, in both themes. All numbers shown come from real reminders; no invented data.
 
 ## Direction contract
 
-THESIS: The app speaks like a freezer label: a big date, a short name, a date-stamped state. It refuses the grey app with one accent colour and the SaaS card grid; reminders are labels in a list, not identical cards.
+THESIS: A bento dashboard of the couple's day in orange: one committed orange block (the day), surrounded by calm cards that each answer one question (what is due, how far along is the day, which days are busy, how the week went). It refuses the grey single-column list.
 
-OWN-WORLD: Orange is committed, 30 to 50 percent of the surface on key screens: the brand band, the primary action field, the "agora" marker. Light theme: cool near-white ground #F3F4F6, ink #1B1D22, orange #F26A1B (text on orange is always ink, never white). Dark theme: graphite #15171B, ink #F1F2F4, orange #FF8A3D. Two person markers (blue #2459D9, green #0E8A6B in light; lifted tints in dark) used only where data needs to tell the two people apart. Type: Barlow Condensed (bold, large dates and titles) with Barlow for text; times and dates in tabular numerals. Shapes: labels have a die-cut notch on the leading edge, not a coloured side border; one corner radius family; flat surfaces, divider only where content separates.
+OWN-WORLD: Orange is committed in two places: the navigation rail (desktop) and the day block. Light theme: page ground #E9EBEF, cards #FFFFFF, ink #1B1D22, orange #F26A1B. Dark theme: page ground #101216, cards #1B1E24, ink #F1F2F4, orange #FF8A3D. Text on orange is always dark ink. Type: Barlow Condensed bold for dates, times and big figures, Barlow for text, tabular numerals. Radius 24px on cards, 12px on controls, pills for chips and buttons. Flat cards, no shadow, no nested cards. Reminder rows keep the freezer-label notch.
 
-STORY: The visitor sees today's date and the next thing due, understands who left what for whom, resolves it with one tap or snoozes it, and leaves with the sense that the day is under control.
+STORY: The visitor opens Hoje, reads today's date and counts in the orange block, sees the reminders due as labels, the day's progress ring, the month with busy days dotted, and the week's resolved bars, and resolves or creates a reminder without leaving the page.
 
-FIRST VIEWPORT: Phone: orange band with the full date set large (weekday and day, condensed) and the greeting of the person in one short line; below it the list of pending reminders as labels, the soonest first, each with its due time large at the leading edge, the text, who left it ("Ana deixou"), and two actions (Resolver, Adiar). A bottom bar with four destinations (Hoje, Rotina, Casa, Mais; Rotina disabled with a clear reason until it ships) and a floating primary action "Novo lembrete" in orange. Desktop: left rail replaces the bottom bar; the list gets a readable column (max 72ch) and a side panel with the composer.
+FIRST VIEWPORT: Desktop: orange rail on the left (brand, Hoje, Rotina soon, Casa, Mais) with a rounded inner corner against the page ground; a 12-column bento: row one the orange day block (weekday and date large, greeting, the three counts pending, overdue, done today, and the New reminder button) beside the day progress ring; below, the reminders list on the left column and the month calendar over the week bars on the right. Phone: bottom bar; stack order day block, ring, reminders, calendar, week bars.
 
-FORM: Etiqueta de marmita (the freezer label), position 1 of my grounded list, taken as the Impeccable's pick card. seed: ceb9b49f0dbad3e1
+FORM: Bento dashboard from the user's references, over the Etiqueta de marmita palette. seed: ceb9b49f0dbad3e1
 
-SIGNATURE MOVE: "Dar baixa": resolving a reminder stamps it with the resolve time ("Resolvido 14:32"), the label slides out and the list closes the gap in 200 to 250 ms with an exponential ease-out; reduced-motion users get an instant swap with the stamp text. No other authored motion beyond standard 150 to 250 ms state transitions.
+SIGNATURE MOVE: "Dar baixa": resolving a reminder stamps it with the resolve time, the label closes, and the ring and bar for today animate to their new value in 200 to 250 ms. No other authored motion.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
-## Constraints and open decisions
-- App name is undecided; one config constant, never hard-coded in components.
-- No eyebrow labels, no section numbers, no gradient text, no cards in cards, no side-borders above 1px, no all-caps tracked labels.
-- Contrast AA in both themes; targets 44px; focus ring in orange with offset; reduced motion honored.
-- Honest risk: heavy orange can tire on dense screens (finanças, rotina); there the field shrinks to the header band and the action, and lists go neutral.
+## Constraints
+- App name in one config constant.
+- No eyebrows, no section numbers, no gradient text, no side borders above 1px, no nested cards.
+- AA contrast both themes, 44px targets, orange focus ring, reduced motion honored.
+- Charts are SVG/CSS drawn from real data, with an accessible text alternative.

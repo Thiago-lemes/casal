@@ -1,14 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { isPending, remindersApi } from './api'
+import { remindersApi } from './api'
 
 export const remindersKey = ['reminders'] as const
 
-export function usePendingReminders(enabled: boolean) {
+/** Todos os lembretes (até 100, do mais recente ao mais antigo); a tela deriva o que precisa. */
+export function useReminders(enabled: boolean) {
   return useQuery({
     queryKey: remindersKey,
     queryFn: remindersApi.list,
     enabled,
-    select: (all) => all.filter(isPending).sort((a, b) => a.remind_at.localeCompare(b.remind_at)),
     refetchInterval: 60_000,
   })
 }

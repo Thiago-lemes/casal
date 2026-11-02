@@ -8,6 +8,7 @@ import (
 )
 
 type ErrorBody struct {
+	Code  string `json:"code,omitempty"`
 	Error string `json:"error"`
 }
 
@@ -21,6 +22,11 @@ func JSON(w http.ResponseWriter, status int, v any) {
 
 func Error(w http.ResponseWriter, status int, msg string) {
 	JSON(w, status, ErrorBody{Error: msg})
+}
+
+// ErrorCode é Error com um código estável, que o cliente traduz em vez de mostrar a mensagem.
+func ErrorCode(w http.ResponseWriter, status int, code, msg string) {
+	JSON(w, status, ErrorBody{Code: code, Error: msg})
 }
 
 // Decode lê o corpo JSON com limite de 1 MB e rejeita campos desconhecidos.

@@ -18,9 +18,9 @@ type User struct {
 }
 
 var (
-	ErrEmailTaken         = apperr.New(apperr.Conflict, "e-mail já cadastrado")
+	ErrEmailTaken         = apperr.NewCoded(apperr.Conflict, "email_taken", "e-mail já cadastrado")
 	ErrNotFound           = apperr.New(apperr.NotFound, "não encontrado")
-	ErrInvalidCredentials = apperr.New(apperr.Unauthorized, "e-mail ou senha inválidos")
+	ErrInvalidCredentials = apperr.NewCoded(apperr.Unauthorized, "invalid_credentials", "e-mail ou senha inválidos")
 	ErrInvalidInput       = apperr.New(apperr.Invalid, "dados inválidos")
 )
 
@@ -33,6 +33,7 @@ type Repository interface {
 	DeleteSession(ctx context.Context, tokenHash string) error
 	DeleteUserSessions(ctx context.Context, userID string) error
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
+	UpdateProfile(ctx context.Context, userID, name, timezone string) (User, error)
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -104,4 +105,17 @@ func (r *PostgresRepo) DeleteExpiredSessions(ctx context.Context, now time.Time)
 		return 0, err
 	}
 	return res.RowsAffected()
+}
+
+// UpdateProfile grava nome e fuso (o service já validou e completou os dois).
+func (r *PostgresRepo) UpdateProfile(ctx context.Context, userID, name, timezone string) (User, error) {
+	var u User
+	err := r.db.QueryRowContext(ctx, `
+		UPDATE users SET name = $2, timezone = $3 WHERE id = $1
+		RETURNING id, email, name, timezone`, userID, name, timezone).
+		Scan(&u.ID, &u.Email, &u.Name, &u.Timezone)
+	if errors.Is(err, sql.ErrNoRows) {
+		return User{}, ErrNotFound
+	}
+	return u, err
 }

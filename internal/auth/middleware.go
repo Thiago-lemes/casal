@@ -34,7 +34,7 @@ func Require(svc *Service) httpx.Middleware {
 				return
 			}
 			ctx := context.WithValue(r.Context(), ctxKey{}, u)
-			ctx = identity.With(ctx, identity.Principal{UserID: u.ID})
+			ctx = identity.With(ctx, identity.Principal{UserID: u.ID, Timezone: u.Timezone})
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 )
@@ -231,5 +232,55 @@ func TestPurgeExpiredKeepsLiveSessions(t *testing.T) {
 	}
 	if _, err := svc.UserFromToken(ctx, old); err == nil {
 		t.Error("a sessão vencida deveria ter sumido")
+	}
+}
+
+func (f *fakeRepo) UpdateProfile(_ context.Context, userID, name, timezone string) (User, error) {
+	for email, u := range f.users {
+		if u.ID == userID {
+			u.Name, u.Timezone = name, timezone
+			f.users[email] = u
+			return u, nil
+		}
+	}
+	return User{}, ErrNotFound
+}
+
+func TestUpdateProfile(t *testing.T) {
+	svc := newTestService(t)
+	ctx := context.Background()
+	u, _, err := svc.Register(ctx, "ana@exemplo.com", "Ana", "senha-forte-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	str := func(s string) *string { return &s }
+
+	got, err := svc.UpdateProfile(ctx, u, nil, str(" America/Manaus "))
+	if err != nil || got.Timezone != "America/Manaus" || got.Name != "Ana" {
+		t.Errorf("fuso não mudou ou o nome mudou junto: %+v %v", got, err)
+	}
+	got, err = svc.UpdateProfile(ctx, got, str("  Ana Maria "), nil)
+	if err != nil || got.Name != "Ana Maria" || got.Timezone != "America/Manaus" {
+		t.Errorf("nome não mudou ou o fuso mudou junto: %+v %v", got, err)
+	}
+
+	bad := []struct {
+		name string
+		n, z *string
+	}{
+		{"fuso inventado", nil, str("Marte/Olympus")},
+		{"fuso vazio", nil, str("")},
+		{"Local depende do servidor", nil, str("Local")},
+		{"fuso sem região", nil, str("EST5EDT")},
+		{"nome vazio", str("  "), nil},
+		{"nome longo", str(strings.Repeat("a", 81)), nil},
+	}
+	for _, c := range bad {
+		if _, err := svc.UpdateProfile(ctx, got, c.n, c.z); !errors.Is(err, ErrInvalidInput) {
+			t.Errorf("%s: esperava ErrInvalidInput, veio %v", c.name, err)
+		}
+	}
+	if !ValidTimezone("UTC") || !ValidTimezone("America/Sao_Paulo") {
+		t.Error("UTC e America/Sao_Paulo deveriam valer")
 	}
 }

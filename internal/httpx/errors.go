@@ -17,28 +17,33 @@ import (
 func Fail(w http.ResponseWriter, r *http.Request, log *slog.Logger, err error) {
 	var ae *apperr.Error
 	if errors.As(err, &ae) {
+		// o código é o do erro (ou do Kind); o cliente traduz por ele e não depende da frase
+		code := ae.Code
+		if code == "" {
+			code = apperr.KindCode(ae.Kind)
+		}
 		switch ae.Kind {
 		case apperr.Invalid:
-			Error(w, http.StatusBadRequest, err.Error())
+			ErrorCode(w, http.StatusBadRequest, code, err.Error())
 		case apperr.Unauthorized:
-			Error(w, http.StatusUnauthorized, err.Error())
+			ErrorCode(w, http.StatusUnauthorized, code, err.Error())
 		case apperr.Forbidden:
-			Error(w, http.StatusForbidden, err.Error())
+			ErrorCode(w, http.StatusForbidden, code, err.Error())
 		case apperr.NotFound:
-			Error(w, http.StatusNotFound, err.Error())
+			ErrorCode(w, http.StatusNotFound, code, err.Error())
 		case apperr.Conflict:
-			Error(w, http.StatusConflict, err.Error())
+			ErrorCode(w, http.StatusConflict, code, err.Error())
 		case apperr.Upstream:
 			logFailure(log, r, err, slog.LevelWarn)
-			Error(w, http.StatusBadGateway, ae.Msg)
+			ErrorCode(w, http.StatusBadGateway, code, ae.Msg)
 		default:
 			logFailure(log, r, err, slog.LevelError)
-			Error(w, http.StatusInternalServerError, "erro interno")
+			ErrorCode(w, http.StatusInternalServerError, "internal", "erro interno")
 		}
 		return
 	}
 	logFailure(log, r, err, slog.LevelError)
-	Error(w, http.StatusInternalServerError, "erro interno")
+	ErrorCode(w, http.StatusInternalServerError, "internal", "erro interno")
 }
 
 func logFailure(log *slog.Logger, r *http.Request, err error, level slog.Level) {

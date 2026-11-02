@@ -8,6 +8,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	_ "time/tzdata" // fusos embutidos: não dependem do sistema (no Windows e em contêineres mínimos faltam)
+	"unicode/utf8"
 
 	"casal/internal/token"
 )
@@ -134,4 +136,38 @@ func (s *Service) LogoutAll(ctx context.Context, userID string) error {
 // PurgeExpired apaga as sessões vencidas. Rode periodicamente.
 func (s *Service) PurgeExpired(ctx context.Context) (int64, error) {
 	return s.repo.DeleteExpiredSessions(ctx, s.now())
+}
+
+// UpdateProfile muda o nome e/ou o fuso da pessoa; campo nulo fica como está.
+// O fuso é o da cidade onde a pessoa diz estar: qualquer nome IANA válido (America/Sao_Paulo).
+func (s *Service) UpdateProfile(ctx context.Context, cur User, name, timezone *string) (User, error) {
+	newName, newTZ := cur.Name, cur.Timezone
+	if name != nil {
+		newName = strings.TrimSpace(*name)
+		if newName == "" || utf8.RuneCountInString(newName) > 80 {
+			return User{}, fmt.Errorf("%w: nome é obrigatório (até 80 caracteres)", ErrInvalidInput)
+		}
+	}
+	if timezone != nil {
+		newTZ = strings.TrimSpace(*timezone)
+		if !ValidTimezone(newTZ) {
+			return User{}, fmt.Errorf("%w: fuso horário desconhecido (use um nome como America/Sao_Paulo)", ErrInvalidInput)
+		}
+	}
+	if newName == cur.Name && newTZ == cur.Timezone {
+		return cur, nil
+	}
+	return s.repo.UpdateProfile(ctx, cur.ID, newName, newTZ)
+}
+
+// ValidTimezone aceita só nomes do banco IANA ("Região/Cidade" ou "UTC"); "Local" e vazio não valem,
+// pois dependem da máquina do servidor.
+func ValidTimezone(name string) bool {
+	if name == "" || name == "Local" || len(name) > 64 {
+		return false
+	}
+	if _, err := time.LoadLocation(name); err != nil {
+		return false
+	}
+	return name == "UTC" || strings.Contains(name, "/")
 }

@@ -87,3 +87,29 @@ func TestRegisterIsRateLimitedPerIP(t *testing.T) {
 		t.Errorf("o 6º cadastro seguido do mesmo IP deveria dar 429, veio %d", last)
 	}
 }
+
+func TestPatchMeChangesTimezoneAndExposesCode(t *testing.T) {
+	mux := newTestServer(t, false)
+	reg := post(mux, "/v1/auth/register", `{"email":"ana@exemplo.com","name":"Ana","password":"senha-forte-123"}`)
+	cookie := reg.Result().Cookies()[0]
+
+	patch := func(body string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest("PATCH", "/v1/me", strings.NewReader(body))
+		req.AddCookie(cookie)
+		rec := httptest.NewRecorder()
+		mux.ServeHTTP(rec, req)
+		return rec
+	}
+	ok := patch(`{"timezone":"America/Manaus"}`)
+	if ok.Code != 200 || !strings.Contains(ok.Body.String(), `"timezone":"America/Manaus"`) {
+		t.Errorf("PATCH deveria mudar o fuso: %d %s", ok.Code, ok.Body)
+	}
+	bad := patch(`{"timezone":"Marte/Olympus"}`)
+	if bad.Code != 400 || !strings.Contains(bad.Body.String(), `"code":"invalid"`) {
+		t.Errorf("fuso inválido deveria dar 400 com code: %d %s", bad.Code, bad.Body)
+	}
+	dup := post(mux, "/v1/auth/register", `{"email":"ana@exemplo.com","name":"Outra","password":"senha-forte-123"}`)
+	if dup.Code != 409 || !strings.Contains(dup.Body.String(), `"code":"email_taken"`) {
+		t.Errorf("e-mail repetido deveria trazer code email_taken: %d %s", dup.Code, dup.Body)
+	}
+}

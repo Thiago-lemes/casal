@@ -9,6 +9,7 @@ import "context"
 type Principal struct {
 	UserID      string
 	HouseholdID string
+	Timezone    string // fuso IANA da pessoa, como ela informou (ex.: America/Sao_Paulo)
 }
 
 type ctxKey struct{}

@@ -18,9 +18,33 @@ const (
 // Funciona com errors.Is e com fmt.Errorf("%w: detalhe", ErrX).
 type Error struct {
 	Kind Kind
+	Code string // opcional: código estável para o cliente traduzir; vazio usa o do Kind
 	Msg  string
 }
 
 func New(kind Kind, msg string) *Error { return &Error{Kind: kind, Msg: msg} }
+
+// NewCoded é New com um código próprio (por exemplo "note_conflict"), para o cliente
+// mostrar um texto específico em vez do genérico do Kind.
+func NewCoded(kind Kind, code, msg string) *Error { return &Error{Kind: kind, Code: code, Msg: msg} }
+
+// KindCode é o código padrão de cada Kind, o mesmo que o cliente deriva do status HTTP.
+func KindCode(k Kind) string {
+	switch k {
+	case Invalid:
+		return "invalid"
+	case Unauthorized:
+		return "unauthorized"
+	case Forbidden:
+		return "forbidden"
+	case NotFound:
+		return "not_found"
+	case Conflict:
+		return "conflict"
+	case Upstream:
+		return "upstream"
+	}
+	return "unknown"
+}
 
 func (e *Error) Error() string { return e.Msg }

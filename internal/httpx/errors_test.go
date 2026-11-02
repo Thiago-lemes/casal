@@ -85,3 +85,23 @@ func TestRequestIDIsGeneratedAndIgnoresClientValue(t *testing.T) {
 		t.Error("o valor do cliente não pode ser usado")
 	}
 }
+
+func TestFailSendsStableCode(t *testing.T) {
+	cases := []struct {
+		name string
+		err  error
+		code string
+	}{
+		{"código do Kind", apperr.New(apperr.NotFound, "não existe"), `"code":"not_found"`},
+		{"código próprio", apperr.NewCoded(apperr.Conflict, "note_conflict", "mudou"), `"code":"note_conflict"`},
+		{"código próprio com detalhe", fmt.Errorf("%w: detalhe", apperr.NewCoded(apperr.Forbidden, "x_forbidden", "não")), `"code":"x_forbidden"`},
+		{"erro inesperado", errors.New("pq: falhou"), `"code":"internal"`},
+	}
+	for _, c := range cases {
+		rec := httptest.NewRecorder()
+		Fail(rec, httptest.NewRequest("GET", "/x", nil), slog.New(slog.NewTextHandler(io.Discard, nil)), c.err)
+		if !strings.Contains(rec.Body.String(), c.code) {
+			t.Errorf("%s: resposta %q deveria conter %s", c.name, rec.Body, c.code)
+		}
+	}
+}

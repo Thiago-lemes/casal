@@ -24,6 +24,7 @@ func (h *Handler) Routes(mux *http.ServeMux, requireUser httpx.Middleware) {
 	mux.Handle("GET /v1/household", httpx.Chain(http.HandlerFunc(h.get), requireUser, requireHH))
 	mux.Handle("POST /v1/household/invites", httpx.Chain(http.HandlerFunc(h.invite), requireUser, requireHH))
 	mux.Handle("POST /v1/household/invites/accept", httpx.Chain(http.HandlerFunc(h.accept), requireUser))
+	mux.Handle("POST /v1/household/leave", httpx.Chain(http.HandlerFunc(h.leave), requireUser))
 }
 
 func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
@@ -74,4 +75,14 @@ func (h *Handler) accept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, map[string]string{"household_id": id})
+}
+
+// leave tira a pessoa do casal. Não exige estar em um casal pelo middleware: sem casal, a resposta é 403 do próprio serviço.
+func (h *Handler) leave(w http.ResponseWriter, r *http.Request) {
+	p, _ := identity.From(r.Context())
+	if err := h.svc.Leave(r.Context(), p.UserID); err != nil {
+		httpx.Fail(w, r, h.log, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

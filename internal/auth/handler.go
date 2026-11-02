@@ -43,6 +43,7 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /v1/auth/logout", h.logout)
 	mux.Handle("POST /v1/auth/logout-all", requireUser(http.HandlerFunc(h.logoutAll)))
 	mux.Handle("GET /v1/me", requireUser(http.HandlerFunc(h.me)))
+	mux.Handle("PATCH /v1/me", requireUser(http.HandlerFunc(h.updateMe)))
 }
 
 type credentials struct {
@@ -138,4 +139,22 @@ func (h *Handler) clearCookie(w http.ResponseWriter) {
 		Name: CookieName, Value: "", Path: "/", MaxAge: -1,
 		HttpOnly: true, Secure: h.opts.CookieSecure, SameSite: http.SameSiteLaxMode,
 	})
+}
+
+// updateMe muda o nome e/ou o fuso horário. Campo ausente fica como está.
+func (h *Handler) updateMe(w http.ResponseWriter, r *http.Request) {
+	var in struct {
+		Name     *string `json:"name"`
+		Timezone *string `json:"timezone"`
+	}
+	if !httpx.Bind(w, r, &in) {
+		return
+	}
+	cur, _ := UserFromContext(r.Context())
+	u, err := h.svc.UpdateProfile(r.Context(), cur, in.Name, in.Timezone)
+	if err != nil {
+		httpx.Fail(w, r, h.log, err)
+		return
+	}
+	httpx.JSON(w, http.StatusOK, u)
 }

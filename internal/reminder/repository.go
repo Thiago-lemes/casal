@@ -12,7 +12,7 @@ import (
 
 var (
 	ErrInvalidInput = apperr.New(apperr.Invalid, "dados inválidos")
-	ErrNotFound     = apperr.New(apperr.NotFound, "lembrete não encontrado")
+	ErrNotFound     = apperr.NewCoded(apperr.NotFound, "reminder_not_found", "lembrete não encontrado")
 )
 
 type Reminder struct {
@@ -213,4 +213,29 @@ func (p *PostgresRepo) MarkSent(ctx context.Context, id string, now time.Time) e
 			WHERE id = $1 AND status = 'scheduled'`, id, now)
 		return err
 	})
+}
+
+// HandleLeave roda quando alguém sai do casal: os lembretes ainda pendentes entre as duas pessoas são cancelados
+// (ninguém mais está lá para recebê-los ou resolvê-los). Os que a pessoa deixou para si mesma ficam com ela.
+// Roda na transação da saída.
+func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff) error {
+	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
+		return err
+	}
+	_, err := tx.ExecContext(ctx, `
+		UPDATE reminders SET status = 'canceled'
+		WHERE household_id = $1 AND status IN ('scheduled', 'sent')
+		  AND created_by <> recipient_id AND (created_by = $2 OR recipient_id = $2)`, h.From, h.UserID)
+	return err
+}
+
+// HandleJoin roda quando a pessoa passa a ter um casal: os lembretes que ela deixou para si mesma vêm junto.
+func (p *PostgresRepo) HandleJoin(ctx context.Context, tx *sql.Tx, h db.Handoff) error {
+	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
+		return err
+	}
+	_, err := tx.ExecContext(ctx, `
+		UPDATE reminders SET household_id = $2
+		WHERE created_by = $1 AND recipient_id = $1 AND household_id <> $2`, h.UserID, h.To)
+	return err
 }

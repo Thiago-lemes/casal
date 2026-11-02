@@ -1,9 +1,12 @@
 package testutil
 
 import (
+	"context"
 	"database/sql"
 	"os"
 	"testing"
+
+	"casal/internal/db"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -56,4 +59,72 @@ func NewHousehold(t *testing.T, db *sql.DB, memberIDs ...string) string {
 		}
 	}
 	return id
+}
+
+// RunHook roda um gancho de mudança de casal (db.Hook) numa transação própria e a confirma,
+// como o household faz ao sair, criar casal ou aceitar convite.
+func RunHook(t *testing.T, conn *sql.DB, hook db.Hook, h db.Handoff) {
+	t.Helper()
+	ctx := context.Background()
+	tx, err := conn.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	if err := hook(ctx, tx, h); err != nil {
+		t.Fatal(err)
+	}
+	if err := tx.Commit(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// SystemScan roda uma consulta de uma linha no escopo de sistema (que enxerga todos os casais) e lê o resultado
+// em dest. Serve para o teste conferir o que ficou no banco mesmo com o RLS ligado, onde um SELECT sem escopo
+// não enxerga nada.
+func SystemScan(t *testing.T, conn *sql.DB, query string, args []any, dest ...any) {
+	t.Helper()
+	ctx := context.Background()
+	tx, err := conn.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
+		t.Fatal(err)
+	}
+	if err := tx.QueryRowContext(ctx, query, args...).Scan(dest...); err != nil {
+		t.Fatalf("consulta de conferência falhou: %v\n%s", err, query)
+	}
+}
+
+// SystemStrings devolve a primeira coluna de todas as linhas, no escopo de sistema (veja SystemScan).
+func SystemStrings(t *testing.T, conn *sql.DB, query string, args ...any) []string {
+	t.Helper()
+	ctx := context.Background()
+	tx, err := conn.BeginTx(ctx, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
+		t.Fatal(err)
+	}
+	rows, err := tx.QueryContext(ctx, query, args...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	out := []string{}
+	for rows.Next() {
+		var s string
+		if err := rows.Scan(&s); err != nil {
+			t.Fatal(err)
+		}
+		out = append(out, s)
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	return out
 }

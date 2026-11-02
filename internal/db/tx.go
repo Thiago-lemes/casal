@@ -25,6 +25,21 @@ func InTx(ctx context.Context, db *sql.DB, scope Scope, fn func(tx *sql.Tx) erro
 	}
 	defer tx.Rollback()
 
+	if err := SetScope(ctx, tx, scope); err != nil {
+		return err
+	}
+	if err := fn(tx); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("db: confirmar transação: %w", err)
+	}
+	return nil
+}
+
+// SetScope informa o escopo ao Postgres numa transação já aberta (vale só dentro dela).
+// InTx chama isto por você; use direto só em quem recebe uma transação pronta, como os ganchos de Handoff.
+func SetScope(ctx context.Context, tx *sql.Tx, scope Scope) error {
 	system := "off"
 	if scope.System {
 		system = "on"
@@ -35,14 +50,24 @@ func InTx(ctx context.Context, db *sql.DB, scope Scope, fn func(tx *sql.Tx) erro
 		scope.HouseholdID, system); err != nil {
 		return fmt.Errorf("db: definir escopo: %w", err)
 	}
-	if err := fn(tx); err != nil {
-		return err
-	}
-	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("db: confirmar transação: %w", err)
-	}
 	return nil
 }
+
+// Handoff descreve uma pessoa mudando de casal. As features recebem isto para levar consigo o que é
+// pessoal e passar adiante o que é compartilhado, sem importar umas às outras: quem liga é o app.
+//
+//   - Ao sair: UserID saiu de From; RemainingUserID é quem ficou (vazio se a pessoa era a única).
+//   - Ao entrar (criar ou aceitar convite): UserID passou a ser de To.
+type Handoff struct {
+	UserID          string
+	From            string
+	To              string
+	RemainingUserID string
+}
+
+// Hook roda dentro da transação da mudança de casal: ou tudo acontece, ou nada.
+// Quem usa Hook decide o próprio escopo (normalmente db.SetScope com System, pois atravessa casais).
+type Hook func(ctx context.Context, tx *sql.Tx, h Handoff) error
 
 // IsUniqueViolation diz se o erro é de chave duplicada (UNIQUE ou PRIMARY KEY).
 func IsUniqueViolation(err error) bool {

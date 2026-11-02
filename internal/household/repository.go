@@ -13,10 +13,10 @@ import (
 const MaxMembers = 2
 
 var (
-	ErrNoHousehold        = apperr.New(apperr.Forbidden, "você ainda não tem um casal")
-	ErrAlreadyInHousehold = apperr.New(apperr.Conflict, "você já pertence a um casal")
-	ErrInviteInvalid      = apperr.New(apperr.NotFound, "convite inválido, expirado ou já usado")
-	ErrHouseholdFull      = apperr.New(apperr.Conflict, "o casal já tem duas pessoas")
+	ErrNoHousehold        = apperr.NewCoded(apperr.Forbidden, "no_household", "você ainda não tem um casal")
+	ErrAlreadyInHousehold = apperr.NewCoded(apperr.Conflict, "already_in_household", "você já pertence a um casal")
+	ErrInviteInvalid      = apperr.NewCoded(apperr.NotFound, "invite_invalid", "convite inválido, expirado ou já usado")
+	ErrHouseholdFull      = apperr.NewCoded(apperr.Conflict, "household_full", "o casal já tem duas pessoas")
 )
 
 type Member struct {
@@ -26,12 +26,16 @@ type Member struct {
 }
 
 type Repository interface {
-	CreateHousehold(ctx context.Context, userID string) (string, error)
+	// CreateHousehold, AcceptInvite e LeaveHousehold rodam os ganchos (db.Hook) dentro da mesma transação:
+	// se um falhar, a mudança de casal toda é desfeita.
+	CreateHousehold(ctx context.Context, userID string, hooks ...db.Hook) (string, error)
 	HouseholdOf(ctx context.Context, userID string) (string, error)
 	Members(ctx context.Context, householdID string) ([]Member, error)
 	IsMember(ctx context.Context, householdID, userID string) (bool, error)
 	CreateInvite(ctx context.Context, householdID, createdBy, tokenHash string, expiresAt time.Time) error
-	AcceptInvite(ctx context.Context, tokenHash, userID string, now time.Time) (string, error)
+	AcceptInvite(ctx context.Context, tokenHash, userID string, now time.Time, hooks ...db.Hook) (string, error)
+	// LeaveHousehold tira a pessoa do casal. Pode sair mesmo sendo a única: o casal fica vazio.
+	LeaveHousehold(ctx context.Context, userID string, hooks ...db.Hook) error
 	// DeleteStaleInvites apaga convites usados ou vencidos há mais de olderThan.
 	DeleteStaleInvites(ctx context.Context, now time.Time, olderThan time.Duration) (int64, error)
 }
@@ -40,7 +44,7 @@ type PostgresRepo struct{ db *sql.DB }
 
 func NewPostgresRepo(db *sql.DB) *PostgresRepo { return &PostgresRepo{db: db} }
 
-func (r *PostgresRepo) CreateHousehold(ctx context.Context, userID string) (string, error) {
+func (r *PostgresRepo) CreateHousehold(ctx context.Context, userID string, hooks ...db.Hook) (string, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return "", err
@@ -58,10 +62,69 @@ func (r *PostgresRepo) CreateHousehold(ctx context.Context, userID string) (stri
 		}
 		return "", err
 	}
+	if err := runHooks(ctx, tx, hooks, db.Handoff{UserID: userID, To: id}); err != nil {
+		return "", err
+	}
 	if err := tx.Commit(); err != nil {
 		return "", err
 	}
 	return id, nil
+}
+
+// runHooks roda cada gancho na transação da mudança de casal; o primeiro erro desfaz tudo.
+func runHooks(ctx context.Context, tx *sql.Tx, hooks []db.Hook, h db.Handoff) error {
+	for _, hook := range hooks {
+		if err := hook(ctx, tx, h); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// LeaveHousehold tira a pessoa do casal. O casal é travado para não correr junto com um convite sendo aceito.
+// Os convites que ela criou e ninguém usou são revogados (e todos, se o casal ficou vazio), para ninguém
+// entrar num casal por um link que quem ficou não gerou.
+func (r *PostgresRepo) LeaveHousehold(ctx context.Context, userID string, hooks ...db.Hook) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	var householdID string
+	err = tx.QueryRowContext(ctx, `SELECT household_id FROM household_members WHERE user_id = $1`, userID).Scan(&householdID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return ErrNoHousehold
+	}
+	if err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `SELECT 1 FROM households WHERE id = $1 FOR UPDATE`, householdID); err != nil {
+		return err
+	}
+
+	var remaining sql.NullString
+	err = tx.QueryRowContext(ctx, `
+		SELECT user_id FROM household_members WHERE household_id = $1 AND user_id <> $2 LIMIT 1`,
+		householdID, userID).Scan(&remaining)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx,
+		`DELETE FROM household_members WHERE household_id = $1 AND user_id = $2`, householdID, userID); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `
+		DELETE FROM household_invites
+		WHERE household_id = $1 AND accepted_at IS NULL AND (created_by = $2 OR $3 = '')`,
+		householdID, userID, remaining.String); err != nil {
+		return err
+	}
+	h := db.Handoff{UserID: userID, From: householdID, RemainingUserID: remaining.String}
+	if err := runHooks(ctx, tx, hooks, h); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (r *PostgresRepo) HouseholdOf(ctx context.Context, userID string) (string, error) {
@@ -114,7 +177,7 @@ func (r *PostgresRepo) CreateInvite(ctx context.Context, householdID, createdBy,
 
 // AcceptInvite faz tudo em uma transação: valida o convite, trava o casal,
 // confere a vaga e registra a entrada.
-func (r *PostgresRepo) AcceptInvite(ctx context.Context, tokenHash, userID string, now time.Time) (string, error) {
+func (r *PostgresRepo) AcceptInvite(ctx context.Context, tokenHash, userID string, now time.Time, hooks ...db.Hook) (string, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return "", err
@@ -161,6 +224,9 @@ func (r *PostgresRepo) AcceptInvite(ctx context.Context, tokenHash, userID strin
 	if _, err := tx.ExecContext(ctx,
 		`UPDATE household_invites SET accepted_by = $1, accepted_at = $2 WHERE id = $3`,
 		userID, now, inviteID); err != nil {
+		return "", err
+	}
+	if err := runHooks(ctx, tx, hooks, db.Handoff{UserID: userID, To: householdID}); err != nil {
 		return "", err
 	}
 	if err := tx.Commit(); err != nil {

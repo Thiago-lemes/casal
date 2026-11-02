@@ -13,8 +13,12 @@ import (
 	"casal/internal/config"
 	"casal/internal/household"
 	"casal/internal/httpx"
+	"casal/internal/note"
 	"casal/internal/push"
 	"casal/internal/reminder"
+	"casal/internal/routine"
+	"casal/internal/shopping"
+	"casal/internal/task"
 )
 
 // Job é um processo em segundo plano; deve rodar até o contexto ser cancelado.
@@ -63,6 +67,35 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	reminder.NewHandler(reminder.NewService(reminderRepo, householdSvc), log).
 		Routes(mux, requireUser, requireHousehold)
 
+	// tarefas
+	taskRepo := task.NewPostgresRepo(conn)
+	task.NewHandler(task.NewService(taskRepo, householdSvc, notifier, log), log).
+		Routes(mux, requireUser, requireHousehold)
+
+	// rotina semanal
+	routineRepo := routine.NewPostgresRepo(conn)
+	routine.NewHandler(routine.NewService(routineRepo, routinePeople{householdSvc}), log).
+		Routes(mux, requireUser, requireHousehold)
+
+	// lista de compras
+	shoppingSvc := shopping.NewService(shopping.NewPostgresRepo(conn))
+	shopping.NewHandler(shoppingSvc, log).Routes(mux, requireUser, requireHousehold)
+
+	// anotações
+	noteRepo := note.NewPostgresRepo(conn)
+	note.NewHandler(note.NewService(noteRepo), log).
+		Routes(mux, requireUser, requireHousehold)
+
+	// mudança de casal: cada feature leva o que é pessoal e passa adiante o que era compartilhado,
+	// na mesma transação. Registrados aqui, antes de atender qualquer requisição.
+	householdSvc.OnLeave(noteRepo.HandleLeave)
+	householdSvc.OnLeave(routineRepo.HandleLeave)
+	householdSvc.OnLeave(taskRepo.HandleLeave)
+	householdSvc.OnLeave(reminderRepo.HandleLeave)
+	householdSvc.OnJoin(noteRepo.HandleJoin)
+	householdSvc.OnJoin(routineRepo.HandleJoin)
+	householdSvc.OnJoin(reminderRepo.HandleJoin)
+
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
 
@@ -75,7 +108,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	)
 	jobs := []Job{
 		reminder.NewWorker(reminderRepo, notifier, log).Run,
-		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites),
+		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
 	}
 	return handler, jobs, nil
 }

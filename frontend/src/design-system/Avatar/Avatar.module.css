@@ -2,8 +2,8 @@
   display: inline-grid;
   place-items: center;
   flex: none; /* nunca encolhe em um contêiner flex */
-  width: var(--tap);
-  height: var(--tap);
+  width: var(--avatar-size, var(--tap));
+  height: var(--avatar-size, var(--tap));
   aspect-ratio: 1;
   border-radius: var(--radius-pill);
   background: var(--avatar-bg, var(--color-accent));

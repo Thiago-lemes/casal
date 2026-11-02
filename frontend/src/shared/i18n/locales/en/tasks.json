@@ -1,0 +1,72 @@
+{
+  "title": "Tasks",
+  "openCount_one": "{{count}} open",
+  "openCount_other": "{{count}} open",
+  "new": "New task",
+  "tabs": {
+    "label": "Task status",
+    "open": "Open",
+    "declined": "Declined",
+    "done": "Done"
+  },
+  "empty": {
+    "open": {
+      "title": "Nothing to do",
+      "body": "Create a task for yourself, your partner or the couple. Whoever gets it can finish it or decline with a reason."
+    },
+    "declined": {
+      "title": "No declined tasks",
+      "body": "When someone declines a task, it shows up here with the reason so its creator can decide."
+    },
+    "done": {
+      "title": "Nothing done yet",
+      "body": "Finished tasks stay here, with who did them and when."
+    }
+  },
+  "loadError": "Could not load the tasks",
+  "unavailable": "This task changed or is no longer available. The list was refreshed.",
+  "assignee": {
+    "label": "Whose task",
+    "me": "Me",
+    "shared": "The couple's",
+    "legend": "For",
+    "sharedTag": "The couple's"
+  },
+  "due": {
+    "label": "Due (optional)",
+    "late": "Overdue",
+    "at": "Due {{when}}"
+  },
+  "row": {
+    "complete": "Finish task: {{title}}",
+    "completed": "Task done",
+    "by": "Created by {{name}}",
+    "byYou": "Created by you",
+    "doneBy": "{{name}} finished it on {{when}}",
+    "doneByYou": "You finished it on {{when}}",
+    "reason": "Reason for declining",
+    "declinedBy": "{{name}} declined"
+  },
+  "actions": {
+    "decline": "Decline",
+    "assume": "Take it",
+    "reassign": "Hand over",
+    "cancel": "Cancel task"
+  },
+  "composer": {
+    "title": "New task",
+    "name": "What needs doing?",
+    "placeholder": "Clean the bathroom",
+    "create": "Create task"
+  },
+  "decline": {
+    "title": "Decline task",
+    "lead": "Explain why so its creator can decide what to do.",
+    "reason": "Reason",
+    "submit": "Decline task"
+  },
+  "reassign": {
+    "title": "Hand the task over",
+    "submit": "Hand over"
+  }
+}

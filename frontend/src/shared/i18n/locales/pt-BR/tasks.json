@@ -1,0 +1,72 @@
+{
+  "title": "Tarefas",
+  "openCount_one": "{{count}} aberta",
+  "openCount_other": "{{count}} abertas",
+  "new": "Nova tarefa",
+  "tabs": {
+    "label": "Situação das tarefas",
+    "open": "Abertas",
+    "declined": "Recusadas",
+    "done": "Concluídas"
+  },
+  "empty": {
+    "open": {
+      "title": "Nada para fazer",
+      "body": "Crie uma tarefa para você, para a outra pessoa ou para o casal. Quem recebe pode concluir ou recusar com um motivo."
+    },
+    "declined": {
+      "title": "Nenhuma tarefa recusada",
+      "body": "Quando alguém recusar uma tarefa, ela aparece aqui com o motivo para quem criou decidir."
+    },
+    "done": {
+      "title": "Nada concluído ainda",
+      "body": "As tarefas concluídas ficam aqui, com quem fez e quando."
+    }
+  },
+  "loadError": "Não deu para carregar as tarefas",
+  "unavailable": "Essa tarefa mudou ou não está mais disponível. A lista foi atualizada.",
+  "assignee": {
+    "label": "De quem é",
+    "me": "Eu",
+    "shared": "Do casal",
+    "legend": "Para quem",
+    "sharedTag": "Do casal"
+  },
+  "due": {
+    "label": "Prazo (opcional)",
+    "late": "Atrasada",
+    "at": "Para {{when}}"
+  },
+  "row": {
+    "complete": "Concluir tarefa: {{title}}",
+    "completed": "Tarefa concluída",
+    "by": "Criada por {{name}}",
+    "byYou": "Criada por você",
+    "doneBy": "{{name}} concluiu em {{when}}",
+    "doneByYou": "Você concluiu em {{when}}",
+    "reason": "Motivo da recusa",
+    "declinedBy": "{{name}} recusou"
+  },
+  "actions": {
+    "decline": "Recusar",
+    "assume": "Assumir",
+    "reassign": "Passar para outra pessoa",
+    "cancel": "Cancelar tarefa"
+  },
+  "composer": {
+    "title": "Nova tarefa",
+    "name": "O que precisa ser feito?",
+    "placeholder": "Lavar o banheiro",
+    "create": "Criar tarefa"
+  },
+  "decline": {
+    "title": "Recusar tarefa",
+    "lead": "Explique o motivo para quem criou a tarefa decidir o que fazer.",
+    "reason": "Motivo",
+    "submit": "Recusar tarefa"
+  },
+  "reassign": {
+    "title": "Passar a tarefa",
+    "submit": "Passar tarefa"
+  }
+}

@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ApiError } from '@/shared/api/client'
 import { AuthPage } from '@/features/auth/AuthPage'
@@ -6,6 +7,9 @@ import { HomePage } from '@/features/household/HomePage'
 import { TodayPage } from '@/features/today/TodayPage'
 import { RequireAuth, RequireHousehold } from './guards'
 import { Shell } from './Shell'
+
+// uma página por pedaço de código: o carregamento inicial não cresce a cada tela nova
+const TasksRoute = lazy(() => import('./TasksRoute').then((m) => ({ default: m.TasksRoute })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +33,14 @@ export function App() {
               <Route element={<RequireHousehold />}>
                 <Route index element={<TodayPage />} />
                 <Route path="/home" element={<HomePage />} />
+                <Route
+                  path="/tasks"
+                  element={
+                    <Suspense fallback={null}>
+                      <TasksRoute />
+                    </Suspense>
+                  }
+                />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Route>

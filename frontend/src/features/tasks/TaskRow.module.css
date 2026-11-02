@@ -1,0 +1,125 @@
+.row {
+  display: grid;
+  grid-template-columns: var(--tap) 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-line);
+}
+
+/* concluir: círculo vazio que se enche de laranja ao passar o mouse ou focar */
+.check,
+.done {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-pill);
+}
+
+.check {
+  border: 2px solid var(--color-text-soft);
+  background: transparent;
+  color: transparent;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.check:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.check:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.done {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.main {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.row[data-status='done'] .title {
+  color: var(--color-text-soft);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.avatar {
+  --avatar-size: 1.5rem;
+  font-size: var(--text-xs);
+}
+
+.shared {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.meta [data-late] {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+/* o motivo da recusa é o que o criador precisa ler para decidir */
+.reason {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-m);
+  overflow-wrap: anywhere;
+}
+
+.reasonHead {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.doneBy {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}

@@ -3,7 +3,8 @@
     "today": "Today",
     "routine": "Routine",
     "home": "Home",
-    "main": "Main navigation"
+    "main": "Main navigation",
+    "tasks": "Tasks"
   },
   "routineSoon": "Coming soon",
   "actions": {

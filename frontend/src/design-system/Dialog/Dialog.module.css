@@ -1,0 +1,48 @@
+.overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  animation: fade var(--dur-base) var(--ease-out);
+}
+
+.sheet {
+  position: fixed;
+  z-index: 21;
+  inset: auto 0 0 0;
+  max-height: 92dvh;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+
+.title {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-4);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+}
+
+@media (min-width: 48rem) {
+  .sheet {
+    inset: 50% auto auto 50%;
+    width: min(32rem, 92vw);
+    border-radius: var(--radius-m);
+    transform: translate(-50%, -50%);
+    animation: fade var(--dur-base) var(--ease-out);
+  }
+}

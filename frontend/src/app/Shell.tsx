@@ -1,4 +1,4 @@
-import { CalendarClock, House, LayoutDashboard } from 'lucide-react'
+import { CalendarClock, House, LayoutDashboard, ListChecks } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +11,7 @@ type Item = { to: string; key: string; icon: LucideIcon; end?: boolean; soon?: b
 const items: Item[] = [
   { to: '/', key: 'today', icon: LayoutDashboard, end: true },
   { to: '/routine', key: 'routine', icon: CalendarClock, soon: true },
+  { to: '/tasks', key: 'tasks', icon: ListChecks },
   { to: '/home', key: 'home', icon: House },
 ]
 

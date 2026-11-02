@@ -72,3 +72,42 @@ func TestHandoffOnLeaveAndJoin(t *testing.T) {
 		t.Errorf("o Carlos não participa desse lembrete: %+v %v", list, err)
 	}
 }
+
+// Lembretes que outro módulo criou com ref (contas a pagar) são do casal, não da pessoa: ao sair, os pendentes dela
+// são cancelados (quem fica os refaz) e, ao entrar em outro casal, nenhum vai junto.
+func TestHandoffRefRemindersBelongToTheHouseholdNotThePerson(t *testing.T) {
+	conn := testutil.OpenDB(t)
+	ctx := context.Background()
+	ana := testutil.NewUser(t, conn, "ana")
+	beto := testutil.NewUser(t, conn, "beto")
+	hh := testutil.NewHousehold(t, conn, ana, beto)
+	hh2 := testutil.NewHousehold(t, conn)
+	repo := NewPostgresRepo(conn)
+	at := time.Now().Add(time.Hour)
+
+	forBeto, err := repo.CreateWithRef(ctx, Reminder{HouseholdID: hh, CreatedBy: beto, RecipientID: beto, Body: "conta do Beto", RemindAt: at}, "bill:1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	forAna, err := repo.CreateWithRef(ctx, Reminder{HouseholdID: hh, CreatedBy: ana, RecipientID: ana, Body: "conta da Ana", RemindAt: at}, "bill:2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	status := func(id string) (st, household string) {
+		t.Helper()
+		testutil.SystemScan(t, conn, `SELECT status, household_id FROM reminders WHERE id = $1`, []any{id}, &st, &household)
+		return
+	}
+
+	testutil.RunHook(t, conn, repo.HandleLeave, db.Handoff{UserID: beto, From: hh, RemainingUserID: ana})
+	if st, _ := status(forBeto.ID); st != "canceled" {
+		t.Errorf("o lembrete de conta de quem saiu deveria ser cancelado: %s", st)
+	}
+	if st, _ := status(forAna.ID); st != "scheduled" {
+		t.Errorf("o de quem ficou continua: %s", st)
+	}
+	testutil.RunHook(t, conn, repo.HandleJoin, db.Handoff{UserID: beto, To: hh2})
+	if _, h := status(forBeto.ID); h != hh {
+		t.Errorf("lembrete com ref não acompanha a pessoa: %s", h)
+	}
+}

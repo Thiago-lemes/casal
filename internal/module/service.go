@@ -27,16 +27,24 @@ type Status struct {
 type Service struct {
 	repo  Repository
 	hooks map[string][]Hook
+	after map[string][]func(ctx context.Context, householdID string, enabled bool)
 }
 
 func NewService(repo Repository) *Service {
-	return &Service{repo: repo, hooks: map[string][]Hook{}}
+	return &Service{repo: repo, hooks: map[string][]Hook{}, after: map[string][]func(context.Context, string, bool){}}
 }
 
 // OnEnable registra um gancho que roda quando o módulo passa de desligado a ligado, na mesma transação.
 // Como religar também conta, o gancho precisa ser idempotente (por exemplo, as categorias padrão de Finanças
 // usam a chave e ignoram as que já existem). Registre na montagem do app, antes de atender requisições.
 func (s *Service) OnEnable(name string, h Hook) { s.hooks[name] = append(s.hooks[name], h) }
+
+// AfterChange registra uma função que roda depois de o módulo ser ligado ou desligado, já fora da transação
+// (é onde se mexe em outras features, como os lembretes). Não devolve erro: quem registra trata e registra a falha,
+// e um job de reconciliação cobre o que não deu certo.
+func (s *Service) AfterChange(name string, f func(ctx context.Context, householdID string, enabled bool)) {
+	s.after[name] = append(s.after[name], f)
+}
 
 func (s *Service) List(ctx context.Context, householdID string) ([]Status, error) {
 	on, err := s.repo.Enabled(ctx, householdID)
@@ -64,6 +72,9 @@ func (s *Service) Set(ctx context.Context, householdID, name string, enabled boo
 		}
 	} else if err := s.repo.Disable(ctx, householdID, name); err != nil {
 		return Status{}, err
+	}
+	for _, f := range s.after[name] {
+		f(ctx, householdID, enabled)
 	}
 	return s.status(ctx, householdID, name)
 }

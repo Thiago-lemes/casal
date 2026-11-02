@@ -11,6 +11,7 @@ import (
 
 	"casal/internal/auth"
 	"casal/internal/config"
+	"casal/internal/finance"
 	"casal/internal/household"
 	"casal/internal/httpx"
 	"casal/internal/module"
@@ -69,8 +70,8 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 
 	// lembretes
 	reminderRepo := reminder.NewPostgresRepo(conn)
-	reminder.NewHandler(reminder.NewService(reminderRepo, householdSvc), log).
-		Routes(mux, requireUser, requireHousehold)
+	reminderSvc := reminder.NewService(reminderRepo, householdSvc)
+	reminder.NewHandler(reminderSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// tarefas
 	taskRepo := task.NewPostgresRepo(conn)
@@ -91,15 +92,26 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	note.NewHandler(note.NewService(noteRepo), log).
 		Routes(mux, requireUser, requireHousehold)
 
+	// finanças (módulo opcional): as rotas exigem o módulo ligado; as categorias padrão nascem ao ligá-lo e os
+	// lembretes das contas acompanham o módulo
+	financeRepo := finance.NewPostgresRepo(conn)
+	financeSvc := finance.NewService(financeRepo, financePeople{householdSvc}, financeReminders{reminderSvc}, notifier, log)
+	finance.NewHandler(financeSvc, log).
+		Routes(mux, requireUser, requireHousehold, module.Require(moduleSvc, log, module.Finance))
+	moduleSvc.OnEnable(module.Finance, finance.SeedCategories)
+	moduleSvc.AfterChange(module.Finance, financeSvc.ModuleChanged)
+
 	// mudança de casal: cada feature leva o que é pessoal e passa adiante o que era compartilhado,
 	// na mesma transação. Registrados aqui, antes de atender qualquer requisição.
 	householdSvc.OnLeave(noteRepo.HandleLeave)
 	householdSvc.OnLeave(routineRepo.HandleLeave)
 	householdSvc.OnLeave(taskRepo.HandleLeave)
 	householdSvc.OnLeave(reminderRepo.HandleLeave)
+	householdSvc.OnLeave(financeRepo.HandleLeave)
 	householdSvc.OnJoin(noteRepo.HandleJoin)
 	householdSvc.OnJoin(routineRepo.HandleJoin)
 	householdSvc.OnJoin(reminderRepo.HandleJoin)
+	householdSvc.OnJoin(financeRepo.HandleJoin)
 
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
@@ -114,6 +126,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	jobs := []Job{
 		reminder.NewWorker(reminderRepo, notifier, log).Run,
 		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
+		maintenance(log, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
 	}
 	return handler, jobs, nil
 }

@@ -86,7 +86,8 @@ func (s *Service) CreateWithRef(ctx context.Context, householdID, creatorID, rec
 	}, ref)
 }
 
-// CancelByRef cancela os lembretes pendentes criados com esse ref. Cancelar o que não existe não é erro.
+// CancelByRef cancela os lembretes pendentes criados com esse ref e devolve quantos eram. Cancelar o que não existe
+// não é erro.
 func (s *Service) CancelByRef(ctx context.Context, householdID, ref string) (int64, error) {
 	return s.repo.CancelByRef(ctx, householdID, ref)
 }

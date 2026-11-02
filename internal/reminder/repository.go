@@ -264,7 +264,8 @@ func (p *PostgresRepo) MarkSent(ctx context.Context, id string, now time.Time) e
 }
 
 // HandleLeave roda quando alguém sai do casal: os lembretes ainda pendentes entre as duas pessoas são cancelados
-// (ninguém mais está lá para recebê-los ou resolvê-los). Os que a pessoa deixou para si mesma ficam com ela.
+// (ninguém mais está lá para recebê-los ou resolvê-los). Os que a pessoa deixou para si mesma ficam com ela, menos os
+// que outro módulo criou com ref (contas a pagar): esses são do casal, não da pessoa, e quem fica os refaz.
 // Roda na transação da saída.
 func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff) error {
 	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
@@ -273,7 +274,8 @@ func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff
 	_, err := tx.ExecContext(ctx, `
 		UPDATE reminders SET status = 'canceled'
 		WHERE household_id = $1 AND status IN ('scheduled', 'sent')
-		  AND created_by <> recipient_id AND (created_by = $2 OR recipient_id = $2)`, h.From, h.UserID)
+		  AND (created_by = $2 OR recipient_id = $2)
+		  AND (created_by <> recipient_id OR ref IS NOT NULL)`, h.From, h.UserID)
 	return err
 }
 
@@ -284,6 +286,6 @@ func (p *PostgresRepo) HandleJoin(ctx context.Context, tx *sql.Tx, h db.Handoff)
 	}
 	_, err := tx.ExecContext(ctx, `
 		UPDATE reminders SET household_id = $2
-		WHERE created_by = $1 AND recipient_id = $1 AND household_id <> $2`, h.UserID, h.To)
+		WHERE created_by = $1 AND recipient_id = $1 AND household_id <> $2 AND ref IS NULL`, h.UserID, h.To)
 	return err
 }

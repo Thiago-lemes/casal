@@ -1,14 +1,16 @@
 .avatar {
   display: inline-grid;
   place-items: center;
+  flex: none; /* nunca encolhe em um contêiner flex */
   width: var(--tap);
   height: var(--tap);
+  aspect-ratio: 1;
   border-radius: var(--radius-pill);
   background: var(--avatar-bg, var(--color-accent));
   color: var(--avatar-fg, var(--color-on-accent));
-  font-family: var(--font-display);
+  font-family: var(--font-text); /* a condensada deixava a inicial estreita e o avatar parecendo achatado */
   font-weight: 700;
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   line-height: 1;
   user-select: none;
 }

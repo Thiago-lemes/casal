@@ -88,8 +88,6 @@
 @media (min-width: 48rem) {
   /* o trilho é o campo de laranja; o conteúdo é uma folha com o canto de dentro arredondado */
   .shell {
-    display: grid;
-    grid-template-columns: var(--rail-w) 1fr;
     padding-bottom: 0;
     background: var(--color-accent);
   }
@@ -105,18 +103,17 @@
   }
 
   .main {
-    grid-column: 2;
+    margin-left: var(--rail-w);
     min-height: 100dvh;
     background: var(--color-bg);
     border-radius: var(--radius-l) 0 0 var(--radius-l);
   }
 
+  /* fixo: o trilho e o avatar não rolam com a página */
   .nav {
-    grid-column: 1;
-    grid-row: 1;
-    position: sticky;
-    top: 0;
-    inset: auto;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--rail-w);
     height: 100dvh;
     flex-direction: column;
     padding: 5rem var(--space-4) var(--space-4);

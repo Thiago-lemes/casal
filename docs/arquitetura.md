@@ -19,6 +19,8 @@ internal/
   note/              anotações (texto ou checklist), pessoais ou do casal, com visibilidade
   routine/           rotina semanal: blocos, repetição, exceções, horários livres, quem está onde
   shopping/          lista de compras do casal (itens iguais somam, comprados saem sozinhos)
+  module/            módulos opcionais por casal (Finanças): liga, desliga e o middleware que barra rota de módulo desligado
+  finance/           gastos, divisão e acerto de contas, renda, gastos fixos, contas a pagar, orçamento
   push/              Web Push (assinaturas e envio)
 
   apperr/            classifica erros de negócio (inválido, não achou, conflito...) sem HTTP
@@ -102,6 +104,10 @@ e quem ficou) e rodam **na mesma transação** da mudança: se um falhar, nada m
 | tarefas | as abertas e recusadas viram de quem ficou | nada (tarefas são do casal) |
 | lembretes | os pendentes entre os dois são cancelados | os da pessoa para ela mesma vêm junto |
 | compras | nada (é do casal) | nada |
+| finanças | se há saldo em aberto, um acerto `leave` (só registro) trava os gastos abertos, inclusive parcelas futuras; fixos e contas da pessoa passam para quem ficou; a divisão padrão volta para igual; o pessoal "view" vira privado | gastos e fixos pessoais, a renda e as categorias que usavam, **sempre privados** |
+
+Lembretes criados por outro módulo com `ref` (contas a pagar) são do casal, não da pessoa: ao sair, os pendentes dela são
+cancelados (quem fica os refaz) e nenhum acompanha a pessoa a outro casal.
 
 Quem sai fica **sem casal** (as rotas do casal respondem `403 no_household`) e pode criar outro ou aceitar um convite.
 Os convites que ela criou e ninguém usou são revogados; se o casal ficou vazio, todos.
@@ -112,6 +118,36 @@ precisa da cláusula `OR current_setting('app.system', true) = 'on'` na polític
 **Cuidado:** um casal vazio guarda os dados pessoais de quem saiu até a pessoa criar ou entrar em outro casal.
 Como `household_id` tem `ON DELETE CASCADE`, **apagar um casal vazio apaga esses dados**. Nada no código apaga casais;
 se algum dia houver limpeza de casais vazios, ela precisa antes migrar ou descartar esses dados de propósito.
+
+## Módulos opcionais
+
+`module.Require(svc, log, "finance")` barra as rotas de um módulo desligado (`403 module_disabled`). Desligar apaga só a
+linha de `household_modules`: os dados ficam e voltam ao religar. O gancho `OnEnable` roda na transação que liga (as categorias
+padrão de Finanças; precisa ser idempotente, pois religar também dispara) e `AfterChange` roda depois, fora da transação
+(cancela ou refaz os lembretes das contas). Os jobs só olham casais com o módulo ligado.
+
+## Dinheiro (Finanças)
+
+- **Centavos inteiros** (`bigint`), nunca ponto flutuante. A divisão é em pontos-base (soma 10000); a parte de cada um é
+  `floor(valor × pontos ÷ 10000)` e os centavos que sobram vão para quem perdeu a maior parte fracionária (empate: menor
+  `user_id`). A mesma regra reparte as parcelas (os extras vão para as primeiras) e a divisão proporcional. `finance.Distribute`
+  é a única implementação, com teste de propriedade.
+- **Cada gasto do casal guarda o seu `split`** na criação. Mudar a divisão do casal não reescreve gastos antigos.
+- **Saldo e acerto.** O saldo soma, nos gastos do casal ainda abertos (`settlement_id` nulo, `spent_on <= hoje`), o que cada um
+  pagou menos a parte que lhe cabe. Parcelas futuras só entram quando a data chega. O acerto trava os gastos abertos com
+  `FOR UPDATE`, recalcula e só grava se o valor enviado for exatamente o saldo (`409 settlement_stale`); dois acertos ao mesmo
+  tempo se enfileiram e o segundo já não acha nada em aberto. Gasto acertado é imutável: corrige-se com um gasto novo.
+- **Privacidade entre os parceiros vive só no código** (o RLS não separa os dois do mesmo casal). Todo SQL de leitura de gasto
+  usa `visibleTo` (`scope = 'household' OR created_by = quem pergunta OR visibility = 'view'`); gasto pessoal nunca entra em
+  saldo, resumo do casal ou orçamento. O teste usa dois parceiros no mesmo casal e foi provado removendo o filtro.
+- **Renda.** Só o dono lê a própria (`finance_incomes` é consultada por `user_id = quem pergunta`). A divisão proporcional lê as
+  duas dentro do service, mas só devolve a **divisão resultante**, e só vale com as duas rendas e a concordância dos dois; senão
+  o gasto cai em igual com `split_fallback`. Mudar a renda avisa o parceiro sem valores.
+- **Lembretes das contas** vivem na feature `reminder` (fora da transação da conta). Cada um leva um `ref` com o vencimento e a
+  pessoa; mudar um dos dois muda os refs, e o sincronismo cancela os velhos e cria os novos. Se falhar, a resposta é `200` com
+  `sync_pending` e o job de hora em hora recalcula.
+- **Jobs.** Gastos fixos (gera o gasto do dia no fuso de quem paga; idempotente, e apagar um gerado não o recria) e
+  reconciliação de lembretes.
 
 ## Códigos de erro
 

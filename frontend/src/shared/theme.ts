@@ -19,7 +19,7 @@ function apply(choice: ThemeChoice) {
 
   // a barra do navegador acompanha o tema efetivo
   const dark = choice === 'dark' || (choice === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#15171B' : '#F26A1B')
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#1C1A19' : '#F26A1B')
 }
 
 /** Aplica o tema salvo antes do primeiro desenho, para não piscar. */

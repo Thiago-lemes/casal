@@ -1,9 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ApiError } from '@/shared/api/client'
 import { AuthPage } from '@/features/auth/AuthPage'
 import { HomePage } from '@/features/household/HomePage'
-import { MorePage } from '@/features/settings/MorePage'
 import { TodayPage } from '@/features/today/TodayPage'
 import { RequireAuth, RequireHousehold } from './guards'
 import { Shell } from './Shell'
@@ -27,10 +26,10 @@ export function App() {
           <Route path="/register" element={<AuthPage mode="register" />} />
           <Route element={<RequireAuth />}>
             <Route element={<Shell />}>
-              <Route path="/more" element={<MorePage />} />
               <Route element={<RequireHousehold />}>
                 <Route index element={<TodayPage />} />
                 <Route path="/home" element={<HomePage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
             </Route>
           </Route>

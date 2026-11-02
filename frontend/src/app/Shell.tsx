@@ -1,40 +1,53 @@
+import { CalendarClock, House, LayoutDashboard } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { APP_NAME } from '@/shared/config'
 import styles from './Shell.module.css'
+import { UserMenu } from './UserMenu'
 
-const items = [
-  { to: '/', key: 'today', end: true },
-  { to: '/routine', key: 'routine', disabled: true },
-  { to: '/home', key: 'home' },
-  { to: '/more', key: 'more' },
-] as const
+type Item = { to: string; key: string; icon: LucideIcon; end?: boolean; soon?: boolean }
 
-/** Moldura do app: barra inferior no celular, coluna lateral no desktop. */
+const items: Item[] = [
+  { to: '/', key: 'today', icon: LayoutDashboard, end: true },
+  { to: '/routine', key: 'routine', icon: CalendarClock, soon: true },
+  { to: '/home', key: 'home', icon: House },
+]
+
+/** Moldura do app: avatar no canto superior esquerdo; barra inferior no celular, trilho no desktop. */
 export function Shell() {
   const { t } = useTranslation()
 
   return (
     <div className={styles.shell}>
-      <nav className={styles.nav} aria-label={t('nav.main')}>
+      <header className={styles.top}>
+        <UserMenu />
         <p className={styles.brand}>{APP_NAME}</p>
+      </header>
+
+      <nav className={styles.nav} aria-label={t('nav.main')}>
         <ul className={styles.items}>
-          {items.map((item) => (
-            <li key={item.key}>
-              {'disabled' in item ? (
+          {items.map(({ to, key, icon: Icon, end, soon }) => (
+            <li key={key}>
+              {soon ? (
                 <span className={styles.link} aria-disabled="true">
-                  {t(`nav.${item.key}`)}
-                  <span className={styles.soon}>{t('routineSoon')}</span>
+                  <Icon className={styles.icon} aria-hidden="true" />
+                  <span className={styles.text}>
+                    {t(`nav.${key}`)}
+                    <span className={styles.soon}>{t('routineSoon')}</span>
+                  </span>
                 </span>
               ) : (
-                <NavLink to={item.to} end={'end' in item} className={styles.link}>
-                  {t(`nav.${item.key}`)}
+                <NavLink to={to} end={end} className={styles.link}>
+                  <Icon className={styles.icon} aria-hidden="true" />
+                  <span className={styles.text}>{t(`nav.${key}`)}</span>
                 </NavLink>
               )}
             </li>
           ))}
         </ul>
       </nav>
+
       <main className={styles.main}>
         <Outlet />
       </main>

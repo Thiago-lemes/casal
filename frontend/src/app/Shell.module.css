@@ -7,8 +7,18 @@
   min-width: 0;
 }
 
+/* canto superior esquerdo: avatar e nome do app */
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-1);
+}
+
 .brand {
-  display: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
 }
 
 .nav {
@@ -23,19 +33,31 @@
 
 .items {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   height: var(--bar-h);
 }
 
-.link {
+.items li {
   display: grid;
-  place-content: center;
-  height: 100%;
-  font-weight: 600;
-  font-size: var(--text-sm);
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   color: var(--color-text-soft);
+  font-weight: 600;
+  font-size: var(--text-xs);
   text-decoration: none;
   text-align: center;
+}
+
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke-width: 1.75;
 }
 
 .link:global(.active) {
@@ -62,29 +84,37 @@
     background: var(--color-accent);
   }
 
+  .top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 11;
+    width: var(--rail-w);
+    padding: var(--space-5) var(--space-4);
+    color: var(--color-on-accent);
+    /* sobre o laranja, o avatar é escuro */
+    --avatar-bg: var(--color-on-accent);
+    --avatar-fg: var(--color-on-dark);
+  }
+
   .main {
+    grid-column: 2;
     min-height: 100dvh;
     background: var(--color-bg);
     border-radius: var(--radius-l) 0 0 var(--radius-l);
   }
 
   .nav {
+    grid-column: 1;
+    grid-row: 1;
     position: sticky;
     top: 0;
     inset: auto;
     height: 100dvh;
-    padding: var(--space-6) var(--space-4);
+    padding: 6.5rem var(--space-4) var(--space-6);
     background: transparent;
     color: var(--color-on-accent);
     border-top: 0;
-  }
-
-  .brand {
-    display: block;
-    margin: 0 var(--space-3) var(--space-5);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--text-2xl);
   }
 
   .items {
@@ -95,13 +125,19 @@
   }
 
   .link {
-    place-content: center start;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-3);
     height: var(--tap);
     padding: 0 var(--space-4);
     border-radius: var(--radius-pill);
     color: var(--color-on-accent);
     font-size: var(--text-md);
     text-align: left;
+  }
+
+  .text {
+    display: grid;
   }
 
   .link:hover:not([aria-disabled='true']) {
@@ -116,6 +152,9 @@
 
   .link[aria-disabled='true'] {
     opacity: 0.85;
+    height: auto;
+    min-height: var(--tap);
+    padding-block: var(--space-1);
   }
 
   .soon {

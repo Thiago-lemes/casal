@@ -1,7 +1,16 @@
 {
-  "nav": { "today": "Hoje", "routine": "Rotina", "home": "Casa", "more": "Mais", "main": "Navegação principal" },
+  "nav": {
+    "today": "Hoje",
+    "routine": "Rotina",
+    "home": "Casa",
+    "main": "Navegação principal"
+  },
   "routineSoon": "Em breve",
-  "actions": { "tryAgain": "Tentar de novo", "cancel": "Cancelar", "close": "Fechar" },
+  "actions": {
+    "tryAgain": "Tentar de novo",
+    "cancel": "Cancelar",
+    "close": "Fechar"
+  },
   "settings": {
     "title": "Preferências",
     "theme": "Tema",
@@ -21,5 +30,8 @@
     "upstream": "Um serviço externo falhou. Tente de novo em instantes.",
     "network": "Sem conexão. Verifique a internet e tente de novo.",
     "unknown": "Algo deu errado. Tente de novo."
+  },
+  "userMenu": {
+    "label": "Menu da conta de {{name}}"
   }
 }

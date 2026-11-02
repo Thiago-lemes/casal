@@ -1,7 +1,16 @@
 {
-  "nav": { "today": "Today", "routine": "Routine", "home": "Home", "more": "More", "main": "Main navigation" },
+  "nav": {
+    "today": "Today",
+    "routine": "Routine",
+    "home": "Home",
+    "main": "Main navigation"
+  },
   "routineSoon": "Coming soon",
-  "actions": { "tryAgain": "Try again", "cancel": "Cancel", "close": "Close" },
+  "actions": {
+    "tryAgain": "Try again",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
   "settings": {
     "title": "Preferences",
     "theme": "Theme",
@@ -21,5 +30,8 @@
     "upstream": "An outside service failed. Try again in a moment.",
     "network": "No connection. Check your internet and try again.",
     "unknown": "Something went wrong. Try again."
+  },
+  "userMenu": {
+    "label": "Account menu for {{name}}"
   }
 }

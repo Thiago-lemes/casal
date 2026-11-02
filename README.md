@@ -5,6 +5,7 @@ lembretes entre o casal e avisos por Web Push, mesmo com o app fechado.
 
 - Visão e escopo do produto: [docs/produto.md](docs/produto.md)
 - Como o código está organizado e as regras do projeto: [docs/arquitetura.md](docs/arquitetura.md)
+- Como o frontend vai crescer (convenções, entregas e telas): [docs/frontend-implementacao.md](docs/frontend-implementacao.md)
 - Guia passo a passo da implementação: [docs/guia-implementacao.md](docs/guia-implementacao.md)
 
 ## Requisitos
@@ -89,18 +90,30 @@ Tudo sob `/v1`, JSON, autenticação por cookie de sessão.
 | --- | --- |
 | `POST /auth/register`, `/auth/login` | cria conta / entra (limitado a poucas tentativas) |
 | `POST /auth/logout`, `/auth/logout-all` | sai deste aparelho / de todos |
-| `GET /me` | quem está logado |
+| `GET /me`, `PATCH /me` | quem está logado / muda nome e fuso (nome IANA, ex.: `America/Sao_Paulo`) |
 | `POST /household` | cria o casal |
 | `GET /household` | membros do casal |
 | `POST /household/invites` | gera convite (vale 7 dias, uso único) |
 | `POST /household/invites/accept` | entra no casal com o token |
+| `POST /household/leave` | sai do casal: o compartilhado fica com quem permanece, o pessoal acompanha quem sai |
 | `POST /reminders`, `GET /reminders` | cria / lista lembretes |
 | `POST /reminders/{id}/resolve`, `/snooze` | quem recebeu resolve ou adia |
 | `DELETE /reminders/{id}` | quem criou cancela |
+| `POST /tasks`, `GET /tasks?status=open\|done\|declined` | cria (para mim, para o parceiro ou do casal; com `repeat` e `rotation`) / lista |
+| `POST /tasks/{id}/complete` | o responsável conclui (qualquer um, se for do casal; o criador também) |
+| `POST /tasks/{id}/decline` | o responsável recusa, com justificativa obrigatória; o criador é avisado |
+| `POST /tasks/{id}/assign`, `DELETE /tasks/{id}` | o criador reatribui (reabre a tarefa) / cancela |
+| `POST /notes`, `GET /notes?q=&tag=`, `GET /notes/{id}` | cria / lista e busca / lê (só o que a pessoa pode ver) |
+| `PUT /notes/{id}`, `DELETE /notes/{id}` | edita (com `version`; `409` se mudou) / apaga (só o dono) |
+| `POST/GET /routine/blocks`, `GET/PUT/DELETE /routine/blocks/{id}` | blocos da rotina semanal (repetição, visibilidade, `version`) |
+| `PUT/DELETE /routine/blocks/{id}/exceptions/{data}` | folga ou horário trocado num dia, sem mudar a rotina fixa |
+| `GET /routine/occurrences?from=&to=`, `/routine/free?date=`, `/routine/now` | o que acontece, horários livres dos dois e quem está onde agora |
+| `POST/GET /shopping/items`, `PUT/DELETE /shopping/items/{id}` | lista de compras do casal (itens iguais somam) |
+| `POST /shopping/items/{id}/bought`, `/unbought`, `POST /shopping/restock` | marca / desfaz a compra / repõe os recorrentes |
 | `GET /push/vapid-key`, `POST/DELETE /push/subscriptions`, `POST /push/test` | Web Push |
 | `GET /healthz` | saúde (fora do `/v1`) |
 
-Erros vêm como `{"error": "mensagem"}`; cada resposta traz `X-Request-Id`, o mesmo que aparece nos logs.
+Erros vêm como `{"error": "mensagem", "code": "..."}` (o cliente traduz pelo `code`); cada resposta traz `X-Request-Id`, o mesmo que aparece nos logs.
 
 ## Antes de mexer no código
 

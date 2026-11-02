@@ -53,7 +53,7 @@ O público inicial são casais que moram juntos e têm rotinas diferentes, a com
 
 Seis princípios guiam as decisões de produto, e quando duas funcionalidades competem, vence a que respeita mais esses princípios.
 
-1. **O casal é a unidade.** Tudo pertence ao casal, e cada pessoa também tem seu espaço individual.
+1. **O casal é a unidade, mas a pessoa também.** Tudo vive dentro do casal, e cada pessoa tem seu espaço individual dentro dele.
 2. **Simples de dois.** Poucos toques para o que se repete todo dia; nada que exija manual.
 3. **Útil no primeiro dia.** O app entrega valor antes de o casal preencher muita coisa.
 4. **Módulos opcionais.** Cada casal liga só o que usa; o que não usa não atrapalha.
@@ -70,15 +70,17 @@ O produto gira em torno do **casal** (a casa), e cada funcionalidade vive em um 
 
 - É formado por duas pessoas, cada uma com sua conta, ligadas por um convite.
 - Concentra tudo o que é compartilhado: rotina, lembretes, compras, tarefas, receitas, freezer e gastos.
-- Cada pessoa mantém também o que é só seu, como blocos pessoais e gastos individuais.
+- Cada pessoa mantém também o que é só seu, como blocos pessoais, anotações, metas e gastos individuais.
+- **Uso sem casal (ideia futura):** servir a quem mora sozinho ou não tem parceiro, sem exigir vínculo. Fica fora do início: hoje toda pessoa usa o app dentro de um casal.
 
 **Os módulos**
 
 | Módulo | O que resolve | Quando entra |
 | --- | --- | --- |
-| Base | Rotina, lembretes, compras e tarefas da casa | Sempre ativo |
+| Base | Rotina, lembretes, anotações, compras e tarefas da casa | Sempre ativo |
 | Marmita | Receitas, cardápio, dia de cozinhar e freezer | Opcional, fase 2 |
 | Finanças | Gastos compartilhados e individuais, acerto de contas | Opcional, fase 3 |
+| Metas | Metas financeiras, de hábitos, do casal e projetos com etapas | Opcional, fase 4 |
 
 **Como os módulos se ligam**
 
@@ -94,11 +96,13 @@ O primeiro contato precisa levar o casal de zero ao primeiro valor em poucos min
 **Conta e vínculo do casal**
 
 - Cada pessoa cria sua conta com nome e uma foto opcional.
+- A própria pessoa indica onde está (cidade) e o app deduz o fuso horário; ela pode atualizar ao viajar. O app nunca rastreia a localização.
 - A primeira pessoa cria o casal e gera um convite compartilhável por link.
 - A segunda pessoa aceita o convite e passa a fazer parte do mesmo casal.
 - Cada conta pertence a um único casal por vez.
 - Qualquer um dos dois pode sair do casal; os dados compartilhados continuam com quem permanecer, e os dados pessoais de quem sai o acompanham.
-- Enquanto o convite não for aceito, o app funciona em modo individual, para o primeiro uso já ser útil.
+- O vínculo é obrigatório: toda pessoa usa o app dentro de um casal.
+- Enquanto o convite não for aceito, o casal tem uma pessoa só e o app funciona normalmente, para o primeiro uso já ser útil.
 
 **Apresentação inicial (onboarding)**
 
@@ -140,7 +144,7 @@ A rotina é o coração do produto: cada pessoa descreve sua semana típica em b
 **Regras**
 
 - Cada um edita apenas os próprios blocos; blocos do casal podem ser editados pelos dois.
-- Um bloco marcado como pessoal aparece para o parceiro apenas como "ocupado", sem detalhes.
+- Cada bloco tem uma visibilidade escolhida por quem o criou: **compartilhado** (o parceiro vê os detalhes), **só ocupado** (o parceiro vê apenas o horário como "ocupado") ou **privado** (o parceiro não vê nada). O mesmo vale para anotações e metas pessoais: o dono decide se o parceiro vê.
 - Blocos que se sobrepõem geram um aviso, mas não são impedidos.
 - Uma semana de exceção pode ser copiada da semana típica e ajustada.
 
@@ -173,6 +177,20 @@ Um lembrete é um recado com hora marcada que uma pessoa deixa para a outra (ou 
 - Lembretes de um para o outro não podem ser apagados pelo destinatário sem resolver, para não sumirem sem aviso.
 - Há um limite de avisos por hora para evitar excesso de notificações.
 
+## Módulo Base: anotações
+
+As anotações guardam o que não cabe em lembrete nem em tarefa: ideias, listas, combinados e informações da casa.
+
+- Há dois tipos de nota: **pessoal** (só do dono) e **do casal** (os dois leem e editam).
+- Cada nota é texto livre ou checklist, com título e etiquetas livres.
+- Uma linha de checklist vira tarefa ou lembrete com um toque (por exemplo, para o parceiro).
+- Notas podem ser fixadas no topo e buscadas por texto ou etiqueta.
+
+| Nota | Quem lê | Quem edita |
+| --- | --- | --- |
+| Pessoal | O dono | O dono |
+| Do casal | Os dois | Os dois |
+
 ## Módulo Base: lista de compras e tarefas da casa
 
 A lista de compras e as tarefas são os itens do dia a dia da casa, e as duas existem para o casal enxergar o que falta e quem cuida de quê.
@@ -193,12 +211,13 @@ A lista de compras e as tarefas são os itens do dia a dia da casa, e as duas ex
 - O rodízio alterna o responsável a cada ciclo, para dividir de forma justa.
 - Um histórico simples mostra quem concluiu o quê, sem ranking nem cobrança.
 - Uma tarefa pode virar um lembrete para o parceiro com um toque.
+- Quem recebe uma tarefa pode recusá-la, mas precisa escrever uma justificativa. Quem criou é avisado e pode reatribuir, assumir ou cancelar a tarefa.
 
 | Elemento | Quem pode criar | Quem pode concluir |
 | --- | --- | --- |
 | Item de compra | Qualquer um dos dois | Qualquer um dos dois |
 | Tarefa atribuída a mim | Qualquer um dos dois | Eu |
-| Tarefa atribuída ao parceiro | Qualquer um dos dois | O parceiro (o criador pode confirmar) |
+| Tarefa atribuída ao parceiro | Qualquer um dos dois | O parceiro (o criador pode confirmar); o parceiro pode recusar com justificativa |
 | Tarefa do casal | Qualquer um dos dois | Qualquer um dos dois |
 
 ## Módulo Marmita: receitas, cardápio, dia de cozinhar e freezer
@@ -272,7 +291,7 @@ O módulo Finanças dá ao casal clareza sobre quanto gasta, quem pagou o quê e
 **Orçamento e metas**
 
 - Limite mensal por categoria, com aviso ao se aproximar dele.
-- Metas do casal (viagem, reserva, compra grande) com valor, prazo e acompanhamento do quanto já foi guardado.
+- Metas financeiras (viagem, reserva, compra grande) com valor, prazo e acompanhamento do quanto já foi guardado; elas são um tipo do módulo Metas.
 
 **Contas a pagar**
 
@@ -285,6 +304,27 @@ O módulo Finanças dá ao casal clareza sobre quanto gasta, quem pagou o quê e
 - O resumo mostra quanto do mercado foi gasto em ingredientes do cardápio.
 
 **Fora do escopo inicial:** ligação direta com contas bancárias, pagamentos dentro do app, investimentos e declaração de imposto. O módulo registra e organiza, mas não movimenta dinheiro.
+
+## Módulo Metas
+
+O módulo Metas reúne o que a pessoa ou o casal quer alcançar, com acompanhamento simples do progresso.
+
+**Tipos de meta**
+
+| Tipo | Exemplo | Como mede o progresso |
+| --- | --- | --- |
+| Financeira | Juntar para a viagem | Valor guardado em relação ao valor e ao prazo (liga com Finanças) |
+| Hábito | Treinar 3 vezes por semana | Marcação a cada ocorrência, com contagem da semana |
+| Do casal | Fazer um jantar fora por mês | Os dois acompanham e marcam |
+| Projeto | Organizar o quarto novo | Etapas, que podem virar tarefas |
+
+**Regras**
+
+- Toda meta é pessoal ou do casal; a pessoal só o dono vê, a menos que escolha compartilhar.
+- Metas têm prazo opcional e podem ser concluídas, pausadas ou arquivadas.
+- Etapas de um projeto viram tarefas, e o progresso da meta acompanha as tarefas concluídas.
+- Hábitos geram um lembrete opcional no horário que a pessoa escolher.
+- O histórico mostra o progresso, sem ranking nem cobrança entre os dois.
 
 ## Jornadas principais do casal
 
@@ -327,13 +367,13 @@ As regras abaixo definem o comportamento esperado do produto e servem de base pa
 
 | Área | Regra |
 | --- | --- |
-| Casal | Um casal tem exatamente duas pessoas; cada pessoa pertence a um casal por vez |
+| Casal | Um casal tem exatamente duas pessoas; cada pessoa pertence a um casal por vez; enquanto o convite não é aceito, o casal tem uma pessoa |
 | Convite | O link de convite vale por um prazo (sugestão: 7 dias), pode ser reenviado e é invalidado depois de aceito |
 | Saída | Quem sai do casal perde acesso aos dados compartilhados; o parceiro que fica mantém tudo |
 | Permissões | Qualquer um dos dois edita o que é do casal; o que é pessoal só o dono edita |
-| Privacidade | Um item marcado como pessoal aparece ao parceiro no máximo como "ocupado", sem detalhes |
+| Privacidade | Cada item pessoal tem uma visibilidade escolhida pelo dono (compartilhado, só "ocupado" ou privado); o padrão é o mais restrito |
 | Módulos | Desativar um módulo o esconde, mas não apaga os dados; ao reativar, tudo volta |
-| Fuso horário | Cada pessoa tem o seu; lembretes disparam no fuso do destinatário |
+| Fuso horário | Cada pessoa tem o seu, deduzido da cidade que ela informa; lembretes disparam no fuso do destinatário |
 | Lembretes | Um lembrete só deixa de aparecer quando resolvido ou apagado por quem criou |
 | Lista de compras | Itens iguais são somados; itens comprados saem da lista após um período |
 | Cardápio | Mudar uma refeição já planejada atualiza a lista de compras e avisa o que mudou |
@@ -355,7 +395,7 @@ O app é pensado para o celular, com cinco áreas principais sempre à mão e os
 | Hoje | Resumo do dia do casal | Base |
 | Semana | Rotina dos dois, horários livres e quem está onde | Base |
 | Lembretes | Recados entre os dois e lembretes automáticos | Base |
-| Casa | Compras, tarefas, receitas, cardápio, freezer e finanças | Base + módulos |
+| Casa | Compras, tarefas, anotações, receitas, cardápio, freezer, finanças e metas | Base + módulos |
 | Perfil | Conta, casal, módulos, avisos e privacidade | Base |
 
 **Telas por área**
@@ -487,15 +527,16 @@ Na pesquisa de 24/10/2026 não apareceu nenhum app que una rotina do casal, marm
 
 ## Roadmap por fases
 
-O produto avança em quatro fases, e cada fase só começa quando a anterior cumpre seu critério de saída.
+O produto avança em cinco fases, e cada fase só começa quando a anterior cumpre seu critério de saída.
 
 1. **Fase 0: validar o essencial.** Provar que os lembretes chegam de forma confiável no celular dos dois, incluindo iPhone. *Saída:* um lembrete criado por um chega ao outro no horário, de forma repetida, durante uma semana.
-2. **Fase 1: base para o casal.** Conta, vínculo, rotina semanal com horários livres, lembretes, lista de compras e tarefas da casa. *Saída:* o casal criador usa a rotina e os lembretes todos os dias por duas semanas.
+2. **Fase 1: base para o casal.** Conta, vínculo do casal, rotina semanal com horários livres, tarefas (inclusive para o outro), anotações, lembretes e lista de compras. A ordem de construção é rotina, tarefas e anotações primeiro. *Saída:* o casal criador usa a rotina, as tarefas e os lembretes todos os dias por duas semanas.
 3. **Fase 2: módulo Marmita.** Receitas, cardápio, lista automática, dia de cozinhar e freezer. *Saída:* o casal faz pelo menos duas semanas de marmitas usando o app do início ao fim.
 4. **Fase 3: módulo Finanças.** Gastos, acerto de contas, orçamento, metas e contas a pagar. *Saída:* o casal fecha um mês de acerto de contas pelo app.
-5. **Fase 4: abrir para outros casais.** Convite de teste para 5 a 10 casais, ajustes e definição dos planos pagos. *Saída:* a maioria dos casais de teste continua usando após quatro semanas.
+5. **Fase 4: módulo Metas.** Metas financeiras, de hábitos, do casal e projetos com etapas. *Saída:* o casal acompanha pelo app ao menos uma meta de cada tipo por um mês.
+6. **Fase 5: abrir para outros casais.** Convite de teste para 5 a 10 casais, ajustes e definição dos planos pagos. *Saída:* a maioria dos casais de teste continua usando após quatro semanas.
 
-**O que fica de fora até a Fase 4**
+**O que fica de fora até a Fase 5**
 
 - Ligação com bancos, pagamentos dentro do app e importação automática de receitas.
 - Famílias com filhos e grupos de mais de duas pessoas.
@@ -539,9 +580,8 @@ Os maiores riscos são o uso real dos avisos no celular e o tamanho do público 
 - [ ] Qual será o nome do produto?
 - [ ] Quais celulares o casal usa hoje, para planejar os avisos?
 - [ ] Quais refeições o casal quer planejar (almoço, jantar, lanche)?
-- [ ] A divisão de gastos será igual ou proporcional à renda?
-- [ ] Os blocos pessoais devem aparecer como "ocupado" ou ficar totalmente ocultos?
-- [ ] Quem entra no teste da Fase 4 (amigos, colegas, comunidade de meal prep)?
-- [ ] Haverá receitas prontas no início ou o catálogo começa vazio?
+- [ ] A divisão de gastos será igual ou proporcional à renda?- [ ] Quem entra no teste da Fase 5 (amigos, colegas, comunidade de meal prep)?
+- [ ] Uma nota pessoal pode ser compartilhada com o parceiro só para leitura ou também para edição?
+- [ ] Metas de hábito: marcação manual a cada ocorrência basta, ou o app deve sugerir a marcação pela rotina?- [ ] Haverá receitas prontas no início ou o catálogo começa vazio?
 - [ ] Qual o limite do plano gratuito?
 - [ ] Quanto tempo por semana o casal pode dedicar ao desenvolvimento?

@@ -51,13 +51,13 @@ A ordem segue o roadmap do produto e o que o backend já tem. Cada entrega termi
 | # | Entrega | Backend | Situação do backend |
 | --- | --- | --- | --- |
 | F1 | Tarefas | `/v1/tasks` | Pronto. **Frontend feito**; falta o bloco "Tarefas de hoje" na tela Hoje |
-| F2 | Anotações | a criar | Falta |
-| F3 | Rotina semanal | a criar | Falta (inclui visibilidade e fuso) |
-| F4 | Lembretes em tela própria e perfil | `/v1/reminders`, `/v1/me` | Lembretes prontos; edição de perfil e fuso faltam |
-| F5 | Lista de compras | a criar | Falta |
+| F2 | Anotações | `/v1/notes` | Pronto |
+| F3 | Rotina semanal | `/v1/routine/*` | Pronto (inclui visibilidade e horários livres); o fuso vem do perfil |
+| F4 | Lembretes em tela própria e perfil | `/v1/reminders`, `PATCH /v1/me`, `POST /v1/household/leave` | Pronto |
+| F5 | Lista de compras | `/v1/shopping/*` | Pronto |
 | F6 | Marmita, Finanças, Metas | a criar | Fases 2 a 4 do produto |
 
-Só F1 está desbloqueada. Para F2 em diante, o backend vem primeiro e este documento ganha uma seção por entrega.
+Da F1 à F5 o backend está pronto: veja o **Contrato do backend** mais abaixo. O fuso (cidade informada pela pessoa) precisa de uma lista de cidades no frontend e deve entrar **antes da rotina (F3)**.
 
 ## F1 — Tarefas
 
@@ -136,7 +136,7 @@ export type Task = {
 
 ### Textos e erros
 
-Namespace novo `tasks` em `pt-BR` e `en`. O backend ainda não envia um `code` estável: hoje "tarefa não encontrada" (id errado, outro casal, sem permissão) chega como `404 not_found`. A interface mostra uma mensagem única ("Essa tarefa mudou ou não está mais disponível. Atualize a lista") e recarrega a lista. Se mais tarde o backend enviar códigos próprios (`task_not_allowed`, `reason_required`), troca-se só o texto.
+Namespace novo `tasks` em `pt-BR` e `en`. O backend agora envia `code` em todo erro (veja o **Contrato do backend**): "tarefa não encontrada" (id errado, outro casal, sem permissão) chega como `404 task_not_found`. A interface mostra uma mensagem única ("Essa tarefa mudou ou não está mais disponível. Atualize a lista") e recarrega a lista. Falta de justificativa na recusa e prazo inválido chegam como `400 invalid`.
 
 ### Testes
 
@@ -156,7 +156,7 @@ Namespace novo `tasks` em `pt-BR` e `en`. O backend ainda não envia um `code` e
 
 ## Itens transversais
 
-**Fuso horário.** `GET /v1/me` já devolve `timezone` e a tela Hoje o usa. Falta o fluxo decidido no produto: a pessoa informa a cidade e o app deduz o fuso. Isso exige um endpoint de edição do perfil (por exemplo `PATCH /v1/me`) e uma lista de cidades com fuso no frontend. Entra na F4, mas **antes da rotina (F3)**, porque a rotina depende do fuso certo.
+**Fuso horário.** `GET /v1/me` já devolve `timezone` e a tela Hoje o usa. O fluxo decidido no produto é a pessoa informar a cidade e o app deduzir o fuso: o backend já aceita `PATCH /v1/me` com `timezone` (nome IANA), e falta a lista de cidades com fuso no frontend. Entra na F4, mas **antes da rotina (F3)**, porque a rotina depende do fuso certo.
 
 **Privacidade por item.** Blocos de rotina, anotações e metas pessoais terão visibilidade escolhida pelo dono (compartilhado, só "ocupado" ou privado). Criar um componente único `VisibilityPicker` em `shared/` e reutilizá-lo nas três telas, com o padrão no valor mais restrito.
 
@@ -170,20 +170,61 @@ Namespace novo `tasks` em `pt-BR` e `en`. O backend ainda não envia um `code` e
 
 **Qualidade de design.** Antes de fechar cada tela, rodar `npm run detect` e, se quiser uma revisão de hierarquia, espaçamento e estados, a skill `impeccable`.
 
-## Pendências de backend que travam o frontend
+## Contrato do backend (Fase 1 completa)
 
-| Pendência | Trava |
+O backend da Fase 1 está pronto: tarefas, anotações, rotina, lista de compras, perfil e saída do casal. Tudo sob `/v1`, JSON, cookie de sessão. O que o frontend precisa saber de cada parte:
+
+### Erros
+
+Toda resposta de erro é `{"error": "frase em português", "code": "..."}`. **Traduza pelo `code`**, nunca mostre a frase. O `code` é o do tipo do erro (`invalid` 400, `unauthorized` 401, `forbidden` 403, `not_found` 404, `conflict` 409, `upstream` 502, `internal` 500; `429` não traz `code`, derive do status) ou um específico:
+
+| `code` | Quando |
 | --- | --- |
-| Anotações (pessoais e do casal, texto e checklist) | F2 |
-| Rotina: blocos, repetição, exceções, visibilidade e horários livres | F3 |
-| `PATCH /v1/me` para cidade e fuso | F4 e F3 |
-| Código de erro estável nas respostas (`code`), em vez de só o status | Mensagens de erro específicas em todas as telas |
-| Sair do casal | Tela de Perfil |
-| Lista de compras | F5 |
+| `no_household` (403) | A pessoa não tem casal: mostrar a tela de criar ou entrar |
+| `already_in_household`, `household_full`, `invite_invalid` | Convites e casal |
+| `email_taken`, `invalid_credentials` | Cadastro e login |
+| `task_not_found`, `reminder_not_found` | Id errado, outro casal ou sem permissão (indistinguíveis de propósito) |
+| `note_not_found` / `note_forbidden` / `note_conflict` | Não vê a nota / vê mas não pode alterar (403) / alguém gravou antes: recarregue (409) |
+| `routine_not_found` / `routine_forbidden` / `routine_conflict` | O mesmo, para blocos da rotina |
+| `shopping_not_found`, `shopping_duplicate` | Item inexistente / já existe um igual aberto (ao renomear ou desfazer a compra) |
+
+### Perfil
+
+`PATCH /v1/me` com `name` e/ou `timezone` (campo ausente fica como está). O fuso é um nome IANA válido (`America/Sao_Paulo`); a lista de cidades fica no frontend. `Local` e nomes inventados dão `400`. Os horários da rotina e as janelas livres usam o fuso do perfil.
+
+### Tarefas (novidades)
+
+`POST /v1/tasks` aceita `repeat` (`none`, `daily`, `weekly`, `monthly`) e `rotation` (rodízio: exige `repeat` e responsável; não vale em tarefa do casal). A tarefa devolvida traz `repeat` e `rotation`. Ao **concluir** uma tarefa que se repete, a próxima já nasce aberta (prazo um ciclo adiante, ou o próximo futuro se estava atrasada; no rodízio, com a outra pessoa como responsável, que recebe o aviso). Basta recarregar a lista; a resposta de `complete` é só a tarefa concluída. Recusar e cancelar não criam a próxima. Passar uma tarefa com rodízio para "do casal" desliga o rodízio.
+
+### Anotações
+
+`POST /v1/notes` com `title`, `kind` (`text` ou `checklist`), `body` (só texto), `items` (`[{text, done}]`, só checklist), `tags`, `visibility` e `pinned`. `visibility`: `private` (padrão), `view` (o parceiro lê) ou `household` (os dois editam). `GET /v1/notes?q=&tag=` lista só o que a pessoa vê, fixadas primeiro; a busca olha título, texto e itens. `PUT /v1/notes/{id}` substitui o conteúdo e **exige `version`** (a que a pessoa viu): `409 note_conflict` se mudou. `kind` não muda depois de criada; `visibility` só o dono muda (vazio mantém). `DELETE` só o dono. Para virar tarefa ou lembrete, o frontend chama a API de tarefas ou de lembretes com o texto da linha.
+
+### Rotina
+
+Bloco: `title`, `category` (`work`, `study`, `workout`, `commute`, `appointment`, `home`, `other`), `location`, `visibility` (`private` o parceiro não vê; `busy` vê só o horário; `view` vê os detalhes; `household` bloco do casal, os dois editam), `recurrence` (`once` ou `weekly`), `weekdays` (1 segunda a 7 domingo), `interval_weeks` (1 a 4; 2 é semana sim, semana não), `start_date` (para `once`, o dia; para `weekly`, a âncora da regra), `end_date` opcional, `start` e `end` em `"HH:MM"` (`end` aceita `"24:00"`; o fim deve ser depois do início, sem cruzar a meia-noite), `version`.
+
+| Rota | O que faz |
+| --- | --- |
+| `POST/GET /v1/routine/blocks`, `GET/PUT/DELETE .../{id}` | CRUD. `PUT` exige `version` (`409 routine_conflict`). Só o dono apaga. `POST` e `PUT` devolvem `overlaps`: ids de outros blocos **seus** que se sobrepõem (aviso, nunca impede) |
+| `PUT /v1/routine/blocks/{id}/exceptions/{AAAA-MM-DD}` | Exceção num dia: `{"skip": true}` (folga) ou `{"start","end"}` (outro horário). Só em dia em que o bloco acontece. `DELETE` na mesma rota desfaz |
+| `GET /v1/routine/occurrences?from=&to=` | O que acontece, dos dois, entre os dias (até 62), já em instantes UTC (`start_at`, `end_at`). Serve o dia e a semana |
+| `GET /v1/routine/free?date=&min=30&from_hour=7&to_hour=22` | Janelas em que os dois estão livres, no dia do fuso de quem pergunta. Só conta o que a pessoa vê |
+| `GET /v1/routine/now` | Quem está onde agora: uma entrada por pessoa, com `now` nulo se não há nada marcado (ou nada visível) |
+
+Um bloco do parceiro marcado como `busy` chega com `busy: true`, `title`, `category` e `location` vazios: mostre "ocupado". Blocos `private` do parceiro **não aparecem em lugar nenhum**, nem nos cálculos.
+
+### Lista de compras
+
+Item: `name`, `quantity` (opcional), `unit`, `category` (`produce`, `grocery`, `cleaning`, `butcher`, `other`), `recurring`, `bought_at`. `POST /v1/shopping/items` soma a quantidade num item aberto igual (mesmo nome sem diferenciar maiúsculas, unidade e categoria): responde `200` com `merged: true` em vez de `201`. `GET` devolve os abertos e os comprados nas últimas 24 horas (abertos primeiro). `PUT /{id}` substitui o item; `POST /{id}/bought` e `/unbought` marcam e desfazem; `DELETE` apaga. `POST /v1/shopping/restock` traz de volta os itens recorrentes já comprados (`{"restocked": n}`).
+
+### Sair do casal
+
+`POST /v1/household/leave` (`204`). Quem sai fica **sem casal**: as rotas do casal passam a responder `403 no_household`, e a pessoa pode criar outro casal ou aceitar um convite. O que era compartilhado fica com quem permanece (notas e blocos do casal, tarefas abertas, lista de compras); o que era pessoal acompanha quem sai e chega ao próximo casal **sempre privado**. Lembretes pendentes entre os dois são cancelados. Convites que a pessoa criou e ninguém usou deixam de valer. Peça confirmação na tela: não há como desfazer.
 
 ## Perguntas em aberto
 
 - ~~O criador deve ver na aba Recusadas só as tarefas que ele criou, ou todas do casal?~~ Decidido na F1: mostra todas; as ações só aparecem para o criador.
 - ~~A página de tarefas entra na barra principal já agora?~~ Decidido na F1: entrou na barra (Hoje · Rotina em breve · Tarefas · Casa; com o avatar são cinco itens no celular).
-- Tarefa recorrente e rodízio (previstos no produto) ficam para uma segunda entrega das tarefas. Confirmar.
+- Tarefa recorrente e rodízio: o backend já está pronto (`repeat` e `rotation`, veja o contrato). Falta decidir se entram na mesma tela de criar tarefa ou numa segunda entrega do frontend.
 - Lista de cidades com fuso: usar uma lista curta embutida (cidades brasileiras) ou a lista completa do `Intl`?

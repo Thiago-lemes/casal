@@ -15,6 +15,10 @@ internal/
   auth/              contas, senhas, sessões, cookie
   household/         casal (2 pessoas) e convites
   reminder/          lembretes e o agendador que os dispara
+  task/              tarefas do casal: atribuir, concluir, recusar com justificativa, repetir e rodízio
+  note/              anotações (texto ou checklist), pessoais ou do casal, com visibilidade
+  routine/           rotina semanal: blocos, repetição, exceções, horários livres, quem está onde
+  shopping/          lista de compras do casal (itens iguais somam, comprados saem sozinhos)
   push/              Web Push (assinaturas e envio)
 
   apperr/            classifica erros de negócio (inválido, não achou, conflito...) sem HTTP
@@ -70,6 +74,51 @@ viram `500 erro interno`, sem detalhes, e vão para o log com o `request_id`.
 
 **Regra de revisão:** se uma consulta não tem `household_id`, ela precisa de justificativa.
 Toda tabela nova com `household_id` ganha política de RLS na mesma migração que a cria.
+
+## Itens pessoais dentro do casal
+
+O RLS isola um casal do outro, mas **não** separa os dois parceiros: ambos têm o mesmo `household_id`.
+Itens que podem ser pessoais (anotações hoje; blocos de rotina e metas depois) ganham:
+
+- `owner_id`: quem criou, e único que apaga e que muda a visibilidade;
+- `visibility`: `private` (só o dono), `view` (o parceiro lê) ou `household` (os dois leem e editam). O padrão é `private`.
+
+Essa trava vive **só no código**: toda consulta de leitura filtra por dono ou visibilidade (inclusive listagem e busca)
+e toda escrita confere a permissão no `WHERE`, além do service. Por isso o teste de integração desses itens precisa
+de **dois parceiros no mesmo casal**, além de dois casais. Quem lê mas não pode alterar recebe `403`; quem nem pode ler recebe `404`.
+
+Itens editados pelos dois (notas do casal) levam `version`: gravar com uma versão velha dá `409`, em vez de apagar o que o outro escreveu.
+
+## Mudança de casal (sair, criar, entrar)
+
+Sair do casal move dados entre casais, o que as features não podem fazer sozinhas nem importando umas às outras.
+O `household` expõe dois ganchos (`Service.OnLeave` e `Service.OnJoin`), e o `app` registra o de cada feature
+(`HandleLeave` e `HandleJoin` no repository). Os ganchos recebem um `db.Handoff` (quem, de qual casal, para qual,
+e quem ficou) e rodam **na mesma transação** da mudança: se um falhar, nada muda.
+
+| Feature | Ao sair | Ao criar casal ou entrar em um |
+| --- | --- | --- |
+| notas, rotina | o que era do casal passa para quem ficou; o que o parceiro lia ou via vira privado e fica com quem saiu | as da pessoa (deixadas para trás) vêm junto, **sempre privadas** |
+| tarefas | as abertas e recusadas viram de quem ficou | nada (tarefas são do casal) |
+| lembretes | os pendentes entre os dois são cancelados | os da pessoa para ela mesma vêm junto |
+| compras | nada (é do casal) | nada |
+
+Quem sai fica **sem casal** (as rotas do casal respondem `403 no_household`) e pode criar outro ou aceitar um convite.
+Os convites que ela criou e ninguém usou são revogados; se o casal ficou vazio, todos.
+
+Os ganchos usam o escopo de sistema (`db.SetScope` com `System: true`), então toda tabela cujo dado pode mudar de casal
+precisa da cláusula `OR current_setting('app.system', true) = 'on'` na política de RLS.
+
+**Cuidado:** um casal vazio guarda os dados pessoais de quem saiu até a pessoa criar ou entrar em outro casal.
+Como `household_id` tem `ON DELETE CASCADE`, **apagar um casal vazio apaga esses dados**. Nada no código apaga casais;
+se algum dia houver limpeza de casais vazios, ela precisa antes migrar ou descartar esses dados de propósito.
+
+## Códigos de erro
+
+`httpx.Fail` responde `{"error": "...", "code": "..."}`. O `code` é o do tipo do erro (`invalid`, `unauthorized`,
+`forbidden`, `not_found`, `conflict`, `upstream`, `internal`) ou um específico, declarado com
+`apperr.NewCoded(kind, "note_conflict", msg)`. O cliente traduz pelo `code` e nunca mostra a frase.
+Use código próprio quando a tela precisa agir diferente (por exemplo, recarregar ao receber `note_conflict`).
 
 ## Agendador de lembretes
 

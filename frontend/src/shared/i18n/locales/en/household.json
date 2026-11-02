@@ -12,6 +12,16 @@
     "title": "Invite to your couple",
     "lead": "Send this code. It is valid for 7 days and only one person can use it.",
     "copy": "Copy code",
-    "copied": "Code copied"
+    "copied": "Code copied",
+    "expires": "Valid until {{date}}."
+  },
+  "status": {
+    "complete": "Couple complete. Reminders reach both of you.",
+    "waiting": "Your partner has not joined yet."
+  },
+  "members": {
+    "title": "Who lives here",
+    "you": "{{name}} (you)",
+    "since": "In the couple since {{date}}"
   }
 }

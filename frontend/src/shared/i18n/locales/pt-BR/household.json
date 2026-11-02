@@ -12,6 +12,16 @@
     "title": "Convite para o casal",
     "lead": "Mande este código. Ele vale por 7 dias e só uma pessoa pode usá-lo.",
     "copy": "Copiar código",
-    "copied": "Código copiado"
+    "copied": "Código copiado",
+    "expires": "Vale até {{date}}."
+  },
+  "status": {
+    "complete": "Casal formado. Os lembretes chegam para os dois.",
+    "waiting": "Falta convidar a outra pessoa."
+  },
+  "members": {
+    "title": "Quem mora aqui",
+    "you": "{{name}} (você)",
+    "since": "No casal desde {{date}}"
   }
 }

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { WeekDay } from '@/features/reminders/stats'
-import { Card } from './Card'
+import { Card } from '@/design-system'
 import styles from './WeekBars.module.css'
 
 /** Baixas dos últimos 7 dias; a barra de hoje é a única em laranja. */

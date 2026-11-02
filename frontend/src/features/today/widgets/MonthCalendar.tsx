@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { dayKey } from '@/features/reminders/stats'
-import { Card } from './Card'
+import { Card } from '@/design-system'
 import styles from './MonthCalendar.module.css'
 
 /** Mês com os dias que têm lembrete pendente marcados. */

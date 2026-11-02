@@ -1,6 +1,7 @@
+import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/design-system'
+import { Avatar, Button, Card } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { useCreateInvite, useHousehold } from './hooks'
@@ -8,7 +9,7 @@ import styles from './HomePage.module.css'
 
 /** "Casa": quem faz parte do casal e o convite para a segunda pessoa. */
 export function HomePage() {
-  const { t } = useTranslation('household')
+  const { t, i18n } = useTranslation('household')
   const { t: tc } = useTranslation('common')
   const me = useMe().data
   const household = useHousehold().data
@@ -22,18 +23,48 @@ export function HomePage() {
     try {
       await navigator.clipboard.writeText(token)
       setCopied(true)
+      window.setTimeout(() => setCopied(false), 2500)
     } catch {
       /* sem permissão de área de transferência: o código continua visível para copiar à mão */
     }
   }
 
+  const expires =
+    invite.data &&
+    new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'long' }).format(new Date(invite.data.expires_at))
+
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>{household.members.map((m) => m.name).join(' & ')}</h1>
+      <header className={styles.hero}>
+        <h1 className={styles.title}>{household.members.map((m) => m.name).join(' & ')}</h1>
+        <p className={styles.status}>{partner ? t('status.complete') : t('status.waiting')}</p>
+      </header>
+
+      <Card title={t('members.title')} className={styles.members}>
+        <ul className={styles.memberList}>
+          {household.members.map((m) => {
+            const mine = m.id === me.id
+            return (
+              <li key={m.id} className={styles.member} data-mine={mine || undefined}>
+                <Avatar name={m.name} className={styles.avatar} />
+                <div>
+                  <p className={styles.memberName}>{mine ? t('members.you', { name: m.name }) : m.name}</p>
+                  <p className={styles.memberSince}>
+                    {t('members.since', {
+                      date: new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' }).format(
+                        new Date(m.joined_at),
+                      ),
+                    })}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      </Card>
 
       {!partner && (
-        <section className={styles.invite}>
-          <h2 className={styles.subtitle}>{t('invite.title')}</h2>
+        <Card title={t('invite.title')} className={styles.invite}>
           <p className={styles.lead}>{t('invite.lead')}</p>
           {!invite.data && (
             <Button variant="primary" loading={invite.isPending} onClick={() => invite.mutate()}>
@@ -43,7 +74,9 @@ export function HomePage() {
           {invite.data && (
             <>
               <code className={styles.token}>{invite.data.token}</code>
+              <p className={styles.expires}>{t('invite.expires', { date: expires })}</p>
               <Button onClick={() => void copy(invite.data.token)}>
+                {copied ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
                 {copied ? t('invite.copied') : t('invite.copy')}
               </Button>
             </>
@@ -53,7 +86,7 @@ export function HomePage() {
               {errorMessage(tc, invite.error)}
             </p>
           )}
-        </section>
+        </Card>
       )}
     </div>
   )

@@ -7,8 +7,12 @@
   min-width: 0;
 }
 
-/* topo: só o nome do app */
+/* topo no celular: avatar e nome do app; fica fixo ao rolar */
 .top {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background: var(--color-bg);
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -39,12 +43,13 @@
   height: var(--bar-h);
 }
 
-/* quarto item da barra: a conta */
+/* no celular a conta está no topo; este é o avatar do trilho do desktop */
 .account {
+  display: none;
+}
+
+.topAccount {
   display: grid;
-  place-items: center;
-  width: 4.5rem;
-  height: var(--bar-h);
 }
 
 .items li {
@@ -99,6 +104,7 @@
     z-index: 11;
     width: var(--rail-w);
     padding: var(--space-6) var(--space-5) 0;
+    background: transparent;
     color: var(--color-on-accent);
   }
 
@@ -130,9 +136,12 @@
   }
 
   /* pé do trilho: avatar e nome; sobre o laranja o avatar é escuro */
+  .topAccount {
+    display: none;
+  }
+
   .account {
-    width: auto;
-    height: auto;
+    display: grid;
     margin-top: auto;
     place-items: stretch;
     --avatar-bg: var(--color-on-accent);

@@ -18,8 +18,8 @@ const themes: { value: ThemeChoice; key: string; icon: LucideIcon }[] = [
 ]
 const languageNames: Record<Language, string> = { 'pt-BR': 'Português', en: 'English' }
 
-/** Avatar no canto superior esquerdo; abre a conta: tema, idioma e sair. */
-export function UserMenu() {
+/** Avatar da conta; abre tema, avisos, idioma e sair. `side` diz para que lado o menu abre. */
+export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const { t, i18n } = useTranslation()
   const me = useMe().data
   const [theme, setTheme] = useTheme()
@@ -37,7 +37,7 @@ export function UserMenu() {
         <span className={styles.triggerName}>{me.name}</span>
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Content className={styles.content} side="top" align="start" sideOffset={8} collisionPadding={12}>
+        <Menu.Content className={styles.content} side={side} align="start" sideOffset={8} collisionPadding={12}>
           <div className={styles.who}>
             <Avatar name={me.name} />
             <div className={styles.whoText}>

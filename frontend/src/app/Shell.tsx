@@ -6,11 +6,11 @@ import { APP_NAME } from '@/shared/config'
 import styles from './Shell.module.css'
 import { UserMenu } from './UserMenu'
 
-type Item = { to: string; key: string; icon: LucideIcon; end?: boolean; soon?: boolean }
+type Item = { to: string; key: string; icon: LucideIcon; end?: boolean }
 
 const items: Item[] = [
   { to: '/', key: 'today', icon: LayoutDashboard, end: true },
-  { to: '/routine', key: 'routine', icon: CalendarClock, soon: true },
+  { to: '/routine', key: 'routine', icon: CalendarClock },
   { to: '/tasks', key: 'tasks', icon: ListChecks },
   { to: '/home', key: 'home', icon: House },
 ]
@@ -31,22 +31,12 @@ export function Shell() {
 
       <nav className={styles.nav} aria-label={t('nav.main')}>
         <ul className={styles.items}>
-          {items.map(({ to, key, icon: Icon, end, soon }) => (
+          {items.map(({ to, key, icon: Icon, end }) => (
             <li key={key}>
-              {soon ? (
-                <span className={styles.link} aria-disabled="true">
-                  <Icon className={styles.icon} aria-hidden="true" />
-                  <span className={styles.text}>
-                    {t(`nav.${key}`)}
-                    <span className={styles.soon}>{t('routineSoon')}</span>
-                  </span>
-                </span>
-              ) : (
-                <NavLink to={to} end={end} className={styles.link}>
-                  <Icon className={styles.icon} aria-hidden="true" />
-                  <span className={styles.text}>{t(`nav.${key}`)}</span>
-                </NavLink>
-              )}
+              <NavLink to={to} end={end} className={styles.link}>
+                <Icon className={styles.icon} aria-hidden="true" />
+                <span className={styles.text}>{t(`nav.${key}`)}</span>
+              </NavLink>
             </li>
           ))}
         </ul>

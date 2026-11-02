@@ -1,0 +1,143 @@
+.week {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.day {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3);
+  background: var(--color-card);
+  border-radius: var(--radius-l);
+}
+
+.day[data-today] {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.dayHead {
+  display: grid;
+  justify-items: center;
+  min-height: var(--tap);
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-m);
+  background: transparent;
+  color: inherit;
+}
+
+.dayHead:hover {
+  background: var(--color-bg);
+}
+
+.dow {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.num {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.day[data-today] .num {
+  color: var(--color-accent-text);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.none {
+  align-self: center;
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap);
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-m);
+  color: var(--color-text);
+  text-align: left;
+  background: color-mix(in srgb, var(--tone) 20%, var(--color-card));
+}
+
+.item[data-tone='me'] {
+  --tone: var(--color-person-a);
+}
+
+.item[data-tone='partner'] {
+  --tone: var(--color-person-b);
+}
+
+.item:hover {
+  background: color-mix(in srgb, var(--tone) 32%, var(--color-card));
+}
+
+.item[data-busy] {
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--tone) 16%, var(--color-card)) 0 6px, var(--color-card) 6px 12px);
+}
+
+.time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.what {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.who {
+  flex: none;
+  color: var(--color-text-soft);
+  font-size: var(--text-xs);
+}
+
+@media (min-width: 64rem) {
+  .week {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .day {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .dayHead {
+    grid-auto-flow: column;
+    justify-content: center;
+    gap: var(--space-2);
+    align-items: baseline;
+  }
+
+  .item {
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    padding: var(--space-2);
+  }
+}

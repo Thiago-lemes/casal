@@ -1,0 +1,29 @@
+.list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tone[data-tone='me'] {
+  --avatar-bg: var(--color-person-a);
+  --avatar-fg: var(--color-on-person);
+}
+
+.tone[data-tone='partner'] {
+  --avatar-bg: var(--color-person-b);
+  --avatar-fg: var(--color-on-person);
+}
+
+.name {
+  font-weight: 600;
+}
+
+.what {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}

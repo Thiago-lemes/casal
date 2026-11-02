@@ -48,9 +48,10 @@
   --c-orange-text: #b8430a; /* laranja que passa AA como texto sobre o fundo claro */
   --c-orange-wash: #fde7d8;
   --c-person-a: #2459d9;
-  --c-person-b: #0e8a6b;
+  --c-person-b: #0b7a5e;
   --c-danger: #b42318;
   --c-on-danger: #ffffff;
+  --c-on-person: #ffffff;
   --c-ok: #1a7f4b;
   color-scheme: light;
 }
@@ -70,6 +71,7 @@
     --c-person-b: #3fcb9e;
     --c-danger: #ff8f85;
     --c-on-danger: #15171b;
+    --c-on-person: #15171b;
     --c-ok: #54d38d;
     color-scheme: dark;
   }
@@ -89,6 +91,7 @@
   --c-person-b: #3fcb9e;
   --c-danger: #ff8f85;
   --c-on-danger: #15171b;
+  --c-on-person: #15171b;
   --c-ok: #54d38d;
   color-scheme: dark;
 }
@@ -113,6 +116,7 @@
   --color-ok: var(--c-ok);
   --color-person-a: var(--c-person-a);
   --color-person-b: var(--c-person-b);
+  --color-on-person: var(--c-on-person);
 }
 
 @media (min-width: 48rem) {

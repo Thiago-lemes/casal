@@ -1,0 +1,72 @@
+{
+  "title": "Week",
+  "new": "New block",
+  "loadError": "Could not load the routine",
+  "busy": "Busy",
+  "views": { "label": "Routine view", "day": "Day", "week": "Week", "free": "Free time" },
+  "nav": { "prev": "Previous", "next": "Next", "today": "Today" },
+  "empty": {
+    "title": "Build your routine",
+    "body": "Add the blocks of your week (work, study, workout) and see both of you side by side and when you are both free."
+  },
+  "day": { "you": "You", "empty": "Nothing set for this day." },
+  "week": { "free": "Nothing set", "openDay": "Open {{day}}" },
+  "free": {
+    "min": "At least",
+    "none": {
+      "title": "No shared free time",
+      "body": "There is no window of {{min}} or more when you are both free on this day."
+    }
+  },
+  "now": { "title": "Who is where now", "free": "Free now", "busy": "Busy until {{until}}", "doing": "{{title}} until {{until}}" },
+  "category": {
+    "work": "Work",
+    "study": "Study",
+    "workout": "Workout",
+    "commute": "Commute",
+    "appointment": "Appointment",
+    "home": "Time at home",
+    "other": "Other"
+  },
+  "weekday": { "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat", "sun": "Sun" },
+  "recurrence": { "weekly": "Every week", "once": "Just once" },
+  "interval": { "1": "Every week", "2": "Every other week", "3": "Every 3 weeks", "4": "Every 4 weeks" },
+  "exception": {
+    "badge": "time changed",
+    "skip": "I am not going this day",
+    "change": "Change the time just this day",
+    "changeHint": "The block stays the same on other days.",
+    "apply": "Apply",
+    "clear": "Back to the usual time",
+    "editBlock": "Edit the block"
+  },
+  "notice": { "overlaps": "Saved. This block overlaps: {{names}}." },
+  "editor": {
+    "new": "New block",
+    "edit": "Edit block",
+    "read": "Block",
+    "title": "Title",
+    "category": "Category",
+    "location": "Place",
+    "locationHint": "Home, work, gym… helps tell who is where.",
+    "recurrence": "Repeat",
+    "weekdays": "Days of the week",
+    "interval": "How often",
+    "start": "Start",
+    "end": "End",
+    "day": "Day",
+    "from": "Starting",
+    "until": "Until",
+    "untilHint": "Leave empty for no end.",
+    "save": "Save",
+    "delete": "Delete block",
+    "confirmDelete": "Confirm: delete",
+    "loadCurrent": "See the current version",
+    "problem": {
+      "title": "Give the block a title.",
+      "weekdays": "Pick at least one day.",
+      "time": "The end must be after the start, on the same day.",
+      "dates": "The end date cannot be before the start date."
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "title": "Semana",
+  "new": "Novo bloco",
+  "loadError": "Não deu para carregar a rotina",
+  "busy": "Ocupado",
+  "views": { "label": "Visão da rotina", "day": "Dia", "week": "Semana", "free": "Horários livres" },
+  "nav": { "prev": "Anterior", "next": "Próximo", "today": "Hoje" },
+  "empty": {
+    "title": "Monte a sua rotina",
+    "body": "Cadastre os blocos da sua semana (trabalho, estudo, treino) e veja os dois lado a lado e quando os dois estão livres."
+  },
+  "day": { "you": "Você", "empty": "Nada marcado neste dia." },
+  "week": { "free": "Nada marcado", "openDay": "Abrir {{day}}" },
+  "free": {
+    "min": "Pelo menos",
+    "none": {
+      "title": "Sem horário livre em comum",
+      "body": "Não há uma janela de {{min}} ou mais em que os dois estejam livres neste dia."
+    }
+  },
+  "now": { "title": "Quem está onde agora", "free": "Livre agora", "busy": "Ocupado até {{until}}", "doing": "{{title}} até {{until}}" },
+  "category": {
+    "work": "Trabalho",
+    "study": "Estudo",
+    "workout": "Treino",
+    "commute": "Deslocamento",
+    "appointment": "Compromisso",
+    "home": "Tempo em casa",
+    "other": "Outro"
+  },
+  "weekday": { "mon": "Seg", "tue": "Ter", "wed": "Qua", "thu": "Qui", "fri": "Sex", "sat": "Sáb", "sun": "Dom" },
+  "recurrence": { "weekly": "Toda semana", "once": "Só uma vez" },
+  "interval": { "1": "Toda semana", "2": "Semana sim, semana não", "3": "A cada 3 semanas", "4": "A cada 4 semanas" },
+  "exception": {
+    "badge": "horário alterado",
+    "skip": "Não vou neste dia",
+    "change": "Mudar o horário só neste dia",
+    "changeHint": "O bloco continua igual nos outros dias.",
+    "apply": "Aplicar",
+    "clear": "Voltar ao horário normal",
+    "editBlock": "Editar o bloco"
+  },
+  "notice": { "overlaps": "Salvo. Este bloco se sobrepõe a: {{names}}." },
+  "editor": {
+    "new": "Novo bloco",
+    "edit": "Editar bloco",
+    "read": "Bloco",
+    "title": "Título",
+    "category": "Categoria",
+    "location": "Local",
+    "locationHint": "Casa, trabalho, academia… ajuda a saber quem está onde.",
+    "recurrence": "Repetição",
+    "weekdays": "Dias da semana",
+    "interval": "Frequência",
+    "start": "Início",
+    "end": "Fim",
+    "day": "Dia",
+    "from": "A partir de",
+    "until": "Até",
+    "untilHint": "Deixe em branco para não ter fim.",
+    "save": "Salvar",
+    "delete": "Apagar bloco",
+    "confirmDelete": "Confirmar: apagar",
+    "loadCurrent": "Ver a versão atual",
+    "problem": {
+      "title": "Dê um título ao bloco.",
+      "weekdays": "Escolha pelo menos um dia.",
+      "time": "O fim precisa ser depois do início, no mesmo dia.",
+      "dates": "A data final não pode ser antes da inicial."
+    }
+  }
+}

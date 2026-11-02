@@ -37,6 +37,15 @@ export function useRegister() {
   })
 }
 
+/** Muda o nome e/ou o fuso (campo ausente fica como está) e atualiza o perfil em cache. */
+export function useUpdateProfile() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: authApi.update,
+    onSuccess: (user) => qc.setQueryData(meKey, user),
+  })
+}
+
 export function useLogout() {
   const qc = useQueryClient()
   return useMutation({

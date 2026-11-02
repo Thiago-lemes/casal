@@ -68,5 +68,20 @@
   "reassign": {
     "title": "Passar a tarefa",
     "submit": "Passar tarefa"
+  },
+  "repeat": {
+    "legend": "Repetir",
+    "none": "Não repete",
+    "daily": "Todo dia",
+    "weekly": "Toda semana",
+    "monthly": "Todo mês",
+    "rotation": "Fazer rodízio",
+    "rotationHint": "A cada vez, a tarefa passa para a outra pessoa.",
+    "every": {
+      "daily": "Repete todo dia",
+      "weekly": "Repete toda semana",
+      "monthly": "Repete todo mês"
+    },
+    "withRotation": "{{repeat}}, com rodízio"
   }
 }

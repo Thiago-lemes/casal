@@ -4,7 +4,7 @@ import { householdApi } from './api'
 
 export const householdKey = ['household'] as const
 
-/** O casal da pessoa. `data === null` significa "ainda sem casal" (403 da API). */
+/** O casal da pessoa. `data === null` significa "ainda sem casal" (`no_household` da API). */
 export function useHousehold() {
   return useQuery({
     queryKey: householdKey,
@@ -12,7 +12,7 @@ export function useHousehold() {
       try {
         return await householdApi.get()
       } catch (err) {
-        if (err instanceof ApiError && err.status === 403) return null
+        if (err instanceof ApiError && err.is('no_household')) return null
         throw err
       }
     },
@@ -38,4 +38,17 @@ export function useAcceptInvite() {
 
 export function useCreateInvite() {
   return useMutation({ mutationFn: householdApi.invite })
+}
+
+/** Sair do casal: depois disso as rotas do casal respondem `no_household` e o app volta à tela de montar ou entrar. */
+export function useLeaveHousehold() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: householdApi.leave,
+    onSuccess: () => {
+      // o que estava em cache era do casal anterior
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== 'me' })
+      qc.setQueryData(householdKey, null)
+    },
+  })
 }

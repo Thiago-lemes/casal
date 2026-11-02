@@ -69,6 +69,9 @@ export function TaskRow({ task, me, people, onComplete, onDecline, onAssume, onR
             <span className={styles.shared}>{t('assignee.sharedTag')}</span>
           )}
           <span>{creator}</span>
+          {task.repeat !== 'none' && (
+            <span>{task.rotation ? t('repeat.withRotation', { repeat: t(`repeat.every.${task.repeat}`) }) : t(`repeat.every.${task.repeat}`)}</span>
+          )}
           {task.due_at && (
             <span data-late={late || undefined}>{late ? `${t('due.late')} · ${fmt(task.due_at)}` : t('due.at', { when: fmt(task.due_at) })}</span>
           )}

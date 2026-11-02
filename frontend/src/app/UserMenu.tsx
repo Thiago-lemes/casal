@@ -1,7 +1,8 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Bell, BellOff, BellRing, Globe, LogOut, Monitor, Moon, Sun } from 'lucide-react'
+import { Bell, BellOff, BellRing, Globe, LogOut, Monitor, Moon, Sun, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@/design-system'
 import { useLogout, useMe } from '@/features/auth/hooks'
 import { usePush } from '@/features/push/hooks'
@@ -24,6 +25,7 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const me = useMe().data
   const [theme, setTheme] = useTheme()
   const logout = useLogout()
+  const navigate = useNavigate()
   const push = usePush()
   const { t: tp } = useTranslation('push')
   const current: Language = i18n.language.startsWith('en') ? 'en' : 'pt-BR'
@@ -45,6 +47,13 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
               <p className={styles.email}>{me.email}</p>
             </div>
           </div>
+
+          <Menu.Separator className={styles.separator} />
+
+          <Menu.Item className={styles.item} onSelect={() => navigate('/profile')}>
+            <UserRound className={styles.icon} aria-hidden="true" />
+            {t('userMenu.profile')}
+          </Menu.Item>
 
           <Menu.Separator className={styles.separator} />
 

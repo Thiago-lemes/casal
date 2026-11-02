@@ -30,9 +30,27 @@
     "rate_limited": "Too many attempts in a row. Wait a moment and try again.",
     "upstream": "An outside service failed. Try again in a moment.",
     "network": "No connection. Check your internet and try again.",
-    "unknown": "Something went wrong. Try again."
+    "unknown": "Something went wrong. Try again.",
+    "internal": "Something went wrong on our side. Try again in a moment.",
+    "no_household": "You are not part of a couple yet.",
+    "already_in_household": "You are already part of a couple.",
+    "household_full": "That couple already has two people.",
+    "invite_invalid": "This invite is no longer valid: it expired, was already used, or the code is wrong.",
+    "email_taken": "An account with this email already exists.",
+    "invalid_credentials": "Wrong email or password.",
+    "task_not_found": "This task changed or is no longer available.",
+    "reminder_not_found": "This reminder changed or is no longer available.",
+    "note_not_found": "This note does not exist or you cannot see it.",
+    "note_forbidden": "You can read this note but not change it.",
+    "note_conflict": "Someone changed this note before you. Check the current version and redo your change.",
+    "routine_not_found": "This routine block does not exist or you cannot see it.",
+    "routine_forbidden": "You can see this block but not change it.",
+    "routine_conflict": "Someone changed this block before you. Check the current version and redo your change.",
+    "shopping_not_found": "This item is no longer on the list.",
+    "shopping_duplicate": "An identical item is already on the list."
   },
   "userMenu": {
-    "label": "Account menu for {{name}}"
+    "label": "Account menu for {{name}}",
+    "profile": "Profile"
   }
 }

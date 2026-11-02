@@ -50,6 +50,7 @@
   --c-person-a: #2459d9;
   --c-person-b: #0e8a6b;
   --c-danger: #b42318;
+  --c-on-danger: #ffffff;
   --c-ok: #1a7f4b;
   color-scheme: light;
 }
@@ -68,6 +69,7 @@
     --c-person-a: #7aa2ff;
     --c-person-b: #3fcb9e;
     --c-danger: #ff8f85;
+    --c-on-danger: #15171b;
     --c-ok: #54d38d;
     color-scheme: dark;
   }
@@ -86,6 +88,7 @@
   --c-person-a: #7aa2ff;
   --c-person-b: #3fcb9e;
   --c-danger: #ff8f85;
+  --c-on-danger: #15171b;
   --c-ok: #54d38d;
   color-scheme: dark;
 }
@@ -106,6 +109,7 @@
   --color-on-accent: #15171b;
   --color-on-dark: #f1f2f4; /* texto sobre tinta escura fixa, nos dois temas */
   --color-danger: var(--c-danger);
+  --color-on-danger: var(--c-on-danger);
   --color-ok: var(--c-ok);
   --color-person-a: var(--c-person-a);
   --color-person-b: var(--c-person-b);

@@ -4,14 +4,16 @@ import ptToday from './locales/pt-BR/today.json'
 import ptHousehold from './locales/pt-BR/household.json'
 import ptPush from './locales/pt-BR/push.json'
 import ptTasks from './locales/pt-BR/tasks.json'
+import ptProfile from './locales/pt-BR/profile.json'
 import enCommon from './locales/en/common.json'
 import enAuth from './locales/en/auth.json'
 import enToday from './locales/en/today.json'
 import enHousehold from './locales/en/household.json'
 import enPush from './locales/en/push.json'
 import enTasks from './locales/en/tasks.json'
+import enProfile from './locales/en/profile.json'
 
 export const resources = {
-  'pt-BR': { common: ptCommon, auth: ptAuth, today: ptToday, household: ptHousehold, push: ptPush, tasks: ptTasks },
-  en: { common: enCommon, auth: enAuth, today: enToday, household: enHousehold, push: enPush, tasks: enTasks },
+  'pt-BR': { common: ptCommon, auth: ptAuth, today: ptToday, household: ptHousehold, push: ptPush, tasks: ptTasks, profile: ptProfile },
+  en: { common: enCommon, auth: enAuth, today: enToday, household: enHousehold, push: enPush, tasks: enTasks, profile: enProfile },
 } as const

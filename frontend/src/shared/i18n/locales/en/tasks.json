@@ -68,5 +68,20 @@
   "reassign": {
     "title": "Hand the task over",
     "submit": "Hand over"
+  },
+  "repeat": {
+    "legend": "Repeat",
+    "none": "Does not repeat",
+    "daily": "Every day",
+    "weekly": "Every week",
+    "monthly": "Every month",
+    "rotation": "Take turns",
+    "rotationHint": "Each time, the task passes to the other person.",
+    "every": {
+      "daily": "Repeats daily",
+      "weekly": "Repeats weekly",
+      "monthly": "Repeats monthly"
+    },
+    "withRotation": "{{repeat}}, taking turns"
   }
 }

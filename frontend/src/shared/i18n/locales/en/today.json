@@ -51,5 +51,12 @@
     "total_one": "{{count}} in total",
     "total_other": "{{count}} in total",
     "day": "{{day}}: {{count}}"
+  },
+  "tasks": {
+    "title": "Today's tasks",
+    "all": "See all",
+    "empty": "No tasks for today.",
+    "complete": "Finish task: {{title}}",
+    "late": "Overdue"
   }
 }

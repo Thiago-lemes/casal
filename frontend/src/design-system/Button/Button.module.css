@@ -57,3 +57,12 @@
 .quiet:hover:not(:disabled) {
   background: var(--color-accent-wash);
 }
+
+/* ação sem volta (sair do casal): vermelho, nunca laranja */
+.danger {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+}
+.danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}

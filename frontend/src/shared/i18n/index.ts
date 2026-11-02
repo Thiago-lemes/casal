@@ -15,7 +15,7 @@ void i18n
     fallbackLng: 'pt-BR',
     supportedLngs: [...LANGUAGES],
     load: 'currentOnly',
-    ns: ['common', 'auth', 'today', 'household', 'push', 'tasks'],
+    ns: ['common', 'auth', 'today', 'household', 'push', 'tasks', 'profile'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     detection: {

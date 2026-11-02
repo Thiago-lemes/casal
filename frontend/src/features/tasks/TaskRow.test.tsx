@@ -15,6 +15,8 @@ const task = (over: Partial<Task>): Task => ({
   title: 'Lavar o banheiro',
   status: 'open',
   created_at: '2026-11-01T10:00:00Z',
+  repeat: 'none',
+  rotation: false,
   ...over,
 })
 

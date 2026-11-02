@@ -40,6 +40,12 @@ describe('tasksApi', () => {
     })
   })
 
+  it('cria tarefa recorrente com rodízio', async () => {
+    reply(201, {})
+    await tasksApi.create({ title: 'Lixo', assignee_id: 'u1', shared: false, repeat: 'weekly', rotation: true })
+    expect(lastCall().body).toEqual({ title: 'Lixo', assignee_id: 'u1', shared: false, repeat: 'weekly', rotation: true })
+  })
+
   it('conclui, recusa, reatribui e cancela nas rotas certas', async () => {
     reply(200, {})
     await tasksApi.complete('t1')

@@ -34,9 +34,9 @@ export function TasksPage({ me, people }: { me: Me; people: Person[] }) {
 
   const tasks = !current.data ? [] : tab === 'open' ? sortOpen(current.data) : tab === 'done' ? sortDone(current.data) : current.data
 
-  /** Uma tarefa que sumiu ou mudou de dono (404) vira um aviso único e uma lista nova. */
+  /** Uma tarefa que sumiu ou mudou de dono (`task_not_found`) vira um aviso único e uma lista nova. */
   function onActionError(err: unknown) {
-    if (err instanceof ApiError && err.status === 404) {
+    if (err instanceof ApiError && err.is('task_not_found')) {
       setNotice(t('unavailable'))
       void actions.refresh()
     } else {
@@ -146,7 +146,7 @@ export function TasksPage({ me, people }: { me: Me; people: Person[] }) {
             {
               onSuccess: () => setDeclining(null),
               onError: (err) => {
-                if (err instanceof ApiError && err.status === 404) {
+                if (err instanceof ApiError && err.is('task_not_found')) {
                   setDeclining(null)
                   onActionError(err)
                 }

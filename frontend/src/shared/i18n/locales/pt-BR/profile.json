@@ -1,0 +1,25 @@
+{
+  "save": "Salvar",
+  "saved": "Salvo.",
+  "name": {
+    "title": "Seu nome",
+    "label": "Nome"
+  },
+  "city": {
+    "title": "Cidade e horário",
+    "lead": "Escolha a sua cidade. É ela que define o horário dos lembretes, da rotina e dos horários livres.",
+    "label": "Cidade",
+    "useDevice": "Usar a cidade deste aparelho ({{city}})"
+  },
+  "leave": {
+    "title": "Sair do casal",
+    "lead": "Você deixa de ver e de receber o que é do casal. Dá para criar outro casal ou entrar com um convite depois.",
+    "action": "Sair do casal",
+    "confirmTitle": "Sair do casal?",
+    "keep": "O que era compartilhado fica com quem permanece: notas e blocos do casal, tarefas abertas e a lista de compras.",
+    "takes": "O que era só seu vai com você e chega a um próximo casal sempre como privado.",
+    "cancels": "Os lembretes pendentes entre vocês dois são cancelados, e os convites que ninguém usou deixam de valer.",
+    "final": "Isso não tem como desfazer.",
+    "confirm": "Sim, sair do casal"
+  }
+}

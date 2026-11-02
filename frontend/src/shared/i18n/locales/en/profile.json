@@ -1,0 +1,25 @@
+{
+  "save": "Save",
+  "saved": "Saved.",
+  "name": {
+    "title": "Your name",
+    "label": "Name"
+  },
+  "city": {
+    "title": "City and time",
+    "lead": "Pick your city. It sets the time for your reminders, routine and free time.",
+    "label": "City",
+    "useDevice": "Use this device's city ({{city}})"
+  },
+  "leave": {
+    "title": "Leave the couple",
+    "lead": "You stop seeing and receiving what belongs to the couple. You can create another couple or join with an invite later.",
+    "action": "Leave the couple",
+    "confirmTitle": "Leave the couple?",
+    "keep": "What was shared stays with the person who remains: the couple's notes and blocks, open tasks and the shopping list.",
+    "takes": "What was only yours goes with you and reaches a next couple always as private.",
+    "cancels": "Pending reminders between you two are canceled, and unused invites stop working.",
+    "final": "This cannot be undone.",
+    "confirm": "Yes, leave the couple"
+  }
+}

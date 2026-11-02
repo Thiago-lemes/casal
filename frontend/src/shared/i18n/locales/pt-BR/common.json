@@ -30,9 +30,27 @@
     "rate_limited": "Muitas tentativas seguidas. Espere um pouco e tente de novo.",
     "upstream": "Um serviço externo falhou. Tente de novo em instantes.",
     "network": "Sem conexão. Verifique a internet e tente de novo.",
-    "unknown": "Algo deu errado. Tente de novo."
+    "unknown": "Algo deu errado. Tente de novo.",
+    "internal": "Algo deu errado do nosso lado. Tente de novo em instantes.",
+    "no_household": "Você ainda não faz parte de um casal.",
+    "already_in_household": "Você já faz parte de um casal.",
+    "household_full": "Esse casal já tem duas pessoas.",
+    "invite_invalid": "Esse convite não vale mais: está vencido, já foi usado ou o código está errado.",
+    "email_taken": "Já existe uma conta com esse e-mail.",
+    "invalid_credentials": "E-mail ou senha incorretos.",
+    "task_not_found": "Essa tarefa mudou ou não está mais disponível.",
+    "reminder_not_found": "Esse lembrete mudou ou não está mais disponível.",
+    "note_not_found": "Essa anotação não existe ou você não pode vê-la.",
+    "note_forbidden": "Você pode ler essa anotação, mas não alterá-la.",
+    "note_conflict": "Alguém alterou essa anotação antes de você. Veja a versão atual e refaça a mudança.",
+    "routine_not_found": "Esse bloco da rotina não existe ou você não pode vê-lo.",
+    "routine_forbidden": "Você pode ver esse bloco, mas não alterá-lo.",
+    "routine_conflict": "Alguém alterou esse bloco antes de você. Veja a versão atual e refaça a mudança.",
+    "shopping_not_found": "Esse item não está mais na lista.",
+    "shopping_duplicate": "Já existe um item igual na lista."
   },
   "userMenu": {
-    "label": "Menu da conta de {{name}}"
+    "label": "Menu da conta de {{name}}",
+    "profile": "Perfil"
   }
 }

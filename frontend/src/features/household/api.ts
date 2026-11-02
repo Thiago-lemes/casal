@@ -7,6 +7,7 @@ export const householdApi = {
   get: () => api<Household>('/v1/household'),
   create: () => api<{ id: string }>('/v1/household', { method: 'POST' }),
   invite: () => api<{ token: string; expires_at: string }>('/v1/household/invites', { method: 'POST' }),
+  leave: () => api<void>('/v1/household/leave', { method: 'POST' }),
   accept: (token: string) =>
     api<{ household_id: string }>('/v1/household/invites/accept', { method: 'POST', body: { token } }),
 }

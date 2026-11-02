@@ -7,9 +7,12 @@ import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
 import { ReminderLabel } from '@/features/reminders/ReminderLabel'
 import { PushPrompt } from '@/features/push/PushPrompt'
+import { tasksForToday } from '@/features/tasks/today'
+import { useTaskActions, useTasks } from '@/features/tasks/hooks'
 import { useReminderActions, useReminders } from '@/features/reminders/hooks'
 import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
+import { TodayTasks } from './widgets/TodayTasks'
 import { DayRing } from './widgets/DayRing'
 import { MonthCalendar } from './widgets/MonthCalendar'
 import { WeekBars } from './widgets/WeekBars'
@@ -22,6 +25,8 @@ export function TodayPage() {
   const household = useHousehold().data
   const reminders = useReminders(Boolean(household))
   const actions = useReminderActions()
+  const openTasks = useTasks('open', Boolean(household))
+  const taskActions = useTaskActions()
   const [composing, setComposing] = useState(false)
 
   const all = reminders.data
@@ -32,6 +37,8 @@ export function TodayPage() {
   const stats = useMemo(() => dayStats(all ?? []), [all])
   const week = useMemo(() => weekSeries(all ?? []), [all])
   const busy = useMemo(() => busyDays(all ?? []), [all])
+
+  const todayTasks = useMemo(() => tasksForToday(openTasks.data ?? [], me?.id ?? ''), [openTasks.data, me?.id])
 
   if (!me || !household) return null
 
@@ -112,6 +119,19 @@ export function TodayPage() {
           </ul>
         )}
       </section>
+
+      <div className={styles.tasks}>
+        <TodayTasks
+          timezone={me.timezone}
+          items={todayTasks.map((t) => ({
+            id: t.id,
+            title: t.title,
+            due_at: t.due_at,
+            late: !!t.due_at && new Date(t.due_at) < new Date(),
+          }))}
+          onComplete={(id) => taskActions.complete.mutate(id)}
+        />
+      </div>
 
       <div className={styles.calendar}>
         <MonthCalendar busy={busy} />

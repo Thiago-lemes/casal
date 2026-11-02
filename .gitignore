@@ -4,3 +4,5 @@
 # cookies dos testes com curl
 ana.txt
 bia.txt
+# binário do depurador
+__debug_bin*

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { formatBRL } from '../money'
+import { formatBRL } from '@/shared/lib/money'
 import { budgetTone } from './summary'
 import styles from './Summary.module.css'
 

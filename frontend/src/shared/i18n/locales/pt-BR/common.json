@@ -5,6 +5,7 @@
     "home": "Casa",
     "main": "Navegação principal",
     "tasks": "Tarefas",
+    "goals": "Metas",
     "finance": "Finanças"
   },
   "routineSoon": "Em breve",
@@ -49,7 +50,7 @@
     "routine_conflict": "Alguém alterou esse bloco antes de você. Veja a versão atual e refaça a mudança.",
     "shopping_not_found": "Esse item não está mais na lista.",
     "shopping_duplicate": "Já existe um item igual na lista.",
-    "module_disabled": "O módulo Finanças está desligado.",
+    "module_disabled": "Esse módulo está desligado.",
     "module_not_found": "Esse módulo não existe.",
     "expense_not_found": "Esse gasto mudou ou não está mais disponível. Atualize a lista.",
     "category_not_found": "Essa categoria mudou ou não está mais disponível.",
@@ -68,7 +69,20 @@
     "settlement_stale": "O saldo mudou desde que você abriu esta tela. Confira o valor novo.",
     "nothing_to_settle": "Não há nada para acertar: o saldo já está em dia.",
     "single_member": "O acerto precisa de duas pessoas no casal.",
-    "bill_already_paid": "Essa conta já foi paga."
+    "bill_already_paid": "Essa conta já foi paga.",
+    "module_required": "Essa meta precisa do módulo Finanças ligado.",
+    "goal_not_found": "Essa meta não está mais disponível. Volte à lista e atualize.",
+    "step_not_found": "Essa etapa mudou ou não está mais disponível. Atualize a meta.",
+    "contribution_not_found": "Esse aporte mudou ou não está mais disponível. Atualize a meta.",
+    "goal_forbidden": "Só quem é dono da meta pode alterá-la.",
+    "goal_conflict": "Outra pessoa mudou esta meta antes de você. Veja a versão atual e salve de novo.",
+    "goal_closed": "Reabra a meta para registrar ou editar.",
+    "goal_kind_mismatch": "Essa ação não vale para esse tipo de meta.",
+    "goal_limit": "Você chegou ao limite de 100 metas ativas (ou de 200 etapas em um projeto).",
+    "contribution_negative": "A retirada é maior que o valor guardado.",
+    "checkin_date_invalid": "Marque até hoje e no máximo 31 dias atrás.",
+    "goal_invalid": "Confira os dados da meta: título, período, valor e prazo.",
+    "step_has_task": "Essa etapa tem uma tarefa: conclua ou reatribua pela tela de Tarefas."
   },
   "userMenu": {
     "label": "Menu da conta de {{name}}",

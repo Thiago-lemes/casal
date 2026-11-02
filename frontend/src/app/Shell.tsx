@@ -1,4 +1,4 @@
-import { CalendarClock, House, LayoutDashboard, ListChecks, Wallet } from 'lucide-react'
+import { CalendarClock, House, LayoutDashboard, ListChecks, Target, Wallet } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -20,12 +20,16 @@ const items: Item[] = [
 /** Módulo opcional: só entra na navegação quando o casal o liga (antes de Casa). */
 const finance: Item = { to: '/finance', key: 'finance', icon: Wallet }
 
+/** Módulo opcional: como a Semana, no celular sai da barra e vai para o menu do avatar. */
+const goals: Item = { to: '/goals', key: 'goals', icon: Target, desktopOnly: true }
+
 /** Moldura do app: barra inferior no celular, trilho no desktop; o avatar da conta fica no topo (celular) ou no pé do trilho (desktop). */
 export function Shell() {
   const { t } = useTranslation()
   const household = useHousehold().data
   const financeOn = useModuleEnabled('finance', Boolean(household)).on
-  const nav = financeOn ? [...items.slice(0, -1), finance, items[items.length - 1]] : items
+  const goalsOn = useModuleEnabled('goals', Boolean(household)).on
+  const nav = [...items.slice(0, -1), ...(financeOn ? [finance] : []), ...(goalsOn ? [goals] : []), items[items.length - 1]]
 
   return (
     <div className={styles.shell}>

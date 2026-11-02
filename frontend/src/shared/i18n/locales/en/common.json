@@ -5,6 +5,7 @@
     "home": "Home",
     "main": "Main navigation",
     "tasks": "Tasks",
+    "goals": "Goals",
     "finance": "Finances"
   },
   "routineSoon": "Coming soon",
@@ -49,7 +50,7 @@
     "routine_conflict": "Someone changed this block before you. Check the current version and redo your change.",
     "shopping_not_found": "This item is no longer on the list.",
     "shopping_duplicate": "An identical item is already on the list.",
-    "module_disabled": "The Finances module is turned off.",
+    "module_disabled": "That module is turned off.",
     "module_not_found": "That module doesn't exist.",
     "expense_not_found": "That expense changed or is no longer available. Refresh the list.",
     "category_not_found": "That category changed or is no longer available.",
@@ -68,7 +69,20 @@
     "settlement_stale": "The balance changed since you opened this screen. Check the new amount.",
     "nothing_to_settle": "Nothing to settle: the balance is already even.",
     "single_member": "Settling up needs two people in the couple.",
-    "bill_already_paid": "That bill was already paid."
+    "bill_already_paid": "That bill was already paid.",
+    "module_required": "That goal needs the Finances module turned on.",
+    "goal_not_found": "That goal is no longer available. Go back to the list and refresh.",
+    "step_not_found": "That step changed or is no longer available. Refresh the goal.",
+    "contribution_not_found": "That contribution changed or is no longer available. Refresh the goal.",
+    "goal_forbidden": "Only the goal's owner can change it.",
+    "goal_conflict": "Someone else changed this goal before you. See the current version and save again.",
+    "goal_closed": "Reopen the goal to record or edit.",
+    "goal_kind_mismatch": "That action doesn't apply to this type of goal.",
+    "goal_limit": "You've reached the limit of 100 active goals (or 200 steps in a project).",
+    "contribution_negative": "The withdrawal is larger than the amount saved.",
+    "checkin_date_invalid": "Check in up to today and at most 31 days back.",
+    "goal_invalid": "Check the goal's details: title, period, amount and due date.",
+    "step_has_task": "This step has a task: complete or reassign it in the Tasks screen."
   },
   "userMenu": {
     "label": "Account menu for {{name}}",

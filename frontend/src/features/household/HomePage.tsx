@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { Avatar, Button, Card } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { errorMessage } from '@/shared/api/errorMessage'
+import { GoalsHomeCard } from '@/features/goals/HomeCard'
 import { useModuleEnabled, useSetModule } from '@/shared/modules/hooks'
 import { useCreateInvite, useHousehold } from './hooks'
 import styles from './HomePage.module.css'
@@ -66,6 +67,7 @@ export function HomePage() {
             </li>
           ))}
         </ul>
+        <GoalsHomeCard />
         {/* módulo opcional desligado: um convite, nunca um erro; dá para desligar sem perder nada */}
         {finance.isSuccess && !finance.on && (
           <div className={styles.optional}>

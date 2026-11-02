@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Button, EmptyState, Skeleton } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { TodayBills } from '@/features/finance/bills/TodayBills'
+import { TodayGoals } from '@/features/goals/TodayGoals'
 import { useHousehold } from '@/features/household/hooks'
 import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
@@ -31,6 +32,7 @@ export function TodayPage() {
   const openTasks = useTasks('open', Boolean(household))
   const taskActions = useTaskActions()
   const finance = useModuleEnabled('finance', Boolean(household))
+  const goals = useModuleEnabled('goals', Boolean(household))
   const [composing, setComposing] = useState(false)
 
   const all = reminders.data
@@ -140,6 +142,8 @@ export function TodayPage() {
         />
         {/* só com o módulo ligado: as contas que vencem hoje ou já venceram */}
         {finance.on && <TodayBills ctx={{ me, people: household.members, partner }} />}
+        {/* só com o módulo ligado: o que ainda dá para marcar hoje */}
+        {goals.on && <TodayGoals me={me} />}
       </div>
 
       <div className={styles.calendar}>

@@ -1,0 +1,303 @@
+{
+  "title": "Metas",
+  "new": "Nova meta",
+  "back": "← Metas",
+  "loadError": "Não deu para carregar as metas",
+  "sharedSection": "Compartilhadas pelo seu par",
+  "tabs": {
+    "household": "Do casal",
+    "mine": "Minhas"
+  },
+  "filters": {
+    "kind": "Tipo",
+    "allKinds": "Todos os tipos",
+    "status": "Estado",
+    "active": "Ativas",
+    "paused": "Pausadas",
+    "done": "Concluídas",
+    "archived": "Arquivadas"
+  },
+  "kind": {
+    "habit": "Hábito",
+    "shared": "Meta do casal",
+    "financial": "Financeira",
+    "project": "Projeto"
+  },
+  "kindHint": {
+    "habit": "Algo que você repete: três vezes por semana, todo dia útil.",
+    "shared": "Algo que vocês fazem juntos, como um jantar fora por mês.",
+    "financial": "Juntar um valor, com ou sem prazo.",
+    "project": "Uma meta com etapas, que podem virar tarefas."
+  },
+  "scope": {
+    "personal": "Minha",
+    "household": "Do casal"
+  },
+  "scopeHint": {
+    "personal": "Só você marca e edita. Seu par só vê se você deixar.",
+    "household": "Os dois acompanham e editam."
+  },
+  "scopeLine": {
+    "personal": "Meta pessoal",
+    "household": "Meta do casal"
+  },
+  "status": {
+    "active": "Ativa",
+    "paused": "Pausada",
+    "done": "Concluída",
+    "archived": "Arquivada"
+  },
+  "card": {
+    "due": "Prazo: {{date}}",
+    "readyToComplete": "Pronta para concluir",
+    "sharedBy": "Compartilhada por {{name}}",
+    "partner": "seu par",
+    "viewOnly": "{{name}} compartilhou esta meta com você. Você vê o título, o prazo e o progresso."
+  },
+  "progress": {
+    "cents": "{{done}} de {{total}}",
+    "count": "{{done}} de {{total}}",
+    "steps": "{{done}} de {{total}} etapas",
+    "unavailable": "Disponível quando Finanças estiver ligado"
+  },
+  "empty": {
+    "title": "Nenhuma meta ainda",
+    "body": "Há quatro tipos: hábito (algo que se repete), meta do casal (algo que fazem juntos), financeira (juntar um valor) e projeto (com etapas). Comece por uma.",
+    "action": "Criar a primeira meta",
+    "filtered": "Nenhuma meta com esse filtro"
+  },
+  "module": {
+    "title": "Ligue Metas para começar",
+    "body": "Hábitos, metas do casal, metas financeiras e projetos, com o progresso calculado por nós. Dá para desligar quando quiser, sem perder nada.",
+    "enable": "Ligar Metas"
+  },
+  "home": {
+    "name": "Metas",
+    "hint": "Hábitos, metas do casal, financeiras e projetos.",
+    "active_one": "{{count}} meta ativa",
+    "active_other": "{{count}} metas ativas",
+    "offTitle": "Metas",
+    "offHint": "Hábitos, metas do casal, metas financeiras e projetos. Dá para desligar quando quiser, sem perder nada.",
+    "create": "Nova meta"
+  },
+  "wizard": {
+    "title": "Nova meta",
+    "step": "Passo {{n}} de {{total}}",
+    "kindLegend": "Tipo da meta",
+    "scopeLegend": "De quem é",
+    "back": "Voltar",
+    "next": "Continuar",
+    "create": "Criar meta"
+  },
+  "form": {
+    "title": "Título",
+    "notes": "Notas (opcional)",
+    "due": "Prazo (opcional)",
+    "dueHint": "Sem prazo, a meta é contínua.",
+    "interpreted": "Entendi {{amount}}",
+    "amount": "Valor a juntar (R$)",
+    "category": "Categoria do orçamento",
+    "categoryPick": "Escolha uma categoria",
+    "period": "Período",
+    "periodWeek": "Por semana",
+    "periodMonth": "Por mês",
+    "periodFixedWeek": "Contada por semana (não muda depois de criada).",
+    "periodFixedMonth": "Contada por mês (não muda depois de criada).",
+    "targetWeek": "Quantas vezes por semana (1 a 7)",
+    "targetMonth": "Quantas vezes por mês (1 a 31)",
+    "days": "Dias combinados (opcional)",
+    "daysHint": "Sem nenhum dia marcado, qualquer dia vale. Marcar fora dos dias combinados é permitido e fica no histórico.",
+    "remind": {
+      "label": "Lembrete diário",
+      "hint": "Um aviso por dia que ainda importa: não avisamos se você já marcou, se já cumpriu a meta do período, nem fora dos dias combinados.",
+      "time": "Horário"
+    },
+    "requires": {
+      "legend": "Quando conta",
+      "any": "Conta quando qualquer um marca",
+      "both": "Conta quando os dois marcam"
+    },
+    "source": {
+      "legend": "Como medir",
+      "contributions": "Aportes que eu registro",
+      "budget": "Economia do orçamento",
+      "contributionsHint": "Você registra o que guardou. É só um registro: o app não move dinheiro.",
+      "budgetHint": "Conta o que sobra do limite de uma categoria, mês a mês. Só gastos do casal entram.",
+      "financeOff": "A economia do orçamento precisa do módulo Finanças ligado.",
+      "financeLink": "Ir para Finanças",
+      "noLimits": "Nenhuma categoria tem limite de orçamento ainda. Defina um limite em Finanças, na aba Resumo."
+    },
+    "steps": {
+      "legend": "Etapas (opcional)",
+      "item": "Etapa {{n}}",
+      "add": "Adicionar etapa",
+      "remove": "Remover etapa {{n}}",
+      "removeShort": "Remover",
+      "tasks": "Criar uma tarefa para cada etapa",
+      "tasksHint": "As tarefas aparecem em Tarefas e em Hoje, e a etapa fica pronta quando a tarefa for concluída."
+    },
+    "errors": {
+      "title": "O título precisa ter de 1 a 120 caracteres.",
+      "notes": "As notas passam de 1000 caracteres.",
+      "dueOnPast": "O prazo não pode estar no passado.",
+      "targetWeek": "Use de 1 a 7 vezes por semana.",
+      "targetMonth": "Use de 1 a 31 vezes por mês.",
+      "amount": "Informe um valor entre R$ 0,01 e R$ 10.000.000,00.",
+      "category": "Escolha a categoria do orçamento.",
+      "stepTitle": "Cada etapa pode ter até 200 caracteres."
+    }
+  },
+  "visibility": {
+    "legend": "Quem pode ver",
+    "private": "Só eu",
+    "view": "Meu par pode ver o progresso",
+    "privateHint": "Ninguém mais vê esta meta.",
+    "viewHint": "Seu par vê o título, o prazo e o progresso. Notas, aportes, marcações e etapas continuam só seus."
+  },
+  "actions": {
+    "edit": "Editar",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "reopen": "Reabrir",
+    "complete": "Concluir",
+    "archive": "Arquivar",
+    "unarchive": "Desarquivar",
+    "delete": "Apagar"
+  },
+  "detail": {
+    "progress": "Progresso",
+    "manage": "Gerenciar",
+    "doneBy": "Concluída por {{name}} em {{date}}."
+  },
+  "suggest": {
+    "habit": "Tudo pronto. Concluir a meta?",
+    "shared": "Tudo pronto. Concluir a meta?",
+    "financial": "Você chegou ao valor. Concluir a meta?",
+    "project": "Todas as etapas estão prontas. Concluir a meta?"
+  },
+  "edit": {
+    "title": "Editar meta",
+    "save": "Salvar",
+    "conflict": "Seu par mudou esta meta antes de você. Carregamos a versão atual: confira e salve de novo.",
+    "loadNew": "Ver a versão atual"
+  },
+  "delete": {
+    "title": "Apagar meta?",
+    "body": "“{{title}}” e todo o histórico dela serão apagados.",
+    "tasks": "As tarefas ligadas às etapas serão canceladas (as já concluídas ficam como histórico).",
+    "final": "Isso não tem como desfazer.",
+    "confirm": "Sim, apagar"
+  },
+  "notFound": {
+    "title": "Não encontramos essa meta",
+    "body": "Ela pode ter sido apagada ou você não tem acesso.",
+    "back": "Voltar às metas"
+  },
+  "mark": {
+    "today": "Marcar hoje",
+    "marked": "Marcado hoje",
+    "undo": "Desfazer",
+    "otherDay": "Marcar outro dia",
+    "pickDay": "Dia (até 31 dias atrás)",
+    "pickPlaceholder": "Escolha o dia",
+    "markDay": "Marcar este dia"
+  },
+  "habit": {
+    "title": "Hábito",
+    "currentWeek": "Semana de {{from}} a {{to}}",
+    "currentMonth": "Mês de {{from}} a {{to}}",
+    "agreedDays": "Dias combinados: {{days}}.",
+    "anyDay": "Vale qualquer dia.",
+    "reminderOn": "Lembrete diário às {{time}}.",
+    "reminderOff": "Sem lembrete.",
+    "pausedNote": "Pausada: o lembrete fica suspenso e nada é zerado."
+  },
+  "shared": {
+    "title": "Meta do casal",
+    "countsAny": "Conta quando qualquer um marca.",
+    "countsBoth": "Conta quando os dois marcam.",
+    "markedToday": "Hoje marcou: {{names}}.",
+    "noneToday": "Ninguém marcou hoje.",
+    "waitingOther": "Falta a outra pessoa em: {{days}}."
+  },
+  "history": {
+    "title": "Histórico",
+    "periods": "Por período",
+    "days": "Dias marcados",
+    "range": "{{from}} a {{to}}",
+    "count": "{{count}} de {{target}}",
+    "empty": "Ainda não há marcações.",
+    "outside": "fora dos dias combinados",
+    "waitingOther": "falta a outra pessoa"
+  },
+  "financial": {
+    "title": "Quanto já foi guardado",
+    "budgetTitle": "Economia do orçamento",
+    "perMonth": "Guardar {{amount}} por mês",
+    "onTrack": "No ritmo",
+    "belowPace": "Abaixo do ritmo",
+    "budgetOf": "Conta o que sobra do limite de {{category}} a cada mês.",
+    "budgetHint": "Conta o que sobra do limite da categoria a cada mês. Só gastos do casal entram.",
+    "provisional": "O mês atual ainda pode mudar.",
+    "unavailable": "Disponível quando Finanças estiver ligado.",
+    "unavailableLink": "Ligar Finanças"
+  },
+  "contribution": {
+    "title": "Aportes",
+    "addAction": "Aportar",
+    "withdrawAction": "Retirar",
+    "addTitle": "Registrar aporte",
+    "withdrawTitle": "Registrar retirada",
+    "add": "Aportar",
+    "withdraw": "Retirar",
+    "notice": "Isto é só um registro da meta. Não cria gasto nem mexe no acerto de contas; para registrar o gasto, use Finanças.",
+    "amount": "Valor (R$)",
+    "date": "Data",
+    "note": "Nota (opcional)",
+    "empty": "Nenhum aporte registrado.",
+    "addBy": "{{name}} guardou",
+    "withdrawBy": "{{name}} retirou",
+    "remove": "Apagar o registro de {{amount}}",
+    "removeShort": "Apagar",
+    "more": "Ver mais"
+  },
+  "project": {
+    "title": "Etapas",
+    "add": "Adicionar etapa",
+    "empty": "Nenhuma etapa ainda.",
+    "syncPending": "Criando a tarefa… a etapa já está salva e a tarefa aparece em instantes."
+  },
+  "step": {
+    "addTitle": "Nova etapa",
+    "editTitle": "Editar etapa",
+    "title": "Título",
+    "due": "Prazo (opcional)",
+    "assignee": "Responsável",
+    "noAssignee": "Sem responsável (do casal)",
+    "assigneeInTask": "Com tarefa, o responsável muda na tela de Tarefas.",
+    "asTask": "Criar uma tarefa para esta etapa",
+    "asTaskHint": "A etapa fica pronta quando a tarefa for concluída.",
+    "toTask": "Virar tarefa",
+    "dropTask": "Desligar a tarefa",
+    "remove": "Remover etapa",
+    "removeConfirm": "Remover esta etapa?",
+    "removeConfirmTask": "Remover esta etapa e cancelar a tarefa ligada?",
+    "removeYes": "Sim, remover",
+    "save": "Salvar",
+    "doneInTask": "Concluída na tarefa",
+    "pendingInTask": "Conclui na tarefa",
+    "declined": "Recusada, sem responsável",
+    "dueOn": "até {{date}}",
+    "moveUp": "Subir “{{title}}”",
+    "moveDown": "Descer “{{title}}”",
+    "edit": "Editar “{{title}}”",
+    "editShort": "Editar"
+  },
+  "today": {
+    "habits": "Hábitos de hoje",
+    "shared": "Metas do casal",
+    "mark": "Marcar",
+    "markFor": "Marcar hoje: {{title}}",
+    "seeAll": "Ver metas"
+  }
+}

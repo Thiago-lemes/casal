@@ -1,13 +1,15 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Sun, UserRound } from 'lucide-react'
+import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Sun, Target, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@/design-system'
 import { useLogout, useMe } from '@/features/auth/hooks'
+import { useHousehold } from '@/features/household/hooks'
 import { usePush } from '@/features/push/hooks'
 import { LANGUAGES } from '@/shared/i18n'
 import type { Language } from '@/shared/i18n'
+import { useModuleEnabled } from '@/shared/modules/hooks'
 import { useTheme } from '@/shared/theme'
 import type { ThemeChoice } from '@/shared/theme'
 import styles from './UserMenu.module.css'
@@ -27,6 +29,8 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const logout = useLogout()
   const navigate = useNavigate()
   const push = usePush()
+  const household = useHousehold().data
+  const goalsOn = useModuleEnabled('goals', Boolean(household)).on
   const { t: tp } = useTranslation('push')
   const current: Language = i18n.language.startsWith('en') ? 'en' : 'pt-BR'
 
@@ -50,11 +54,18 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
 
           <Menu.Separator className={styles.separator} />
 
-          {/* no celular a Semana sai da barra inferior e mora aqui */}
+          {/* no celular a Semana (e Metas, se ligado) sai da barra inferior e mora aqui */}
           <Menu.Item className={`${styles.item} ${styles.mobileOnly}`} onSelect={() => navigate('/routine')}>
             <CalendarClock className={styles.icon} aria-hidden="true" />
             {t('nav.routine')}
           </Menu.Item>
+
+          {goalsOn && (
+            <Menu.Item className={`${styles.item} ${styles.mobileOnly}`} onSelect={() => navigate('/goals')}>
+              <Target className={styles.icon} aria-hidden="true" />
+              {t('nav.goals')}
+            </Menu.Item>
+          )}
 
           <Menu.Item className={styles.item} onSelect={() => navigate('/profile')}>
             <UserRound className={styles.icon} aria-hidden="true" />

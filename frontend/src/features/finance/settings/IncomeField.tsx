@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, Card, Skeleton, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { useIncome, useIncomeActions, useSettings } from '../hooks'
-import { centsToInput, interpretedHint, MAX_CENTS, parseMoney } from '../money'
+import { centsToInput, interpretedHint, MAX_CENTS, parseMoney } from '@/shared/lib/money'
 import styles from '../finance.module.css'
 
 /**

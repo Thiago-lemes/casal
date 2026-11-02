@@ -4,7 +4,7 @@ import { Button, Card, Skeleton, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { categoryName, selectable } from '../categories'
 import { useBudgetActions, useBudgets, useCategories } from '../hooks'
-import { centsToInput, formatBRL, MAX_CENTS, parseMoney } from '../money'
+import { centsToInput, formatBRL, MAX_CENTS, parseMoney } from '@/shared/lib/money'
 import styles from '../finance.module.css'
 
 /** O limite mensal por categoria do casal. Gasto pessoal não conta; não há orçamento pessoal nesta fase. */

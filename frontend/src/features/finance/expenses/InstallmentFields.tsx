@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { ChoiceGroup, TextField } from '@/design-system'
-import { daysBetween } from '../dates'
-import { formatBRL, installmentPreview } from '../money'
+import { daysBetween } from '@/shared/lib/dates'
+import { formatBRL, installmentPreview } from '@/shared/lib/money'
 import styles from '../finance.module.css'
 
 export type InstallmentValue = { on: boolean; count: string; firstOn: string; mode: 'total' | 'each' }

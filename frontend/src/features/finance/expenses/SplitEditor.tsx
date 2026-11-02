@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { splitLabel } from '../money'
+import { splitLabel } from '@/shared/lib/money'
 import { setShare, WHOLE } from '../split'
 import type { Split } from '../api'
 import type { Person } from '../types'

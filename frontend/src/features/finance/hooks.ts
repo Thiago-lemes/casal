@@ -29,8 +29,8 @@ function refreshMoney(qc: QueryClient) {
 }
 
 /** As categorias; as arquivadas só vêm quando o gerenciador pede. */
-export function useCategories(archived = false) {
-  return useQuery({ queryKey: keys.categories(archived), queryFn: () => financeApi.categories(archived), staleTime: 60_000 })
+export function useCategories(archived = false, enabled = true) {
+  return useQuery({ queryKey: keys.categories(archived), queryFn: () => financeApi.categories(archived), staleTime: 60_000, enabled })
 }
 
 export function useCategoryActions() {
@@ -162,8 +162,8 @@ export function useBillActions() {
   }
 }
 
-export function useBudgets() {
-  return useQuery({ queryKey: keys.budgets, queryFn: financeApi.budgets })
+export function useBudgets(enabled = true) {
+  return useQuery({ queryKey: keys.budgets, queryFn: financeApi.budgets, enabled })
 }
 
 export function useBudgetActions() {

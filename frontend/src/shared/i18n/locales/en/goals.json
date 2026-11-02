@@ -1,0 +1,303 @@
+{
+  "title": "Goals",
+  "new": "New goal",
+  "back": "← Goals",
+  "loadError": "Couldn't load the goals",
+  "sharedSection": "Shared by your partner",
+  "tabs": {
+    "household": "Shared",
+    "mine": "Mine"
+  },
+  "filters": {
+    "kind": "Type",
+    "allKinds": "All types",
+    "status": "Status",
+    "active": "Active",
+    "paused": "Paused",
+    "done": "Completed",
+    "archived": "Archived"
+  },
+  "kind": {
+    "habit": "Habit",
+    "shared": "Shared goal",
+    "financial": "Financial",
+    "project": "Project"
+  },
+  "kindHint": {
+    "habit": "Something you repeat: three times a week, every weekday.",
+    "shared": "Something you do together, like dinner out once a month.",
+    "financial": "Save an amount, with or without a deadline.",
+    "project": "A goal with steps that can become tasks."
+  },
+  "scope": {
+    "personal": "Mine",
+    "household": "Shared"
+  },
+  "scopeHint": {
+    "personal": "Only you check in and edit. Your partner only sees it if you allow it.",
+    "household": "You both follow and edit it."
+  },
+  "scopeLine": {
+    "personal": "Personal goal",
+    "household": "Shared goal"
+  },
+  "status": {
+    "active": "Active",
+    "paused": "Paused",
+    "done": "Completed",
+    "archived": "Archived"
+  },
+  "card": {
+    "due": "Due: {{date}}",
+    "readyToComplete": "Ready to complete",
+    "sharedBy": "Shared by {{name}}",
+    "partner": "your partner",
+    "viewOnly": "{{name}} shared this goal with you. You can see the title, the due date and the progress."
+  },
+  "progress": {
+    "cents": "{{done}} of {{total}}",
+    "count": "{{done}} of {{total}}",
+    "steps": "{{done}} of {{total}} steps",
+    "unavailable": "Available when Finances is turned on"
+  },
+  "empty": {
+    "title": "No goals yet",
+    "body": "There are four types: habit (something you repeat), shared goal (something you do together), financial (save an amount) and project (with steps). Start with one.",
+    "action": "Create the first goal",
+    "filtered": "No goals match this filter"
+  },
+  "module": {
+    "title": "Turn on Goals to get started",
+    "body": "Habits, shared goals, financial goals and projects, with the progress calculated for you. You can turn it off whenever you like without losing anything.",
+    "enable": "Turn on Goals"
+  },
+  "home": {
+    "name": "Goals",
+    "hint": "Habits, shared goals, financial goals and projects.",
+    "active_one": "{{count}} active goal",
+    "active_other": "{{count}} active goals",
+    "offTitle": "Goals",
+    "offHint": "Habits, shared goals, financial goals and projects. You can turn it off whenever you like without losing anything.",
+    "create": "New goal"
+  },
+  "wizard": {
+    "title": "New goal",
+    "step": "Step {{n}} of {{total}}",
+    "kindLegend": "Type of goal",
+    "scopeLegend": "Whose goal is it",
+    "back": "Back",
+    "next": "Continue",
+    "create": "Create goal"
+  },
+  "form": {
+    "title": "Title",
+    "notes": "Notes (optional)",
+    "due": "Due date (optional)",
+    "dueHint": "Without a due date the goal is ongoing.",
+    "interpreted": "Understood {{amount}}",
+    "amount": "Amount to save (R$)",
+    "category": "Budget category",
+    "categoryPick": "Pick a category",
+    "period": "Period",
+    "periodWeek": "Per week",
+    "periodMonth": "Per month",
+    "periodFixedWeek": "Counted per week (it doesn't change after it's created).",
+    "periodFixedMonth": "Counted per month (it doesn't change after it's created).",
+    "targetWeek": "How many times per week (1 to 7)",
+    "targetMonth": "How many times per month (1 to 31)",
+    "days": "Agreed days (optional)",
+    "daysHint": "With no day picked, any day counts. Checking in outside the agreed days is allowed and stays in the history.",
+    "remind": {
+      "label": "Daily reminder",
+      "hint": "One reminder a day that still matters: we don't remind you if you already checked in, if you already reached the period's goal, or outside the agreed days.",
+      "time": "Time"
+    },
+    "requires": {
+      "legend": "When it counts",
+      "any": "Counts when either of you checks in",
+      "both": "Counts when both of you check in"
+    },
+    "source": {
+      "legend": "How to measure",
+      "contributions": "Contributions I record",
+      "budget": "Budget savings",
+      "contributionsHint": "You record what you've saved. It's only a record: the app doesn't move money.",
+      "budgetHint": "Counts what's left of a category's limit, month by month. Only shared expenses count.",
+      "financeOff": "Budget savings needs the Finances module turned on.",
+      "financeLink": "Go to Finances",
+      "noLimits": "No category has a budget limit yet. Set a limit in Finances, on the Summary tab."
+    },
+    "steps": {
+      "legend": "Steps (optional)",
+      "item": "Step {{n}}",
+      "add": "Add step",
+      "remove": "Remove step {{n}}",
+      "removeShort": "Remove",
+      "tasks": "Create a task for each step",
+      "tasksHint": "Tasks show up in Tasks and in Today, and the step is ready when the task is completed."
+    },
+    "errors": {
+      "title": "The title needs 1 to 120 characters.",
+      "notes": "The notes are over 1000 characters.",
+      "dueOnPast": "The due date can't be in the past.",
+      "targetWeek": "Use 1 to 7 times per week.",
+      "targetMonth": "Use 1 to 31 times per month.",
+      "amount": "Enter an amount between R$ 0.01 and R$ 10,000,000.00.",
+      "category": "Pick the budget category.",
+      "stepTitle": "Each step can have up to 200 characters."
+    }
+  },
+  "visibility": {
+    "legend": "Who can see it",
+    "private": "Only me",
+    "view": "My partner can see the progress",
+    "privateHint": "No one else sees this goal.",
+    "viewHint": "Your partner sees the title, the due date and the progress. Notes, contributions, check-ins and steps stay yours only."
+  },
+  "actions": {
+    "edit": "Edit",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reopen": "Reopen",
+    "complete": "Complete",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "delete": "Delete"
+  },
+  "detail": {
+    "progress": "Progress",
+    "manage": "Manage",
+    "doneBy": "Completed by {{name}} on {{date}}."
+  },
+  "suggest": {
+    "habit": "All done. Complete the goal?",
+    "shared": "All done. Complete the goal?",
+    "financial": "You've reached the amount. Complete the goal?",
+    "project": "All the steps are done. Complete the goal?"
+  },
+  "edit": {
+    "title": "Edit goal",
+    "save": "Save",
+    "conflict": "Your partner changed this goal before you. We loaded the current version: check it and save again.",
+    "loadNew": "See the current version"
+  },
+  "delete": {
+    "title": "Delete goal?",
+    "body": "“{{title}}” and all of its history will be deleted.",
+    "tasks": "Tasks linked to the steps will be canceled (completed ones stay as history).",
+    "final": "This can't be undone.",
+    "confirm": "Yes, delete"
+  },
+  "notFound": {
+    "title": "We couldn't find this goal",
+    "body": "It may have been deleted, or you don't have access.",
+    "back": "Back to goals"
+  },
+  "mark": {
+    "today": "Check in today",
+    "marked": "Checked in today",
+    "undo": "Undo",
+    "otherDay": "Check in another day",
+    "pickDay": "Day (up to 31 days back)",
+    "pickPlaceholder": "Pick the day",
+    "markDay": "Check in this day"
+  },
+  "habit": {
+    "title": "Habit",
+    "currentWeek": "Week of {{from}} to {{to}}",
+    "currentMonth": "Month of {{from}} to {{to}}",
+    "agreedDays": "Agreed days: {{days}}.",
+    "anyDay": "Any day counts.",
+    "reminderOn": "Daily reminder at {{time}}.",
+    "reminderOff": "No reminder.",
+    "pausedNote": "Paused: the reminder is suspended and nothing is reset."
+  },
+  "shared": {
+    "title": "Shared goal",
+    "countsAny": "Counts when either of you checks in.",
+    "countsBoth": "Counts when both of you check in.",
+    "markedToday": "Checked in today: {{names}}.",
+    "noneToday": "No one has checked in today.",
+    "waitingOther": "Still open for the other person on: {{days}}."
+  },
+  "history": {
+    "title": "History",
+    "periods": "By period",
+    "days": "Days checked in",
+    "range": "{{from}} to {{to}}",
+    "count": "{{count}} of {{target}}",
+    "empty": "No check-ins yet.",
+    "outside": "outside the agreed days",
+    "waitingOther": "open for the other person"
+  },
+  "financial": {
+    "title": "Saved so far",
+    "budgetTitle": "Budget savings",
+    "perMonth": "Save {{amount}} per month",
+    "onTrack": "On pace",
+    "belowPace": "Below pace",
+    "budgetOf": "Counts what's left of the {{category}} limit each month.",
+    "budgetHint": "Counts what's left of the category's limit each month. Only shared expenses count.",
+    "provisional": "The current month can still change.",
+    "unavailable": "Available when Finances is turned on.",
+    "unavailableLink": "Turn on Finances"
+  },
+  "contribution": {
+    "title": "Contributions",
+    "addAction": "Add money",
+    "withdrawAction": "Take out",
+    "addTitle": "Record a contribution",
+    "withdrawTitle": "Record a withdrawal",
+    "add": "Add money",
+    "withdraw": "Take out",
+    "notice": "This is only a record for the goal. It doesn't create an expense or touch the settle-up; to record the expense, use Finances.",
+    "amount": "Amount (R$)",
+    "date": "Date",
+    "note": "Note (optional)",
+    "empty": "No contributions recorded.",
+    "addBy": "{{name}} saved",
+    "withdrawBy": "{{name}} took out",
+    "remove": "Delete the {{amount}} record",
+    "removeShort": "Delete",
+    "more": "Show more"
+  },
+  "project": {
+    "title": "Steps",
+    "add": "Add step",
+    "empty": "No steps yet.",
+    "syncPending": "Creating the task… the step is already saved and the task will show up shortly."
+  },
+  "step": {
+    "addTitle": "New step",
+    "editTitle": "Edit step",
+    "title": "Title",
+    "due": "Due date (optional)",
+    "assignee": "Assigned to",
+    "noAssignee": "No one (shared)",
+    "assigneeInTask": "With a task, the assignee is changed in the Tasks screen.",
+    "asTask": "Create a task for this step",
+    "asTaskHint": "The step is ready when the task is completed.",
+    "toTask": "Turn into a task",
+    "dropTask": "Unlink the task",
+    "remove": "Remove step",
+    "removeConfirm": "Remove this step?",
+    "removeConfirmTask": "Remove this step and cancel the linked task?",
+    "removeYes": "Yes, remove",
+    "save": "Save",
+    "doneInTask": "Completed in the task",
+    "pendingInTask": "Completes in the task",
+    "declined": "Declined, no assignee",
+    "dueOn": "by {{date}}",
+    "moveUp": "Move “{{title}}” up",
+    "moveDown": "Move “{{title}}” down",
+    "edit": "Edit “{{title}}”",
+    "editShort": "Edit"
+  },
+  "today": {
+    "habits": "Habits for today",
+    "shared": "Shared goals",
+    "mark": "Check in",
+    "markFor": "Check in today: {{title}}",
+    "seeAll": "See goals"
+  }
+}

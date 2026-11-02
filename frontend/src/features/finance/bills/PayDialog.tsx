@@ -5,9 +5,9 @@ import { Button, ChoiceGroup, Dialog, DialogClose, TextField } from '@/design-sy
 import { ApiError } from '@/shared/api/client'
 import { errorMessage } from '@/shared/api/errorMessage'
 import type { Bill, PayResult } from '../api'
-import { todayIn } from '../dates'
+import { todayIn } from '@/shared/lib/dates'
 import { useBillActions } from '../hooks'
-import { centsToInput, formatBRL, interpretedHint, MAX_CENTS, parseMoney } from '../money'
+import { centsToInput, formatBRL, interpretedHint, MAX_CENTS, parseMoney } from '@/shared/lib/money'
 import type { Ctx } from '../types'
 import styles from '../finance.module.css'
 

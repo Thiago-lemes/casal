@@ -16,9 +16,11 @@ type Props = {
   leave?: Mutation<void>
   /** com Finanças ligado: link para baixar a cópia dos dados antes de sair (a promessa do produto a quem sai) */
   exportHref?: string
+  /** com Metas ligado: a cópia das metas que a pessoa pode ver (as pessoais dela e as do casal) */
+  goalsExportHref?: string
 }
 
-export function ProfilePage({ me, update, leave, exportHref }: Props) {
+export function ProfilePage({ me, update, leave, exportHref, goalsExportHref }: Props) {
   const { t, i18n } = useTranslation('profile')
   const { t: tc } = useTranslation('common')
   const [name, setName] = useState(me.name)
@@ -131,6 +133,13 @@ export function ProfilePage({ me, update, leave, exportHref }: Props) {
               <div>
                 <ButtonLink href={exportHref} download>
                   {t('leave.download')}
+                </ButtonLink>
+              </div>
+            )}
+            {goalsExportHref && (
+              <div>
+                <ButtonLink href={goalsExportHref} download>
+                  {t('leave.downloadGoals')}
                 </ButtonLink>
               </div>
             )}

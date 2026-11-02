@@ -21,6 +21,7 @@
     "cancels": "Pending reminders between you two are canceled, and unused invites stop working.",
     "financeSettle": "Any open balance is recorded as a leaving settlement. Your personal expenses and income go with you.",
     "download": "Download a copy of your data",
+    "downloadGoals": "Download a copy of your goals",
     "final": "This cannot be undone.",
     "confirm": "Yes, leave the couple"
   }

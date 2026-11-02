@@ -1,6 +1,7 @@
 import { useMe, useUpdateProfile } from '@/features/auth/hooks'
 import { useHousehold, useLeaveHousehold } from '@/features/household/hooks'
 import { exportUrl } from '@/features/finance/api'
+import { goalsExportUrl } from '@/features/goals/api'
 import { ProfilePage } from '@/features/profile/ProfilePage'
 import { useModuleEnabled } from '@/shared/modules/hooks'
 
@@ -11,6 +12,7 @@ export function ProfileRoute() {
   const update = useUpdateProfile()
   const leave = useLeaveHousehold()
   const finance = useModuleEnabled('finance', Boolean(household))
+  const goals = useModuleEnabled('goals', Boolean(household))
   if (!me) return null
-  return <ProfilePage me={me} update={update} leave={household ? leave : undefined} exportHref={finance.on ? exportUrl('csv') : undefined} />
+  return <ProfilePage me={me} update={update} leave={household ? leave : undefined} exportHref={finance.on ? exportUrl('csv') : undefined} goalsExportHref={goals.on ? goalsExportUrl('csv') : undefined} />
 }

@@ -1,0 +1,30 @@
+{
+  "banner": {
+    "title": "Receba os lembretes no celular",
+    "body": "Ative os avisos para saber na hora certa, mesmo com o app fechado.",
+    "enable": "Ativar avisos",
+    "later": "Agora não"
+  },
+  "install": {
+    "title": "Instale o app para receber avisos",
+    "body": "No iPhone, os avisos só funcionam com o app na tela inicial.",
+    "step1": "Toque em Compartilhar, na barra do Safari.",
+    "step2": "Escolha “Adicionar à Tela de Início”.",
+    "step3": "Abra o app pela tela inicial e ative os avisos."
+  },
+  "menu": {
+    "title": "Avisos",
+    "toggle": "Receber avisos",
+    "test": "Enviar aviso de teste",
+    "testSent": "Aviso enviado",
+    "denied": "Bloqueados no navegador",
+    "install": "Instale o app para ativar",
+    "unsupported": "Este navegador não suporta avisos",
+    "testFailed": "Não foi possível enviar"
+  },
+  "error": {
+    "noWorker": "O app ainda está carregando. Recarregue a página e tente de novo.",
+    "denied": "Os avisos foram bloqueados. Libere nas configurações do navegador.",
+    "timeout": "Não conseguimos falar com o serviço de avisos do navegador. Tente de novo."
+  }
+}

@@ -1,9 +1,10 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Globe, LogOut, Monitor, Moon, Sun } from 'lucide-react'
+import { Bell, BellOff, BellRing, Globe, LogOut, Monitor, Moon, Sun } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/design-system'
 import { useLogout, useMe } from '@/features/auth/hooks'
+import { usePush } from '@/features/push/hooks'
 import { LANGUAGES } from '@/shared/i18n'
 import type { Language } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
@@ -23,6 +24,8 @@ export function UserMenu() {
   const me = useMe().data
   const [theme, setTheme] = useTheme()
   const logout = useLogout()
+  const push = usePush()
+  const { t: tp } = useTranslation('push')
   const current: Language = i18n.language.startsWith('en') ? 'en' : 'pt-BR'
 
   if (!me) return null
@@ -56,6 +59,40 @@ export function UserMenu() {
                 </Menu.RadioItem>
               ))}
             </Menu.RadioGroup>
+          </Menu.Group>
+
+          <Menu.Separator className={styles.separator} />
+
+          <Menu.Group>
+            <Menu.Label className={styles.label}>{tp('menu.title')}</Menu.Label>
+            {push.status === 'on' || push.status === 'off' ? (
+              <>
+                <Menu.CheckboxItem
+                  className={styles.item}
+                  checked={push.status === 'on'}
+                  disabled={push.enable.isPending || push.disable.isPending}
+                  onSelect={(e) => e.preventDefault()}
+                  onCheckedChange={(on) => (on ? push.enable.mutate() : push.disable.mutate())}
+                >
+                  {push.status === 'on' ? <Bell className={styles.icon} aria-hidden="true" /> : <BellOff className={styles.icon} aria-hidden="true" />}
+                  {tp('menu.toggle')}
+                  <Menu.ItemIndicator className={styles.check} aria-hidden="true" />
+                </Menu.CheckboxItem>
+                {push.status === 'on' && (
+                  <Menu.Item className={styles.item} disabled={push.test.isPending} onSelect={(e) => { e.preventDefault(); push.test.mutate() }}>
+                    <BellRing className={styles.icon} aria-hidden="true" />
+                    {push.test.isError ? tp('menu.testFailed') : push.test.isSuccess ? tp('menu.testSent') : tp('menu.test')}
+                  </Menu.Item>
+                )}
+              </>
+            ) : (
+              push.status && (
+                <Menu.Item className={styles.item} disabled>
+                  <BellOff className={styles.icon} aria-hidden="true" />
+                  {tp(`menu.${push.status}`)}
+                </Menu.Item>
+              )
+            )}
           </Menu.Group>
 
           <Menu.Separator className={styles.separator} />

@@ -1,0 +1,30 @@
+{
+  "banner": {
+    "title": "Get reminders on your phone",
+    "body": "Turn on notifications to hear about it at the right time, even with the app closed.",
+    "enable": "Turn on notifications",
+    "later": "Not now"
+  },
+  "install": {
+    "title": "Install the app to get notifications",
+    "body": "On iPhone, notifications only work with the app on the home screen.",
+    "step1": "Tap Share in the Safari toolbar.",
+    "step2": "Choose “Add to Home Screen”.",
+    "step3": "Open the app from the home screen and turn notifications on."
+  },
+  "menu": {
+    "title": "Notifications",
+    "toggle": "Get notifications",
+    "test": "Send a test notification",
+    "testSent": "Notification sent",
+    "denied": "Blocked in the browser",
+    "install": "Install the app to turn on",
+    "unsupported": "This browser does not support notifications",
+    "testFailed": "Could not send"
+  },
+  "error": {
+    "noWorker": "The app is still loading. Reload the page and try again.",
+    "denied": "Notifications were blocked. Allow them in your browser settings.",
+    "timeout": "We could not reach the browser's notification service. Try again."
+  }
+}

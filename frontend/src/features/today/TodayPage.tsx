@@ -6,6 +6,7 @@ import { useHousehold } from '@/features/household/hooks'
 import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
 import { ReminderLabel } from '@/features/reminders/ReminderLabel'
+import { PushPrompt } from '@/features/push/PushPrompt'
 import { useReminderActions, useReminders } from '@/features/reminders/hooks'
 import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
@@ -39,7 +40,9 @@ export function TodayPage() {
   const dueTotal = stats.doneToday + stats.dueToday
 
   return (
-    <div className={styles.page}>
+    <>
+      <PushPrompt />
+      <div className={styles.page}>
       <header className={styles.day}>
         <div className={styles.dayTop}>
           <p className={styles.date}>
@@ -118,6 +121,7 @@ export function TodayPage() {
       </div>
 
       <Composer open={composing} onOpenChange={setComposing} me={me} partner={partner} actions={actions} />
-    </div>
+      </div>
+    </>
   )
 }

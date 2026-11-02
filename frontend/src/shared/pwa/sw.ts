@@ -12,7 +12,7 @@ self.addEventListener('message', (event) => {
 
 // Web Push: no iOS toda mensagem precisa mostrar uma notificação.
 self.addEventListener('push', (event) => {
-  let data = { title: 'Casal', body: '', url: '/' }
+  let data = { title: 'Zoog', body: '', url: '/' }
   try {
     data = { ...data, ...event.data?.json() }
   } catch {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, Navigate } from 'react-router-dom'
-import { Button, TextField } from '@/design-system'
+import { Button, Logo, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { APP_NAME } from '@/shared/config'
 import { useLogin, useMe, useRegister } from './hooks'
@@ -31,7 +31,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   return (
     <main className={styles.page}>
       <div className={styles.band}>
-        <p className={styles.brand}>{APP_NAME}</p>
+        <Logo className={styles.brand} tone="onDark" title={APP_NAME} />
       </div>
       <form className={styles.form} onSubmit={submit}>
         <h1 className={styles.title}>{t(`${mode}.title`)}</h1>

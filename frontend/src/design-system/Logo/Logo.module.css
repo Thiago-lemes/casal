@@ -1,0 +1,52 @@
+/*
+ * Cores da marca. Cada uma lê uma variável --logo-* e, se ninguém a definiu, usa o padrão claro/escuro
+ * (light-dark segue o color-scheme que tokens.css já troca junto com o tema).
+ * A = metade azul, B = metade laranja; faceA/faceB = cor do rosto sobre cada metade.
+ */
+.logo {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+.ink {
+  fill: var(--logo-ink, light-dark(#12204a, #eef1ff));
+}
+
+.inkLine {
+  stroke: var(--logo-ink, light-dark(#12204a, #eef1ff));
+}
+
+.a {
+  fill: var(--logo-a, light-dark(#2747c9, #6d8bff));
+}
+
+.b {
+  fill: var(--logo-b, light-dark(#f26a1b, #f98a42));
+}
+
+.faceA {
+  color: var(--logo-face-a, light-dark(#fff6ee, #0d1330));
+}
+
+.faceB {
+  color: var(--logo-face-b, light-dark(#fff6ee, #0d1330));
+}
+
+/* sobre o laranja da interface: metades escura e creme, rosto invertido em cada uma */
+.onAccent {
+  --logo-ink: #15171b;
+  --logo-a: #15171b;
+  --logo-b: #fff6ee;
+  --logo-face-a: #fff6ee;
+  --logo-face-b: #15171b;
+}
+
+/* sobre um fundo escuro que não muda com o tema (ex.: a faixa azul do login): sempre as cores do tema escuro */
+.onDark {
+  --logo-ink: #eef1ff;
+  --logo-a: #6d8bff;
+  --logo-b: #f98a42;
+  --logo-face-a: #0d1330;
+  --logo-face-b: #0d1330;
+}

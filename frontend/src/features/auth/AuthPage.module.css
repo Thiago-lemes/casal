@@ -4,17 +4,16 @@
   grid-template-rows: auto 1fr;
 }
 
+/* faixa azul-tinta da marca, igual nos dois temas; a logo fica centralizada nela */
 .band {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-5) var(--space-5);
+  display: grid;
+  place-items: center;
+  background: #12204a;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-5) var(--space-6);
 }
 
 .brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-date);
-  line-height: 0.95;
+  width: min(100%, 15rem);
 }
 
 .form {
@@ -46,12 +45,10 @@
     grid-template-columns: minmax(18rem, 5fr) 6fr;
   }
   .band {
-    display: flex;
-    align-items: flex-end;
     padding: var(--space-7);
   }
   .brand {
-    font-size: 7rem;
+    width: min(100%, 26rem);
   }
   .form {
     align-self: center;

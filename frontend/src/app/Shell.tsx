@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useHousehold } from '@/features/household/hooks'
+import { Logo } from '@/design-system'
 import { APP_NAME } from '@/shared/config'
 import { useModuleEnabled } from '@/shared/modules/hooks'
 import styles from './Shell.module.css'
@@ -38,7 +39,9 @@ export function Shell() {
         <div className={styles.topAccount}>
           <UserMenu side="bottom" />
         </div>
-        <p className={styles.brand}>{APP_NAME}</p>
+        {/* celular: fundo claro, cores da marca; desktop: trilho laranja, versão para laranja */}
+        <Logo className={styles.brandMobile} title={APP_NAME} />
+        <Logo className={styles.brandRail} tone="onAccent" title={APP_NAME} />
       </header>
 
       <nav className={styles.nav} aria-label={t('nav.main')}>

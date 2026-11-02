@@ -19,10 +19,12 @@
   padding: calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-1);
 }
 
-.brand {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-xl);
+.brandMobile {
+  height: 1.5rem;
+}
+
+.brandRail {
+  display: none;
 }
 
 .nav {
@@ -112,6 +114,15 @@
     padding: var(--space-6) var(--space-5) 0;
     background: transparent;
     color: var(--color-on-accent);
+  }
+
+  .brandMobile {
+    display: none;
+  }
+
+  .brandRail {
+    display: block;
+    height: 2.5rem;
   }
 
   .main {

@@ -51,8 +51,10 @@ export function useLogout() {
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      qc.clear()
+      // grava "sem sessão" antes de limpar: um clear() remove a consulta que o RequireAuth observa,
+      // e o redirecionamento para o login nunca acontece
       qc.setQueryData(meKey, null)
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== meKey[0] })
     },
   })
 }

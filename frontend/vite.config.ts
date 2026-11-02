@@ -22,8 +22,8 @@ export default defineConfig({
       registerType: 'prompt',
       injectRegister: false,
       manifest: {
-        name: 'Casal',
-        short_name: 'Casal',
+        name: 'Zoog',
+        short_name: 'Zoog',
         start_url: '/',
         display: 'standalone',
         background_color: '#15171B',

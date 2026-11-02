@@ -30,7 +30,7 @@ export function Tabs<V extends string>({ label, tabs, value, onChange, children 
   }
 
   return (
-    <div>
+    <div className={styles.root}>
       <div role="tablist" aria-label={label} className={styles.list}>
         {tabs.map((tab, i) => (
           <button

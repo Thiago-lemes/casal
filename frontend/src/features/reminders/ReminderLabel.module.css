@@ -8,7 +8,7 @@
 .label {
   position: relative;
   display: grid;
-  grid-template-columns: 5.25rem 1fr;
+  grid-template-columns: 5.25rem minmax(0, 1fr);
   gap: var(--space-3);
   min-height: 0;
   overflow: hidden;
@@ -117,6 +117,6 @@
 
 @media (min-width: 48rem) {
   .label {
-    grid-template-columns: 6.5rem 1fr;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
   }
 }

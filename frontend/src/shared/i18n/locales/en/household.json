@@ -29,6 +29,10 @@
     "notes": {
       "name": "Notes",
       "hint": "Recipes, lists and ideas, only yours or the couple's."
+    },
+    "reminders": {
+      "name": "Reminders",
+      "hint": "Notes with a set time between the two of you."
     }
   }
 }

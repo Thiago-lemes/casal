@@ -29,6 +29,10 @@
     "notes": {
       "name": "Anotações",
       "hint": "Receitas, listas e ideias, só suas ou do casal."
+    },
+    "reminders": {
+      "name": "Lembretes",
+      "hint": "Recados com hora marcada entre vocês dois."
     }
   }
 }

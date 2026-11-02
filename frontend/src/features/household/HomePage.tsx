@@ -1,4 +1,4 @@
-import { Check, Copy, NotebookText } from 'lucide-react'
+import { BellRing, Check, Copy, NotebookText } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -10,7 +10,10 @@ import { useCreateInvite, useHousehold } from './hooks'
 import styles from './HomePage.module.css'
 
 /** Os módulos da casa; cada um é uma página própria. Os opcionais só entram aqui quando o casal os ativa. */
-const MODULES: { to: string; key: string; icon: LucideIcon }[] = [{ to: '/notes', key: 'notes', icon: NotebookText }]
+const MODULES: { to: string; key: string; icon: LucideIcon }[] = [
+  { to: '/reminders', key: 'reminders', icon: BellRing },
+  { to: '/notes', key: 'notes', icon: NotebookText },
+]
 
 /** "Casa": quem faz parte do casal e o convite para a segunda pessoa. */
 export function HomePage() {

@@ -1,0 +1,16 @@
+{
+  "title": "Reminders",
+  "pendingCount_one": "{{count}} pending",
+  "pendingCount_other": "{{count}} pending",
+  "new": "New reminder",
+  "loadError": "Could not load the reminders",
+  "tabs": { "label": "Reminder status", "pending": "Pending", "resolved": "Resolved" },
+  "empty": {
+    "pending": { "title": "No pending reminders", "body": "Leave a note for yourself or your partner. It arrives as a notification at the set time." },
+    "resolved": { "title": "Nothing resolved yet", "body": "Resolved reminders stay here, newest first." }
+  },
+  "byYou": "You left this",
+  "by": "{{name}} left this",
+  "forPartner": "For {{name}}",
+  "resolvedAt": "Resolved on {{when}}"
+}

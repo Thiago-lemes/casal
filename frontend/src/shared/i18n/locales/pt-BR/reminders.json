@@ -1,0 +1,16 @@
+{
+  "title": "Lembretes",
+  "pendingCount_one": "{{count}} pendente",
+  "pendingCount_other": "{{count}} pendentes",
+  "new": "Novo lembrete",
+  "loadError": "Não deu para carregar os lembretes",
+  "tabs": { "label": "Situação dos lembretes", "pending": "Pendentes", "resolved": "Resolvidos" },
+  "empty": {
+    "pending": { "title": "Nenhum lembrete pendente", "body": "Deixe um recado para você ou para a outra pessoa. Ele chega como aviso no horário marcado." },
+    "resolved": { "title": "Nada resolvido ainda", "body": "Os lembretes que forem resolvidos ficam aqui, do mais recente ao mais antigo." }
+  },
+  "byYou": "Você deixou",
+  "by": "{{name}} deixou",
+  "forPartner": "Para {{name}}",
+  "resolvedAt": "Resolvido em {{when}}"
+}

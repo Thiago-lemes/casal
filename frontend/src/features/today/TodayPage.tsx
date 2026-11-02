@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { Button, EmptyState, Skeleton } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { useHousehold } from '@/features/household/hooks'
@@ -83,7 +84,10 @@ export function TodayPage() {
       </div>
 
       <section className={styles.list} aria-live="polite" aria-label={t('listTitle')}>
-        <h2 className={styles.listTitle}>{t('listTitle')}</h2>
+        <div className={styles.listHead}>
+          <h2 className={styles.listTitle}>{t('listTitle')}</h2>
+          <Link to="/reminders">{t('seeAll')}</Link>
+        </div>
 
         {reminders.isPending && (
           <div className={styles.skeletons}>

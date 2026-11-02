@@ -58,5 +58,6 @@
     "empty": "Nenhuma tarefa para hoje.",
     "complete": "Concluir tarefa: {{title}}",
     "late": "Atrasada"
-  }
+  },
+  "seeAll": "Ver todos"
 }

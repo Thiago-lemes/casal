@@ -58,5 +58,6 @@
     "empty": "No tasks for today.",
     "complete": "Finish task: {{title}}",
     "late": "Overdue"
-  }
+  },
+  "seeAll": "See all"
 }

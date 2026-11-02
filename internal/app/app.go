@@ -13,6 +13,7 @@ import (
 	"casal/internal/config"
 	"casal/internal/household"
 	"casal/internal/httpx"
+	"casal/internal/module"
 	"casal/internal/note"
 	"casal/internal/push"
 	"casal/internal/reminder"
@@ -47,6 +48,10 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	householdSvc := household.NewService(household.NewPostgresRepo(conn))
 	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
 	requireHousehold := household.RequireHousehold(householdSvc, log)
+
+	// módulos opcionais do casal; as features de cada módulo usam module.Require(moduleSvc, log, nome) nas rotas
+	moduleSvc := module.NewService(module.NewPostgresRepo(conn))
+	module.NewHandler(moduleSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// push, com o notificador de log como alternativa quando o VAPID não está configurado
 	var notifier reminder.Notifier = logNotifier{log}

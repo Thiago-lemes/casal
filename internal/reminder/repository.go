@@ -35,6 +35,11 @@ type Repository interface {
 	Resolve(ctx context.Context, householdID, id, userID string, now time.Time) (Reminder, error)
 	Snooze(ctx context.Context, householdID, id, userID string, remindAt time.Time) (Reminder, error)
 	Cancel(ctx context.Context, householdID, id, userID string) error
+	// CreateWithRef grava um lembrete de outro módulo. Se já há um ativo com o mesmo ref no casal, devolve esse
+	// (criar de novo é idempotente).
+	CreateWithRef(ctx context.Context, r Reminder, ref string) (Reminder, error)
+	// CancelByRef cancela os lembretes pendentes com esse ref e devolve quantos eram.
+	CancelByRef(ctx context.Context, householdID, ref string) (int64, error)
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -80,6 +85,49 @@ func (p *PostgresRepo) Create(ctx context.Context, in Reminder) (Reminder, error
 		return err
 	})
 	return out, err
+}
+
+func (p *PostgresRepo) CreateWithRef(ctx context.Context, in Reminder, ref string) (Reminder, error) {
+	var out Reminder
+	err := db.InTx(ctx, p.db, db.Scope{HouseholdID: in.HouseholdID}, func(tx *sql.Tx) error {
+		// O índice único dos ativos por ref faz a idempotência. DO NOTHING não devolve a linha existente,
+		// então ela é lida em seguida (a transação é a mesma e o escopo é o do casal).
+		var id string
+		err := tx.QueryRowContext(ctx, `
+			INSERT INTO reminders (household_id, created_by, recipient_id, body, remind_at, ref)
+			VALUES ($1, $2, $3, $4, $5, $6)
+			ON CONFLICT (household_id, ref) WHERE ref IS NOT NULL AND status <> 'canceled' DO NOTHING
+			RETURNING id`,
+			in.HouseholdID, in.CreatedBy, in.RecipientID, in.Body, in.RemindAt, ref).Scan(&id)
+		if errors.Is(err, sql.ErrNoRows) {
+			err = tx.QueryRowContext(ctx, `
+				SELECT id FROM reminders
+				WHERE household_id = $1 AND ref = $2 AND status <> 'canceled'`, in.HouseholdID, ref).Scan(&id)
+		}
+		if err != nil {
+			return err
+		}
+		out, err = scan(tx.QueryRowContext(ctx, `
+			SELECT `+cols+` FROM reminders r JOIN users u ON u.id = r.created_by
+			WHERE r.id = $1 AND r.household_id = $2`, id, in.HouseholdID))
+		return err
+	})
+	return out, err
+}
+
+func (p *PostgresRepo) CancelByRef(ctx context.Context, householdID, ref string) (int64, error) {
+	var n int64
+	err := db.InTx(ctx, p.db, db.Scope{HouseholdID: householdID}, func(tx *sql.Tx) error {
+		res, err := tx.ExecContext(ctx, `
+			UPDATE reminders SET status = 'canceled'
+			WHERE household_id = $1 AND ref = $2 AND status IN ('scheduled', 'sent')`, householdID, ref)
+		if err != nil {
+			return err
+		}
+		n, _ = res.RowsAffected()
+		return nil
+	})
+	return n, err
 }
 
 // List devolve os lembretes que a pessoa recebeu ou criou, os mais recentes primeiro.

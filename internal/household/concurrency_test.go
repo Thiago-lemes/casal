@@ -63,3 +63,26 @@ func TestOnlyOneInviteTakesTheLastSlot(t *testing.T) {
 		t.Errorf("o casal deveria ter %d pessoas, tem %d", MaxMembers, len(members))
 	}
 }
+
+// Finanças marca o lembrete de uma conta na hora local de quem paga: Members precisa trazer o fuso.
+func TestMembersCarryTimezone(t *testing.T) {
+	db := testutil.OpenDB(t)
+	ana := testutil.NewUser(t, db, "ana")
+	beto := testutil.NewUser(t, db, "beto")
+	hh := testutil.NewHousehold(t, db, ana, beto)
+	if _, err := db.Exec(`UPDATE users SET timezone = 'America/Manaus' WHERE id = $1`, beto); err != nil {
+		t.Fatal(err)
+	}
+
+	members, err := NewPostgresRepo(db).Members(context.Background(), hh)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]string{}
+	for _, m := range members {
+		got[m.ID] = m.Timezone
+	}
+	if got[ana] != "America/Sao_Paulo" || got[beto] != "America/Manaus" {
+		t.Errorf("fusos errados: %v", got)
+	}
+}

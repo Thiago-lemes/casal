@@ -22,6 +22,7 @@ var (
 type Member struct {
 	ID       string    `json:"id"`
 	Name     string    `json:"name"`
+	Timezone string    `json:"timezone"`
 	JoinedAt time.Time `json:"joined_at"`
 }
 
@@ -137,10 +138,10 @@ func (r *PostgresRepo) HouseholdOf(ctx context.Context, userID string) (string, 
 	return id, err
 }
 
-// Members faz um JOIN somente leitura em users, só para mostrar o nome.
+// Members faz um JOIN somente leitura em users, só para mostrar o nome e o fuso.
 func (r *PostgresRepo) Members(ctx context.Context, householdID string) ([]Member, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT u.id, u.name, m.joined_at
+		SELECT u.id, u.name, u.timezone, m.joined_at
 		FROM household_members m JOIN users u ON u.id = m.user_id
 		WHERE m.household_id = $1
 		ORDER BY m.joined_at`, householdID)
@@ -152,7 +153,7 @@ func (r *PostgresRepo) Members(ctx context.Context, householdID string) ([]Membe
 	var out []Member
 	for rows.Next() {
 		var m Member
-		if err := rows.Scan(&m.ID, &m.Name, &m.JoinedAt); err != nil {
+		if err := rows.Scan(&m.ID, &m.Name, &m.Timezone, &m.JoinedAt); err != nil {
 			return nil, err
 		}
 		out = append(out, m)

@@ -1,4 +1,4 @@
-import { BellRing, Check, Copy, NotebookText } from 'lucide-react'
+import { BellRing, Check, Copy, NotebookText, ShoppingCart } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -11,6 +11,7 @@ import styles from './HomePage.module.css'
 
 /** Os módulos da casa; cada um é uma página própria. Os opcionais só entram aqui quando o casal os ativa. */
 const MODULES: { to: string; key: string; icon: LucideIcon }[] = [
+  { to: '/shopping', key: 'shopping', icon: ShoppingCart },
   { to: '/reminders', key: 'reminders', icon: BellRing },
   { to: '/notes', key: 'notes', icon: NotebookText },
 ]

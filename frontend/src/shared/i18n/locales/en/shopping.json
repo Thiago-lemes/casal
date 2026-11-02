@@ -1,0 +1,30 @@
+{
+  "title": "Shopping",
+  "count_one": "{{count}} item to buy",
+  "count_other": "{{count}} items to buy",
+  "loadError": "Could not load the list",
+  "category": { "produce": "Produce", "butcher": "Butcher", "grocery": "Groceries", "cleaning": "Cleaning", "other": "Other" },
+  "add": { "title": "Add to the list", "submit": "Add" },
+  "form": {
+    "name": "What are we missing?",
+    "more": "More details",
+    "less": "Fewer details",
+    "quantity": "Quantity",
+    "quantityInvalid": "Use a number, like 2 or 1.5.",
+    "unit": "Unit",
+    "category": "Category",
+    "recurring": "Always buy",
+    "recurringHint": "When you restock, it returns to the list once it has been bought."
+  },
+  "notice": { "merged": "{{name}} was already on the list: we added to its quantity.", "restocked_one": "{{count}} recurring item is back on the list.", "restocked_other": "{{count}} recurring items are back on the list." },
+  "row": { "buy": "Mark as bought: {{name}}", "undo": "Undo purchase: {{name}}", "edit": "Edit {{name}}", "recurring": "Recurring item" },
+  "bought": { "title": "Bought in the last 24 hours" },
+  "empty": {
+    "title": "The list is empty",
+    "body": "Add what the home is missing. You both see the same list, and what one checks off, the other sees.",
+    "done": { "title": "Everything bought", "body": "Nothing is missing. If you have recurring items, just restock them." }
+  },
+  "restock": { "action": "Restock recurring", "hint": "Brings back to the list the items marked \"always buy\" that were already bought." },
+  "market": { "title": "Market mode", "enter": "Market mode", "exit": "Leave market mode" },
+  "editor": { "title": "Edit item", "save": "Save", "delete": "Delete item", "confirmDelete": "Confirm: delete" }
+}

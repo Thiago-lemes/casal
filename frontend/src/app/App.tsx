@@ -13,6 +13,7 @@ const ProfileRoute = lazy(() => import('./ProfileRoute').then((m) => ({ default:
 const NotesRoute = lazy(() => import('./NotesRoute').then((m) => ({ default: m.NotesRoute })))
 const RoutineRoute = lazy(() => import('./RoutineRoute').then((m) => ({ default: m.RoutineRoute })))
 const RemindersRoute = lazy(() => import('./RemindersRoute').then((m) => ({ default: m.RemindersRoute })))
+const ShoppingRoute = lazy(() => import('./ShoppingRoute').then((m) => ({ default: m.ShoppingRoute })))
 const TasksRoute = lazy(() => import('./TasksRoute').then((m) => ({ default: m.TasksRoute })))
 
 const queryClient = new QueryClient({
@@ -45,6 +46,14 @@ export function App() {
               <Route element={<RequireHousehold />}>
                 <Route index element={<TodayPage />} />
                 <Route path="/home" element={<HomePage />} />
+                <Route
+                  path="/shopping"
+                  element={
+                    <Suspense fallback={null}>
+                      <ShoppingRoute />
+                    </Suspense>
+                  }
+                />
                 <Route
                   path="/reminders"
                   element={

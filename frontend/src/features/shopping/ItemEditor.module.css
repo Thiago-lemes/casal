@@ -1,0 +1,8 @@
+.error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.delete {
+  margin-right: auto;
+}

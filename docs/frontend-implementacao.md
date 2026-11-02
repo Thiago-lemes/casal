@@ -6,7 +6,7 @@ Este documento diz como o frontend vai crescer: o que já existe, as convençõe
 
 ## Estado atual
 
-PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), a página **Tarefas** (F1), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
+PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), as páginas **Tarefas** (F1), **Anotações** (F2), **Semana** com a rotina (F3), **Lembretes** (F4) e **Compras** (F5), o **Perfil** (nome, cidade e fuso, sair do casal), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
 
 | Tema | Como está hoje |
 | --- | --- |
@@ -14,11 +14,11 @@ PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cada
 | Dados do servidor | `@tanstack/react-query`. Sem retry em erro 4xx; consulta de novo ao voltar o foco |
 | HTTP | `shared/api/client.ts`: um só `api()`, cookie de sessão na mesma origem, erros viram `ApiError` com `code` |
 | Estilo | CSS Modules + tokens em `design-system/tokens` (camada crua `--c-*` e papéis `--color-*`); tema claro e escuro |
-| Componentes | `design-system/`: Avatar, Button, Card, ChoiceGroup, Dialog, EmptyState, Skeleton, Tabs, TextArea, TextField. O Radix Dropdown é usado direto no `UserMenu` |
-| Idiomas | `i18next`, um arquivo por namespace e idioma (`pt-BR` e `en`): `common`, `auth`, `household`, `today`, `push`, `tasks` |
+| Componentes | `design-system/`: Avatar, Button, Card, ChoiceGroup, Dialog, EmptyState, Skeleton, Tabs, TextArea, TextField. `shared/ui/VisibilityPicker` (anotações e rotina). O Radix Dropdown é usado direto no `UserMenu` |
+| Idiomas | `i18next`, um arquivo por namespace e idioma (`pt-BR` e `en`): `common`, `auth`, `household`, `today`, `push`, `tasks`, `profile`, `notes`, `routine`, `reminders`, `shopping` |
 | Testes | Vitest + Testing Library (jsdom) |
 | Desenvolvimento | `F5` no VS Code sobe banco, API e Vite; o Vite repassa `/v1` para a API em `:8080` |
-| Navegação | Hoje, Rotina (marcada "em breve", sem rota), Tarefas e Casa; o avatar da conta fica no pé da barra |
+| Navegação | Hoje · Semana · Tarefas · Casa. Anotações, Lembretes e Compras ficam em **Casa** (hub de módulos); o Perfil abre pelo menu do avatar |
 
 ## Convenções (todas as telas novas seguem)
 
@@ -50,14 +50,14 @@ A ordem segue o roadmap do produto e o que o backend já tem. Cada entrega termi
 
 | # | Entrega | Backend | Situação do backend |
 | --- | --- | --- | --- |
-| F1 | Tarefas | `/v1/tasks` | Pronto. **Frontend feito**; falta o bloco "Tarefas de hoje" na tela Hoje |
-| F2 | Anotações | `/v1/notes` | Pronto |
-| F3 | Rotina semanal | `/v1/routine/*` | Pronto (inclui visibilidade e horários livres); o fuso vem do perfil |
-| F4 | Lembretes em tela própria e perfil | `/v1/reminders`, `PATCH /v1/me`, `POST /v1/household/leave` | Pronto |
-| F5 | Lista de compras | `/v1/shopping/*` | Pronto |
+| F1 | Tarefas | `/v1/tasks` | Pronto. **Frontend feito** (inclui repetição, rodízio e o bloco "Tarefas de hoje" em Hoje) |
+| F2 | Anotações | `/v1/notes` | Pronto. **Frontend feito** |
+| F3 | Rotina semanal | `/v1/routine/*` | Pronto. **Frontend feito** (dia, semana, horários livres, quem está onde, blocos e exceções) |
+| F4 | Lembretes em tela própria e perfil | `/v1/reminders`, `PATCH /v1/me`, `POST /v1/household/leave` | Pronto. **Frontend feito** |
+| F5 | Lista de compras | `/v1/shopping/*` | Pronto. **Frontend feito** (inclui modo mercado) |
 | F6 | Marmita, Finanças, Metas | a criar | Fases 2 a 4 do produto |
 
-Da F1 à F5 o backend está pronto: veja o **Contrato do backend** mais abaixo. O fuso (cidade informada pela pessoa) precisa de uma lista de cidades no frontend e deve entrar **antes da rotina (F3)**.
+Da F1 à F5 o backend está pronto: veja o **Contrato do backend** mais abaixo, e o frontend também. Falta só rodar tudo junto contra o backend real (as telas foram testadas com respostas simuladas e com testes automatizados).
 
 ## F1 — Tarefas
 
@@ -226,5 +226,15 @@ Item: `name`, `quantity` (opcional), `unit`, `category` (`produce`, `grocery`, `
 
 - ~~O criador deve ver na aba Recusadas só as tarefas que ele criou, ou todas do casal?~~ Decidido na F1: mostra todas; as ações só aparecem para o criador.
 - ~~A página de tarefas entra na barra principal já agora?~~ Decidido na F1: entrou na barra (Hoje · Rotina em breve · Tarefas · Casa; com o avatar são cinco itens no celular).
-- Tarefa recorrente e rodízio: o backend já está pronto (`repeat` e `rotation`, veja o contrato). Falta decidir se entram na mesma tela de criar tarefa ou numa segunda entrega do frontend.
-- Lista de cidades com fuso: usar uma lista curta embutida (cidades brasileiras) ou a lista completa do `Intl`?
+- ~~Tarefa recorrente e rodízio: mesma tela ou segunda entrega?~~ Decidido: **na mesma tela de criar tarefa**. O rodízio só aparece quando a tarefa se repete, tem responsável e há duas pessoas.
+- ~~Lista de cidades com fuso: curta ou completa do `Intl`?~~ Decidido: **lista curta embutida** em `features/profile/cities.ts` (capitais brasileiras e algumas cidades do exterior), com teste que valida cada fuso contra o `Intl`. Um fuso que não está na lista continua selecionável.
+
+## Decisões tomadas na implementação
+
+- **Erros.** `ApiError.code` é o `code` do servidor; `errorMessage` traduz por ele e, sem texto para um `code` específico, cai no tipo geral pelo status. Todos os `code` do contrato têm texto em `pt-BR` e `en`.
+- **Anotações.** O filtro por busca e por etiqueta roda no navegador sobre a lista que o backend já devolve filtrada pela visibilidade (o `GET` aceita `q` e `tag`, mas não é preciso). Atalhos do cartão (fixar, marcar item) mandam `visibility: ""` para nunca mudar a visibilidade.
+- **Conflito de versão** (`note_conflict`, `routine_conflict`): o diálogo explica e oferece "Ver a versão atual", que recarrega o rascunho já com a versão nova.
+- **Rotina.** Datas e horas sempre pelo fuso do perfil (nunca o do aparelho). Semana de segunda a domingo, como o `weekdays` do backend. Blocos "ocupado" do parceiro aparecem sem título e sem exceção.
+- **Compras.** Marcar e desmarcar são otimistas. "Repor recorrentes" avisa quantos voltaram. O modo mercado esconde cadastro e edição.
+- **Perfil.** Sair do casal pede confirmação e lista as consequências (o que fica, o que acompanha, o que é cancelado).
+- **Fora desta entrega:** transformar uma linha de anotação em tarefa ou lembrete, e tela de metas.

@@ -1,0 +1,30 @@
+{
+  "title": "Compras",
+  "count_one": "{{count}} item para comprar",
+  "count_other": "{{count}} itens para comprar",
+  "loadError": "Não deu para carregar a lista",
+  "category": { "produce": "Hortifrúti", "butcher": "Açougue", "grocery": "Mercado", "cleaning": "Limpeza", "other": "Outros" },
+  "add": { "title": "Adicionar à lista", "submit": "Adicionar" },
+  "form": {
+    "name": "O que falta?",
+    "more": "Mais detalhes",
+    "less": "Menos detalhes",
+    "quantity": "Quantidade",
+    "quantityInvalid": "Use um número, como 2 ou 1,5.",
+    "unit": "Unidade",
+    "category": "Categoria",
+    "recurring": "Sempre comprar",
+    "recurringHint": "Quando você pedir para repor, ele volta à lista depois de comprado."
+  },
+  "notice": { "merged": "{{name}} já estava na lista: somamos à quantidade.", "restocked_one": "{{count}} item recorrente voltou à lista.", "restocked_other": "{{count}} itens recorrentes voltaram à lista." },
+  "row": { "buy": "Marcar como comprado: {{name}}", "undo": "Desfazer a compra: {{name}}", "edit": "Editar {{name}}", "recurring": "Item recorrente" },
+  "bought": { "title": "Comprados nas últimas 24 horas" },
+  "empty": {
+    "title": "A lista está vazia",
+    "body": "Adicione o que falta em casa. Os dois veem a mesma lista, e o que um marca, o outro vê.",
+    "done": { "title": "Tudo comprado", "body": "Não falta nada na lista. Se tiver itens recorrentes, é só repor." }
+  },
+  "restock": { "action": "Repor recorrentes", "hint": "Traz de volta à lista os itens marcados como \"sempre comprar\" que já foram comprados." },
+  "market": { "title": "Modo mercado", "enter": "Modo mercado", "exit": "Sair do modo mercado" },
+  "editor": { "title": "Editar item", "save": "Salvar", "delete": "Apagar item", "confirmDelete": "Confirmar: apagar" }
+}

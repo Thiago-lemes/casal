@@ -33,6 +33,10 @@
     "reminders": {
       "name": "Reminders",
       "hint": "Notes with a set time between the two of you."
+    },
+    "shopping": {
+      "name": "Shopping",
+      "hint": "The home's single list, with a market mode."
     }
   }
 }

@@ -7,7 +7,7 @@
   min-width: 0;
 }
 
-/* canto superior esquerdo: avatar e nome do app */
+/* topo: só o nome do app */
 .top {
   display: flex;
   align-items: center;
@@ -27,13 +27,23 @@
   z-index: 10;
   height: calc(var(--bar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
   background: var(--color-surface);
   border-top: 1px solid var(--color-line);
 }
 
 .items {
   display: grid;
+  flex: 1;
   grid-template-columns: repeat(3, 1fr);
+  height: var(--bar-h);
+}
+
+/* quarto item da barra: a conta */
+.account {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
   height: var(--bar-h);
 }
 
@@ -90,11 +100,8 @@
     left: 0;
     z-index: 11;
     width: var(--rail-w);
-    padding: var(--space-5) var(--space-4);
+    padding: var(--space-6) var(--space-5) 0;
     color: var(--color-on-accent);
-    /* sobre o laranja, o avatar é escuro */
-    --avatar-bg: var(--color-on-accent);
-    --avatar-fg: var(--color-on-dark);
   }
 
   .main {
@@ -111,17 +118,28 @@
     top: 0;
     inset: auto;
     height: 100dvh;
-    padding: 6.5rem var(--space-4) var(--space-6);
+    flex-direction: column;
+    padding: 5rem var(--space-4) var(--space-4);
     background: transparent;
     color: var(--color-on-accent);
     border-top: 0;
   }
 
   .items {
-    display: grid;
+    flex: none;
     grid-template-columns: 1fr;
     gap: var(--space-1);
     height: auto;
+  }
+
+  /* pé do trilho: avatar e nome; sobre o laranja o avatar é escuro */
+  .account {
+    width: auto;
+    height: auto;
+    margin-top: auto;
+    place-items: stretch;
+    --avatar-bg: var(--color-on-accent);
+    --avatar-fg: var(--color-on-dark);
   }
 
   .link {

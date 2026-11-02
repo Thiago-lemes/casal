@@ -14,14 +14,13 @@ const items: Item[] = [
   { to: '/home', key: 'home', icon: House },
 ]
 
-/** Moldura do app: avatar no canto superior esquerdo; barra inferior no celular, trilho no desktop. */
+/** Moldura do app: barra inferior no celular, trilho no desktop; o avatar da conta fica no pé de ambos. */
 export function Shell() {
   const { t } = useTranslation()
 
   return (
     <div className={styles.shell}>
       <header className={styles.top}>
-        <UserMenu />
         <p className={styles.brand}>{APP_NAME}</p>
       </header>
 
@@ -46,6 +45,9 @@ export function Shell() {
             </li>
           ))}
         </ul>
+        <div className={styles.account}>
+          <UserMenu />
+        </div>
       </nav>
 
       <main className={styles.main}>

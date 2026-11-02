@@ -31,9 +31,10 @@ export function UserMenu() {
     <Menu.Root>
       <Menu.Trigger className={styles.trigger} aria-label={t('userMenu.label', { name: me.name })}>
         <Avatar name={me.name} />
+        <span className={styles.triggerName}>{me.name}</span>
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Content className={styles.content} align="start" sideOffset={8} collisionPadding={12}>
+        <Menu.Content className={styles.content} side="top" align="start" sideOffset={8} collisionPadding={12}>
           <div className={styles.who}>
             <Avatar name={me.name} />
             <div className={styles.whoText}>

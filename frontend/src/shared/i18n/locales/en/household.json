@@ -23,5 +23,12 @@
     "title": "Who lives here",
     "you": "{{name}} (you)",
     "since": "In the couple since {{date}}"
+  },
+  "modules": {
+    "title": "Around the home",
+    "notes": {
+      "name": "Notes",
+      "hint": "Recipes, lists and ideas, only yours or the couple's."
+    }
   }
 }

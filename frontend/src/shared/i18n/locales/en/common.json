@@ -52,5 +52,40 @@
   "userMenu": {
     "label": "Account menu for {{name}}",
     "profile": "Profile"
+  },
+  "visibility": {
+    "legend": "Who sees it",
+    "note": {
+      "private": {
+        "title": "Only me",
+        "hint": "Nobody else sees this note."
+      },
+      "view": {
+        "title": "My partner can read",
+        "hint": "They see it, but only you edit."
+      },
+      "household": {
+        "title": "The couple's",
+        "hint": "Both of you see and edit."
+      }
+    },
+    "routine": {
+      "private": {
+        "title": "Only me",
+        "hint": "Your partner does not see this block, not even in free time."
+      },
+      "busy": {
+        "title": "Busy only",
+        "hint": "Your partner sees the time as busy, with no details."
+      },
+      "view": {
+        "title": "My partner can see",
+        "hint": "They see the details, but only you edit."
+      },
+      "household": {
+        "title": "The couple's",
+        "hint": "A block for both, both of you edit."
+      }
+    }
   }
 }

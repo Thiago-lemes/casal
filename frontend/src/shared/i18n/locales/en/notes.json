@@ -1,0 +1,55 @@
+{
+  "title": "Notes",
+  "count_one": "{{count}} note",
+  "count_other": "{{count}} notes",
+  "new": "New note",
+  "search": "Search",
+  "filterTags": "Filter by tag",
+  "loadError": "Could not load the notes",
+  "empty": {
+    "title": "No notes yet",
+    "body": "Keep a recipe, a list or an idea. Only you see it, unless you choose to share it with the couple."
+  },
+  "noResults": {
+    "title": "Nothing found",
+    "body": "No note matches this search.",
+    "clear": "Clear search"
+  },
+  "kind": {
+    "text": "Text",
+    "checklist": "List"
+  },
+  "card": {
+    "untitled": "Untitled",
+    "pin": "Pin: {{title}}",
+    "unpin": "Unpin: {{title}}",
+    "more": "and {{count}} more",
+    "tags": "Tags",
+    "by": "by {{name}}",
+    "visibility": {
+      "private": "Only you",
+      "view": "Your partner can read",
+      "household": "The couple's"
+    }
+  },
+  "editor": {
+    "new": "New note",
+    "edit": "Edit note",
+    "read": "Note",
+    "title": "Title",
+    "kind": "Type",
+    "body": "Text",
+    "items": "Items",
+    "itemDone": "Item {{n}} done",
+    "itemText": "Item {{n}} text",
+    "removeItem": "Remove item {{n}}",
+    "addItem": "Add item",
+    "tags": "Tags",
+    "tagsHint": "Separated by commas",
+    "pin": "Pin to the top",
+    "save": "Save",
+    "delete": "Delete note",
+    "confirmDelete": "Confirm: delete",
+    "loadCurrent": "See the current version"
+  }
+}

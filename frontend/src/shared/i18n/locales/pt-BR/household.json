@@ -23,5 +23,12 @@
     "title": "Quem mora aqui",
     "you": "{{name}} (você)",
     "since": "No casal desde {{date}}"
+  },
+  "modules": {
+    "title": "Da casa",
+    "notes": {
+      "name": "Anotações",
+      "hint": "Receitas, listas e ideias, só suas ou do casal."
+    }
   }
 }

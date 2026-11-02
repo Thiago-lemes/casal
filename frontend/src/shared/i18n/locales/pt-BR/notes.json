@@ -1,0 +1,55 @@
+{
+  "title": "Anotações",
+  "count_one": "{{count}} anotação",
+  "count_other": "{{count}} anotações",
+  "new": "Nova anotação",
+  "search": "Buscar",
+  "filterTags": "Filtrar por etiqueta",
+  "loadError": "Não deu para carregar as anotações",
+  "empty": {
+    "title": "Nenhuma anotação ainda",
+    "body": "Guarde uma receita, uma lista ou uma ideia. Só você vê, a menos que escolha compartilhar com o casal."
+  },
+  "noResults": {
+    "title": "Nada encontrado",
+    "body": "Nenhuma anotação bate com essa busca.",
+    "clear": "Limpar busca"
+  },
+  "kind": {
+    "text": "Texto",
+    "checklist": "Lista"
+  },
+  "card": {
+    "untitled": "Sem título",
+    "pin": "Fixar: {{title}}",
+    "unpin": "Desafixar: {{title}}",
+    "more": "e mais {{count}}",
+    "tags": "Etiquetas",
+    "by": "de {{name}}",
+    "visibility": {
+      "private": "Só você",
+      "view": "Seu parceiro lê",
+      "household": "Do casal"
+    }
+  },
+  "editor": {
+    "new": "Nova anotação",
+    "edit": "Editar anotação",
+    "read": "Anotação",
+    "title": "Título",
+    "kind": "Tipo",
+    "body": "Texto",
+    "items": "Itens",
+    "itemDone": "Item {{n}} feito",
+    "itemText": "Texto do item {{n}}",
+    "removeItem": "Remover item {{n}}",
+    "addItem": "Adicionar item",
+    "tags": "Etiquetas",
+    "tagsHint": "Separadas por vírgula",
+    "pin": "Fixar no topo",
+    "save": "Salvar",
+    "delete": "Apagar anotação",
+    "confirmDelete": "Confirmar: apagar",
+    "loadCurrent": "Ver a versão atual"
+  }
+}

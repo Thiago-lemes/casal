@@ -10,6 +10,7 @@ import { Shell } from './Shell'
 
 // uma página por pedaço de código: o carregamento inicial não cresce a cada tela nova
 const ProfileRoute = lazy(() => import('./ProfileRoute').then((m) => ({ default: m.ProfileRoute })))
+const NotesRoute = lazy(() => import('./NotesRoute').then((m) => ({ default: m.NotesRoute })))
 const TasksRoute = lazy(() => import('./TasksRoute').then((m) => ({ default: m.TasksRoute })))
 
 const queryClient = new QueryClient({
@@ -42,6 +43,14 @@ export function App() {
               <Route element={<RequireHousehold />}>
                 <Route index element={<TodayPage />} />
                 <Route path="/home" element={<HomePage />} />
+                <Route
+                  path="/notes"
+                  element={
+                    <Suspense fallback={null}>
+                      <NotesRoute />
+                    </Suspense>
+                  }
+                />
                 <Route
                   path="/tasks"
                   element={

@@ -1,11 +1,16 @@
-import { Check, Copy } from 'lucide-react'
+import { Check, Copy, NotebookText } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { Avatar, Button, Card } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { useCreateInvite, useHousehold } from './hooks'
 import styles from './HomePage.module.css'
+
+/** Os módulos da casa; cada um é uma página própria. Os opcionais só entram aqui quando o casal os ativa. */
+const MODULES: { to: string; key: string; icon: LucideIcon }[] = [{ to: '/notes', key: 'notes', icon: NotebookText }]
 
 /** "Casa": quem faz parte do casal e o convite para a segunda pessoa. */
 export function HomePage() {
@@ -39,6 +44,22 @@ export function HomePage() {
         <h1 className={styles.title}>{household.members.map((m) => m.name).join(' & ')}</h1>
         <p className={styles.status}>{partner ? t('status.complete') : t('status.waiting')}</p>
       </header>
+
+      <Card title={t('modules.title')} className={styles.modules}>
+        <ul className={styles.moduleList}>
+          {MODULES.map(({ to, key, icon: Icon }) => (
+            <li key={key}>
+              <Link to={to} className={styles.module}>
+                <Icon size={22} aria-hidden="true" />
+                <span>
+                  <span className={styles.moduleName}>{t(`modules.${key}.name`)}</span>
+                  <span className={styles.moduleHint}>{t(`modules.${key}.hint`)}</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
 
       <Card title={t('members.title')} className={styles.members}>
         <ul className={styles.memberList}>

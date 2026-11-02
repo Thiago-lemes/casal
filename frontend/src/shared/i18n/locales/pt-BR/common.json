@@ -52,5 +52,40 @@
   "userMenu": {
     "label": "Menu da conta de {{name}}",
     "profile": "Perfil"
+  },
+  "visibility": {
+    "legend": "Quem vê",
+    "note": {
+      "private": {
+        "title": "Só eu",
+        "hint": "Ninguém mais vê esta anotação."
+      },
+      "view": {
+        "title": "Meu parceiro lê",
+        "hint": "Ele vê, mas só você edita."
+      },
+      "household": {
+        "title": "Do casal",
+        "hint": "Os dois veem e editam."
+      }
+    },
+    "routine": {
+      "private": {
+        "title": "Só eu",
+        "hint": "O parceiro não vê este bloco, nem nos horários livres."
+      },
+      "busy": {
+        "title": "Só ocupado",
+        "hint": "O parceiro vê o horário como ocupado, sem detalhes."
+      },
+      "view": {
+        "title": "Meu parceiro vê",
+        "hint": "Ele vê os detalhes, mas só você edita."
+      },
+      "household": {
+        "title": "Do casal",
+        "hint": "Bloco dos dois, os dois editam."
+      }
+    }
   }
 }

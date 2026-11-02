@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { Avatar, Button, Card } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { errorMessage } from '@/shared/api/errorMessage'
+import { useModuleEnabled, useSetModule } from '@/shared/modules/hooks'
 import { useCreateInvite, useHousehold } from './hooks'
 import styles from './HomePage.module.css'
 
@@ -23,6 +24,8 @@ export function HomePage() {
   const me = useMe().data
   const household = useHousehold().data
   const invite = useCreateInvite()
+  const finance = useModuleEnabled('finance', Boolean(household))
+  const setFinance = useSetModule('finance')
   const [copied, setCopied] = useState(false)
 
   if (!me || !household) return null
@@ -63,6 +66,21 @@ export function HomePage() {
             </li>
           ))}
         </ul>
+        {/* módulo opcional desligado: um convite, nunca um erro; dá para desligar sem perder nada */}
+        {finance.isSuccess && !finance.on && (
+          <div className={styles.optional}>
+            <p className={styles.moduleName}>{t('modules.finance.offTitle')}</p>
+            <p className={styles.moduleHint}>{t('modules.finance.offHint')}</p>
+            <Button loading={setFinance.isPending} onClick={() => setFinance.mutate(true)}>
+              {t('modules.finance.enable')}
+            </Button>
+            {setFinance.error != null && (
+              <p className={styles.error} role="alert">
+                {errorMessage(tc, setFinance.error)}
+              </p>
+            )}
+          </div>
+        )}
       </Card>
 
       <Card title={t('members.title')} className={styles.members}>

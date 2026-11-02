@@ -34,6 +34,13 @@
       "name": "Reminders",
       "hint": "Notes with a set time between the two of you."
     },
+    "finance": {
+      "name": "Finances",
+      "hint": "Expenses, balance, bills and budget.",
+      "offTitle": "Finances",
+      "offHint": "The couple's expenses, settling up, bills and budget. You can turn it off any time without losing anything.",
+      "enable": "Turn on Finances"
+    },
     "shopping": {
       "name": "Shopping",
       "hint": "The home's single list, with a market mode."

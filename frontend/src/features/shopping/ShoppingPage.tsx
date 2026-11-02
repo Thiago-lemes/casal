@@ -10,7 +10,12 @@ import { ItemForm } from './ItemForm'
 import { boughtRecently, formatQuantity, groupOpen } from './rules'
 import styles from './ShoppingPage.module.css'
 
-export function ShoppingPage() {
+type Props = {
+  /** com o módulo Finanças ligado, o modo mercado oferece registrar o gasto da compra */
+  onRegisterExpense?: () => void
+}
+
+export function ShoppingPage({ onRegisterExpense }: Props = {}) {
   const { t, i18n } = useTranslation('shopping')
   const { t: tc } = useTranslation('common')
   const list = useShopping()
@@ -131,6 +136,14 @@ export function ShoppingPage() {
           </Card>
         )}
       </div>
+
+      {market && onRegisterExpense && (
+        <div className={styles.restock}>
+          <Button variant="primary" onClick={onRegisterExpense}>
+            {t('market.registerExpense')}
+          </Button>
+        </div>
+      )}
 
       {!market && list.isSuccess && (
         <div className={styles.restock}>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, EmptyState, Skeleton } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
+import { TodayBills } from '@/features/finance/bills/TodayBills'
 import { useHousehold } from '@/features/household/hooks'
 import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
@@ -13,6 +14,7 @@ import { useTaskActions, useTasks } from '@/features/tasks/hooks'
 import { useReminderActions, useReminders } from '@/features/reminders/hooks'
 import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
+import { useModuleEnabled } from '@/shared/modules/hooks'
 import { TodayTasks } from './widgets/TodayTasks'
 import { DayRing } from './widgets/DayRing'
 import { MonthCalendar } from './widgets/MonthCalendar'
@@ -28,6 +30,7 @@ export function TodayPage() {
   const actions = useReminderActions()
   const openTasks = useTasks('open', Boolean(household))
   const taskActions = useTaskActions()
+  const finance = useModuleEnabled('finance', Boolean(household))
   const [composing, setComposing] = useState(false)
 
   const all = reminders.data
@@ -135,6 +138,8 @@ export function TodayPage() {
           }))}
           onComplete={(id) => taskActions.complete.mutate(id)}
         />
+        {/* só com o módulo ligado: as contas que vencem hoje ou já venceram */}
+        {finance.on && <TodayBills ctx={{ me, people: household.members, partner }} />}
       </div>
 
       <div className={styles.calendar}>

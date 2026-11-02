@@ -1,0 +1,310 @@
+{
+  "title": "Finances",
+  "loadError": "Couldn't load this. Try again.",
+  "tabs": {
+    "expenses": "Expenses",
+    "balance": "Balance",
+    "bills": "Bills",
+    "summary": "Summary"
+  },
+  "category": {
+    "housing": "Housing",
+    "groceries": "Groceries",
+    "transport": "Transport",
+    "leisure": "Leisure",
+    "health": "Health",
+    "bills": "Fixed bills",
+    "other": "Other"
+  },
+  "source": {
+    "recurring": "Fixed",
+    "bill": "Bill",
+    "shopping": "Groceries",
+    "manual": "Manual"
+  },
+  "scope": {
+    "legend": "Show",
+    "household": "Shared",
+    "mine": "Mine",
+    "personal": "Personal"
+  },
+  "visibility": {
+    "legend": "Who sees it",
+    "private": "Only me",
+    "view": "My partner can see it"
+  },
+  "month": {
+    "previous": "Previous month",
+    "next": "Next month"
+  },
+  "module": {
+    "title": "Turn on Finances to get started",
+    "body": "Log the couple's expenses, see who owes whom, track bills and a budget. You can turn it off any time without losing anything.",
+    "enable": "Turn on Finances",
+    "offTitle": "Turn off Finances",
+    "offHelp": "Turning it off only hides the module. Expenses, balance and bills stay saved and come back when you turn it on again.",
+    "disable": "Turn off Finances"
+  },
+  "settings": {
+    "open": "Finance settings",
+    "back": "Back to expenses"
+  },
+  "form": {
+    "amount": "Amount",
+    "amountTotal": "Total amount",
+    "amountEach": "Amount of each installment",
+    "interpreted": "Read as {{amount}}.",
+    "amountInvalid": "Enter an amount between R$ 0.01 and R$ 10,000,000.00.",
+    "category": "Category",
+    "date": "Date",
+    "description": "Description (optional)",
+    "paidBy": "Paid by",
+    "me": "Me"
+  },
+  "composer": {
+    "title": "New expense",
+    "editTitle": "Edit expense",
+    "scope": "Expense type",
+    "submit": "Log expense",
+    "save": "Save"
+  },
+  "split": {
+    "legend": "Split",
+    "default": "The couple's default split",
+    "equal": "Equal",
+    "mine": "I cover it all",
+    "theirs": "{{name}} owes it all",
+    "custom": "Customize",
+    "editor": "Each person's share"
+  },
+  "installments": {
+    "toggle": "Paid in installments",
+    "count": "Number of installments",
+    "countInvalid": "Use {{min}} to {{max}} installments.",
+    "firstOn": "Date of the first installment",
+    "modeLegend": "The amount you typed is",
+    "modeTotal": "The total",
+    "modeEach": "The installment amount",
+    "previewExact": "{{count}} × {{each}} = {{total}}",
+    "previewApprox": "{{count}} installments of about {{each}} (total {{total}})",
+    "previewEach": "{{count}} × {{each}} = {{total}}",
+    "past": "The first installment is in the past. Installments already due go into the next settlement.",
+    "editHint": "This expense is an installment. To change the amount or the number of installments, delete the purchase and log it again."
+  },
+  "conflict": {
+    "current": "Someone else changed this expense. It is now {{amount}} ({{description}}). What you typed was kept: save again to apply it.",
+    "apply": "Apply again"
+  },
+  "expenses": {
+    "new": "New expense",
+    "more": "Show more",
+    "emptyTitle": "No expenses this month",
+    "emptyBody": "Log the first expense of the month. It goes into the balance and summary right away.",
+    "emptyMine": "You haven't logged personal expenses this month. Only you see them unless you choose to show your partner."
+  },
+  "row": {
+    "open": "View expense: {{title}}",
+    "paidBy": "paid by {{name}}",
+    "installment": "Installment {{no}}/{{total}}",
+    "settled": "Settled",
+    "sharedByPartner": "Shared by your partner",
+    "visibleToPartner": "Partner sees"
+  },
+  "detail": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDelete": "Delete this expense? This can't be undone.",
+    "makePrivate": "Keep it just for me",
+    "sharePartner": "Show to my partner",
+    "wholePurchase": "See the whole purchase",
+    "settledHint": "This expense is part of a settlement and can't change. To correct it, log an adjustment expense."
+  },
+  "group": {
+    "title": "Installment purchase",
+    "installments": "Installments",
+    "edit": "Edit purchase",
+    "editHint": "Applies only to open installments. To change the amount or the number of installments, delete the purchase and log it again.",
+    "keepSplit": "Keep the split",
+    "delete": "Delete purchase",
+    "confirmDelete": "Delete the {{open}} open installments? The {{settled}} already settled stay.",
+    "deleted": "{{deleted}} installments deleted. {{remaining}} already settled stayed."
+  },
+  "balance": {
+    "title": "Balance",
+    "even": "All even",
+    "iOwe": "You owe {{amount}} to {{name}}",
+    "owedToMe": "{{name}} owes you {{amount}}",
+    "through": "Expenses through {{date}}. Future installments don't count yet.",
+    "settle": "Settle up",
+    "advanced": "Advanced",
+    "throughLabel": "Settle through",
+    "paidTitle": "How much each paid",
+    "expenses": "What makes up the balance",
+    "singleTitle": "Settling up takes two people",
+    "singleBody": "You can already log expenses. Once the other person joins, the balance shows up here.",
+    "invite": "Invite partner"
+  },
+  "settle": {
+    "title": "Settle up",
+    "direction": "{{from}} → {{to}}",
+    "through": "Expenses through {{date}}.",
+    "offline": "The app only records it. The payment happens outside (bank transfer, cash...).",
+    "stale": "The balance changed since you opened this screen. Check the new amount and confirm again.",
+    "confirm": "Record settlement"
+  },
+  "history": {
+    "title": "Past settlements",
+    "leave": "Settlement on leaving the couple"
+  },
+  "division": {
+    "title": "Splitting expenses",
+    "today": "New expenses are currently split {{split}}.",
+    "help": "Changing the split doesn't rewrite old expenses: each one keeps its own.",
+    "legend": "Default split",
+    "equal": "Equal",
+    "fixed": "Agreed",
+    "proportional": "Proportional to income",
+    "result": "By income, the split is {{split}}.",
+    "save": "Save split",
+    "proportionalHelp": "Each pays a share according to income. It only works when both enter their income and agree.",
+    "incomeMineSet": "You entered your income.",
+    "incomeMineMissing": "You still need to enter your income.",
+    "incomePartnerSet": "{{name}} entered their income.",
+    "incomePartnerMissing": "{{name}} still needs to enter their income.",
+    "consentMine": "You agreed.",
+    "consentMineMissing": "You haven't agreed yet.",
+    "consentPartner": "{{name}} agreed.",
+    "consentPartnerMissing": "{{name}} hasn't agreed yet.",
+    "consent": "Agree to the proportional split",
+    "withdraw": "Withdraw my agreement"
+  },
+  "consent": {
+    "title": "Split proportional to income",
+    "body": "With a proportional split, each person pays a share according to income. Since you both see each expense's percentage, whoever knows their own income can work out the other's. Only turn it on if you both agree. Either of you can withdraw agreement at any time.",
+    "agree": "I agree"
+  },
+  "income": {
+    "title": "Your monthly income",
+    "privacy": "Only you see this amount. It is used only to work out the proportional split, if you both want it.",
+    "label": "Monthly income (optional)",
+    "save": "Save income",
+    "remove": "Delete my income",
+    "notifyPartner": "The split is proportional to income. If you change or delete your income, your partner will be notified (without seeing amounts) and the split may go back to equal."
+  },
+  "categories": {
+    "title": "Categories",
+    "new": "New category",
+    "add": "Add",
+    "rename": "Rename",
+    "renameOf": "Rename {{name}}",
+    "save": "Save",
+    "archive": "Archive",
+    "archiveOf": "Archive {{name}}",
+    "unarchive": "Unarchive",
+    "unarchiveOf": "Unarchive {{name}}",
+    "archivedTag": "archived"
+  },
+  "recurring": {
+    "title": "Fixed expenses",
+    "help": "Rent, internet, subscriptions: the expense appears by itself every month, on the agreed day.",
+    "empty": "No fixed expenses yet.",
+    "new": "New fixed",
+    "newTitle": "New fixed expense",
+    "editTitle": "Edit fixed expense",
+    "day": "Day of the month",
+    "dayHint": "In shorter months it falls on the last day.",
+    "dayInvalid": "Use a day from 1 to 31.",
+    "everyDay": "every month on day {{day}}",
+    "startOn": "Starts on",
+    "startInvalid": "It can't start before the current month.",
+    "endOn": "Ends on (optional)",
+    "editHint": "Editing applies from the next months on: what was already generated doesn't change. If this month's day has passed, the expense appears right away.",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Paused",
+    "confirmDelete": "Confirm: delete"
+  },
+  "bills": {
+    "status": "Bills",
+    "open_tab": "Open",
+    "paid_tab": "Paid",
+    "new": "New bill",
+    "newTitle": "New bill to pay",
+    "editTitle": "Edit bill",
+    "titleLabel": "Bill name",
+    "amount": "Amount (optional)",
+    "amountHint": "An electricity bill, for example, only has an amount later.",
+    "dueOn": "Due date",
+    "responsible": "Who pays",
+    "notifyBoth": "Notify both",
+    "repeat": "Repeat",
+    "repeatNone": "Just once",
+    "repeatMonthly": "Every month",
+    "remindersHint": "Reminders are automatic: 3 days before and on the due date, at 9 am.",
+    "emptyTitle": "No bills to pay",
+    "emptyBody": "Add a bill and the app reminds you before it's due.",
+    "emptyPaid": "No paid bills yet",
+    "late": "Overdue",
+    "today": "Due today",
+    "paid": "Paid",
+    "noAmount": "no amount",
+    "syncPending": "reminders updating",
+    "open": "Edit bill: {{title}}",
+    "pay": "Pay {{title}}",
+    "payAction": "Pay",
+    "todayTitle": "Bills for today",
+    "seeAll": "See all"
+  },
+  "pay": {
+    "title": "Pay {{title}}",
+    "amount": "Amount paid",
+    "amountRequired": "Amount paid (required)",
+    "paidOn": "Payment date",
+    "hint": "This logs a shared expense, split by the default split.",
+    "confirm": "Record payment"
+  },
+  "notice": {
+    "splitFallback": "The proportional split isn't available right now; we split it equally.",
+    "syncPending": "Bill saved. Reminders will be redone within an hour.",
+    "billPaid": "Bill paid and expense logged.",
+    "nextBill": "Bill paid. The next one is due {{date}}."
+  },
+  "summary": {
+    "total": "Shared expenses this month",
+    "totalMine": "My personal expenses this month",
+    "mineHint": "Only your personal expenses. Your partner's don't count, not even the ones they left visible.",
+    "same": "Same as {{month}}.",
+    "more": "{{amount}} more than in {{month}} ({{percent}}%).",
+    "moreNoPercent": "{{amount}} more than in {{month}}.",
+    "less": "{{amount}} less than in {{month}} ({{percent}}%).",
+    "lessNoPercent": "{{amount}} less than in {{month}}.",
+    "byCategory": "By category",
+    "emptyTitle": "No expenses this month",
+    "emptyBody": "Once there are expenses, the summary shows where the money went.",
+    "installmentsHint": "Installments count in the month of each one.",
+    "paidBy": "How much each paid",
+    "usedOfLimit": "{{percent}}% of the {{limit}} limit",
+    "nearLimit": "close to the limit",
+    "overLimit": "limit exceeded"
+  },
+  "budget": {
+    "title": "Budget by category",
+    "help": "The limit applies every month and covers shared expenses only. Personal expenses don't count. You get a heads-up at 80% and 100%.",
+    "noLimit": "No limit",
+    "current": "Current limit: {{limit}}",
+    "save": "Save",
+    "saveOf": "Save limit for {{name}}",
+    "remove": "Remove limit",
+    "removeOf": "Remove limit for {{name}}"
+  },
+  "export": {
+    "title": "Download a copy of your data",
+    "help": "Your visible expenses, the settlements and the categories (and only your own income).",
+    "csv": "Download CSV",
+    "json": "Download JSON"
+  },
+  "shopping": {
+    "title": "Log the shopping expense",
+    "hint": "The category is Groceries. The amount is what you type here: the shopping list doesn't keep prices."
+  }
+}

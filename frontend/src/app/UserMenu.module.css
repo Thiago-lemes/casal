@@ -122,3 +122,9 @@
   border-width: 0 3px 3px 0;
   transform: rotate(45deg) translate(-2px, -2px);
 }
+
+@media (min-width: 48rem) {
+  .mobileOnly {
+    display: none;
+  }
+}

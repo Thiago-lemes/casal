@@ -1,0 +1,74 @@
+.total {
+  font-family: var(--font-display);
+  font-size: var(--text-date);
+  font-weight: 700;
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+
+.compare {
+  color: var(--color-text-soft);
+}
+
+.bars {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.bar {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.barHead {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.barName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.barValue {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.track {
+  height: 0.625rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--color-text-soft);
+  transition: width var(--dur-base) var(--ease-out);
+}
+
+.fill[data-tone='attention'] {
+  background: var(--color-accent);
+}
+
+.fill[data-tone='alert'] {
+  background: var(--color-danger);
+}
+
+.barNote {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.barNote[data-tone='attention'] {
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+.barNote[data-tone='alert'] {
+  color: var(--color-danger);
+  font-weight: 600;
+}

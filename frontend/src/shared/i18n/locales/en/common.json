@@ -4,7 +4,8 @@
     "routine": "Week",
     "home": "Home",
     "main": "Main navigation",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "finance": "Finances"
   },
   "routineSoon": "Coming soon",
   "actions": {
@@ -47,7 +48,27 @@
     "routine_forbidden": "You can see this block but not change it.",
     "routine_conflict": "Someone changed this block before you. Check the current version and redo your change.",
     "shopping_not_found": "This item is no longer on the list.",
-    "shopping_duplicate": "An identical item is already on the list."
+    "shopping_duplicate": "An identical item is already on the list.",
+    "module_disabled": "The Finances module is turned off.",
+    "module_not_found": "That module doesn't exist.",
+    "expense_not_found": "That expense changed or is no longer available. Refresh the list.",
+    "category_not_found": "That category changed or is no longer available.",
+    "bill_not_found": "That bill changed or is no longer available. Refresh the list.",
+    "recurring_not_found": "That fixed expense changed or is no longer available.",
+    "expense_forbidden": "You can see this expense but not change it.",
+    "expense_conflict": "Someone else changed this expense before you. See the current version and save again.",
+    "expense_settled": "This expense is part of a settlement and can't change. To correct it, log an adjustment expense.",
+    "category_archived": "That category was archived. Pick another one.",
+    "category_duplicate": "A category with that name already exists.",
+    "split_invalid": "The split must add up to 100% between the people in the couple.",
+    "installments_invalid": "Check the installments: 2 to 48, with a consistent date and amount.",
+    "amount_invalid": "The amount must be between R$ 0.01 and R$ 10,000,000.00.",
+    "income_invalid": "Income must be between R$ 0.01 and R$ 10,000,000.00.",
+    "proportional_unavailable": "A proportional split needs both incomes and both agreements.",
+    "settlement_stale": "The balance changed since you opened this screen. Check the new amount.",
+    "nothing_to_settle": "Nothing to settle: the balance is already even.",
+    "single_member": "Settling up needs two people in the couple.",
+    "bill_already_paid": "That bill was already paid."
   },
   "userMenu": {
     "label": "Account menu for {{name}}",

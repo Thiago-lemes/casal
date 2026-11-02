@@ -34,6 +34,13 @@
       "name": "Lembretes",
       "hint": "Recados com hora marcada entre vocês dois."
     },
+    "finance": {
+      "name": "Finanças",
+      "hint": "Gastos, saldo, contas a pagar e orçamento.",
+      "offTitle": "Finanças",
+      "offHint": "Gastos do casal, acerto de contas, contas a pagar e orçamento. Dá para desligar quando quiser, sem perder nada.",
+      "enable": "Ligar Finanças"
+    },
     "shopping": {
       "name": "Compras",
       "hint": "A lista única da casa, com modo mercado."

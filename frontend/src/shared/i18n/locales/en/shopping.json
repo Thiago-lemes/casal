@@ -25,6 +25,6 @@
     "done": { "title": "Everything bought", "body": "Nothing is missing. If you have recurring items, just restock them." }
   },
   "restock": { "action": "Restock recurring", "hint": "Brings back to the list the items marked \"always buy\" that were already bought." },
-  "market": { "title": "Market mode", "enter": "Market mode", "exit": "Leave market mode" },
+  "market": { "title": "Market mode", "enter": "Market mode", "exit": "Leave market mode", "registerExpense": "Log expense" },
   "editor": { "title": "Edit item", "save": "Save", "delete": "Delete item", "confirmDelete": "Confirm: delete" }
 }

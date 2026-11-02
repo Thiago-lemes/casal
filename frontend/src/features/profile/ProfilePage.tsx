@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Avatar, Button, Card, Dialog, DialogClose, TextField } from '@/design-system'
+import { Avatar, Button, ButtonLink, Card, Dialog, DialogClose, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { CITIES, cityForZone, cityName, deviceZone } from './cities'
 import styles from './ProfilePage.module.css'
@@ -14,9 +14,11 @@ type Props = {
   update: Mutation<{ name?: string; timezone?: string }>
   /** vem de `useLeaveHousehold`; sem casal, a pessoa não tem o que sair */
   leave?: Mutation<void>
+  /** com Finanças ligado: link para baixar a cópia dos dados antes de sair (a promessa do produto a quem sai) */
+  exportHref?: string
 }
 
-export function ProfilePage({ me, update, leave }: Props) {
+export function ProfilePage({ me, update, leave, exportHref }: Props) {
   const { t, i18n } = useTranslation('profile')
   const { t: tc } = useTranslation('common')
   const [name, setName] = useState(me.name)
@@ -122,8 +124,16 @@ export function ProfilePage({ me, update, leave }: Props) {
               <li>{t('leave.keep')}</li>
               <li>{t('leave.takes')}</li>
               <li>{t('leave.cancels')}</li>
+              {exportHref && <li>{t('leave.financeSettle')}</li>}
               <li>{t('leave.final')}</li>
             </ul>
+            {exportHref && (
+              <div>
+                <ButtonLink href={exportHref} download>
+                  {t('leave.download')}
+                </ButtonLink>
+              </div>
+            )}
             {leave.error != null && (
               <p className={styles.error} role="alert">
                 {errorMessage(tc, leave.error)}

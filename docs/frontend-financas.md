@@ -6,6 +6,8 @@ Como o frontend vai consumir o módulo Finanças: ordem das entregas, telas, reg
 
 **Saída da fase:** o casal fecha um mês de acerto de contas pelo app.
 
+**Situação:** FF0 a FF6 implementadas. O estado do módulo (`/v1/modules`) vive em `shared/modules`, porque Casa, Hoje, Compras e Perfil também precisam dele e as features não se importam. As telas que juntam Finanças com outra feature ficam em `app/` (`ShoppingRoute`, `ProfileRoute`) ou em telas de composição (`HomePage`, `TodayPage`).
+
 ## Princípios que esta fase acrescenta
 
 1. **Dinheiro é inteiro em centavos, do começo ao fim.** O JSON só tem centavos (`amount_cents`). Nunca guarde, some ou compare valores como `number` decimal. Converta para texto só na hora de mostrar. Entrada do usuário ("1.234,56") vira centavos por uma função pura com teste.

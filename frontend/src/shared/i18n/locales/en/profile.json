@@ -19,6 +19,8 @@
     "keep": "What was shared stays with the person who remains: the couple's notes and blocks, open tasks and the shopping list.",
     "takes": "What was only yours goes with you and reaches a next couple always as private.",
     "cancels": "Pending reminders between you two are canceled, and unused invites stop working.",
+    "financeSettle": "Any open balance is recorded as a leaving settlement. Your personal expenses and income go with you.",
+    "download": "Download a copy of your data",
     "final": "This cannot be undone.",
     "confirm": "Yes, leave the couple"
   }

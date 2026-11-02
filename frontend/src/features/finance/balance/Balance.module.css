@@ -1,0 +1,51 @@
+.headline {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.advanced {
+  color: var(--color-text-soft);
+  font-size: var(--text-sm);
+}
+
+.advanced summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.bar {
+  display: flex;
+  height: 0.75rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+
+.seg[data-person='a'],
+.dot[data-person='a'] {
+  background: var(--color-person-a);
+}
+
+.seg[data-person='b'],
+.dot[data-person='b'] {
+  background: var(--color-person-b);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.dot {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-pill);
+}

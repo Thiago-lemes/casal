@@ -6,7 +6,7 @@ Este documento diz como o frontend vai crescer: o que já existe, as convençõe
 
 ## Estado atual
 
-PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), as páginas **Tarefas** (F1), **Anotações** (F2), **Semana** com a rotina (F3), **Lembretes** (F4) e **Compras** (F5), o **Perfil** (nome, cidade e fuso, sair do casal), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
+PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), as páginas **Tarefas** (F1), **Anotações** (F2), **Semana** com a rotina (F3), **Lembretes** (F4) e **Compras** (F5), **Finanças** (FF0 a FF6, módulo opcional), o **Perfil** (nome, cidade e fuso, sair do casal), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
 
 | Tema | Como está hoje |
 | --- | --- |
@@ -15,10 +15,10 @@ PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cada
 | HTTP | `shared/api/client.ts`: um só `api()`, cookie de sessão na mesma origem, erros viram `ApiError` com `code` |
 | Estilo | CSS Modules + tokens em `design-system/tokens` (camada crua `--c-*` e papéis `--color-*`); tema claro e escuro |
 | Componentes | `design-system/`: Avatar, Button, Card, ChoiceGroup, Dialog, EmptyState, Skeleton, Tabs, TextArea, TextField. `shared/ui/VisibilityPicker` (anotações e rotina). O Radix Dropdown é usado direto no `UserMenu` |
-| Idiomas | `i18next`, um arquivo por namespace e idioma (`pt-BR` e `en`): `common`, `auth`, `household`, `today`, `push`, `tasks`, `profile`, `notes`, `routine`, `reminders`, `shopping` |
+| Idiomas | `i18next`, um arquivo por namespace e idioma (`pt-BR` e `en`): `common`, `auth`, `household`, `today`, `push`, `tasks`, `profile`, `notes`, `routine`, `reminders`, `shopping`, `finance` |
 | Testes | Vitest + Testing Library (jsdom) |
 | Desenvolvimento | `F5` no VS Code sobe banco, API e Vite; o Vite repassa `/v1` para a API em `:8080` |
-| Navegação | Hoje · Semana · Tarefas · Casa. Anotações, Lembretes e Compras ficam em **Casa** (hub de módulos); o Perfil abre pelo menu do avatar |
+| Navegação | Hoje · Semana · Tarefas · Casa. Anotações, Lembretes, Compras e Finanças (quando ligado) ficam em **Casa** (hub de módulos); o Perfil abre pelo menu do avatar |
 
 ## Convenções (todas as telas novas seguem)
 
@@ -55,7 +55,7 @@ A ordem segue o roadmap do produto e o que o backend já tem. Cada entrega termi
 | F3 | Rotina semanal | `/v1/routine/*` | Pronto. **Frontend feito** (dia, semana, horários livres, quem está onde, blocos e exceções) |
 | F4 | Lembretes em tela própria e perfil | `/v1/reminders`, `PATCH /v1/me`, `POST /v1/household/leave` | Pronto. **Frontend feito** |
 | F5 | Lista de compras | `/v1/shopping/*` | Pronto. **Frontend feito** (inclui modo mercado) |
-| F6 | Marmita, Finanças, Metas | a criar | Fases 2 a 4 do produto |
+| F6 | Finanças (fase 2), Metas (fase 3), Marmita (fase 4) | Finanças pronto; Metas e Marmita a criar | Finanças: backend pronto e **frontend feito** (FF0 a FF6), veja [frontend-financas.md](frontend-financas.md). Specs em `docs/spec-fase-2-financas.md` e `docs/spec-fase-4-marmita.md` |
 
 Da F1 à F5 o backend está pronto: veja o **Contrato do backend** mais abaixo, e o frontend também. Falta só rodar tudo junto contra o backend real (as telas foram testadas com respostas simuladas e com testes automatizados).
 

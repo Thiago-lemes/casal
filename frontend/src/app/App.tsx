@@ -14,6 +14,7 @@ const NotesRoute = lazy(() => import('./NotesRoute').then((m) => ({ default: m.N
 const RoutineRoute = lazy(() => import('./RoutineRoute').then((m) => ({ default: m.RoutineRoute })))
 const RemindersRoute = lazy(() => import('./RemindersRoute').then((m) => ({ default: m.RemindersRoute })))
 const ShoppingRoute = lazy(() => import('./ShoppingRoute').then((m) => ({ default: m.ShoppingRoute })))
+const FinanceRoute = lazy(() => import('./FinanceRoute').then((m) => ({ default: m.FinanceRoute })))
 const TasksRoute = lazy(() => import('./TasksRoute').then((m) => ({ default: m.TasksRoute })))
 
 const queryClient = new QueryClient({
@@ -83,6 +84,14 @@ export function App() {
                   element={
                     <Suspense fallback={null}>
                       <TasksRoute />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/finance"
+                  element={
+                    <Suspense fallback={null}>
+                      <FinanceRoute />
                     </Suspense>
                   }
                 />

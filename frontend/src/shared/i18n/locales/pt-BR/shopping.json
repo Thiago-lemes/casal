@@ -25,6 +25,6 @@
     "done": { "title": "Tudo comprado", "body": "Não falta nada na lista. Se tiver itens recorrentes, é só repor." }
   },
   "restock": { "action": "Repor recorrentes", "hint": "Traz de volta à lista os itens marcados como \"sempre comprar\" que já foram comprados." },
-  "market": { "title": "Modo mercado", "enter": "Modo mercado", "exit": "Sair do modo mercado" },
+  "market": { "title": "Modo mercado", "enter": "Modo mercado", "exit": "Sair do modo mercado", "registerExpense": "Registrar gasto" },
   "editor": { "title": "Editar item", "save": "Salvar", "delete": "Apagar item", "confirmDelete": "Confirmar: apagar" }
 }

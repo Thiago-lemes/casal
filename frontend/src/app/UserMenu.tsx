@@ -1,5 +1,5 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Bell, BellOff, BellRing, Globe, LogOut, Monitor, Moon, Sun, UserRound } from 'lucide-react'
+import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Sun, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -49,6 +49,12 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
           </div>
 
           <Menu.Separator className={styles.separator} />
+
+          {/* no celular a Semana sai da barra inferior e mora aqui */}
+          <Menu.Item className={`${styles.item} ${styles.mobileOnly}`} onSelect={() => navigate('/routine')}>
+            <CalendarClock className={styles.icon} aria-hidden="true" />
+            {t('nav.routine')}
+          </Menu.Item>
 
           <Menu.Item className={styles.item} onSelect={() => navigate('/profile')}>
             <UserRound className={styles.icon} aria-hidden="true" />

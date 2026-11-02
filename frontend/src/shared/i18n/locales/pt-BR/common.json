@@ -4,7 +4,8 @@
     "routine": "Semana",
     "home": "Casa",
     "main": "Navegação principal",
-    "tasks": "Tarefas"
+    "tasks": "Tarefas",
+    "finance": "Finanças"
   },
   "routineSoon": "Em breve",
   "actions": {
@@ -47,7 +48,27 @@
     "routine_forbidden": "Você pode ver esse bloco, mas não alterá-lo.",
     "routine_conflict": "Alguém alterou esse bloco antes de você. Veja a versão atual e refaça a mudança.",
     "shopping_not_found": "Esse item não está mais na lista.",
-    "shopping_duplicate": "Já existe um item igual na lista."
+    "shopping_duplicate": "Já existe um item igual na lista.",
+    "module_disabled": "O módulo Finanças está desligado.",
+    "module_not_found": "Esse módulo não existe.",
+    "expense_not_found": "Esse gasto mudou ou não está mais disponível. Atualize a lista.",
+    "category_not_found": "Essa categoria mudou ou não está mais disponível.",
+    "bill_not_found": "Essa conta mudou ou não está mais disponível. Atualize a lista.",
+    "recurring_not_found": "Esse gasto fixo mudou ou não está mais disponível.",
+    "expense_forbidden": "Você pode ver esse gasto, mas não alterá-lo.",
+    "expense_conflict": "Outra pessoa mudou este gasto antes de você. Veja a versão atual e salve de novo.",
+    "expense_settled": "Esse gasto já entrou num acerto e não muda mais. Para corrigir, registre um gasto de ajuste.",
+    "category_archived": "Essa categoria foi arquivada. Escolha outra.",
+    "category_duplicate": "Já existe uma categoria com esse nome.",
+    "split_invalid": "A divisão precisa somar 100% entre as pessoas do casal.",
+    "installments_invalid": "Confira as parcelas: de 2 a 48, com data e valor coerentes.",
+    "amount_invalid": "O valor precisa ficar entre R$ 0,01 e R$ 10.000.000,00.",
+    "income_invalid": "A renda precisa ficar entre R$ 0,01 e R$ 10.000.000,00.",
+    "proportional_unavailable": "A divisão proporcional precisa da renda e da concordância dos dois.",
+    "settlement_stale": "O saldo mudou desde que você abriu esta tela. Confira o valor novo.",
+    "nothing_to_settle": "Não há nada para acertar: o saldo já está em dia.",
+    "single_member": "O acerto precisa de duas pessoas no casal.",
+    "bill_already_paid": "Essa conta já foi paga."
   },
   "userMenu": {
     "label": "Menu da conta de {{name}}",

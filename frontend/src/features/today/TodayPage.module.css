@@ -104,6 +104,11 @@
   min-width: 0;
 }
 
+.tasks {
+  display: grid;
+  gap: var(--space-4);
+}
+
 @media (min-width: 48rem) {
   .page {
     padding: var(--space-5);

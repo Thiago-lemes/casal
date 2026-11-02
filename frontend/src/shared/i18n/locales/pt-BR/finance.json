@@ -1,0 +1,310 @@
+{
+  "title": "Finanças",
+  "loadError": "Não deu para carregar. Tente de novo.",
+  "tabs": {
+    "expenses": "Gastos",
+    "balance": "Saldo",
+    "bills": "Contas",
+    "summary": "Resumo"
+  },
+  "category": {
+    "housing": "Moradia",
+    "groceries": "Mercado",
+    "transport": "Transporte",
+    "leisure": "Lazer",
+    "health": "Saúde",
+    "bills": "Contas fixas",
+    "other": "Outros"
+  },
+  "source": {
+    "recurring": "Fixo",
+    "bill": "Conta",
+    "shopping": "Mercado",
+    "manual": "Manual"
+  },
+  "scope": {
+    "legend": "Mostrar",
+    "household": "Do casal",
+    "mine": "Meus",
+    "personal": "Pessoal"
+  },
+  "visibility": {
+    "legend": "Quem vê",
+    "private": "Só eu",
+    "view": "Meu parceiro pode ver"
+  },
+  "month": {
+    "previous": "Mês anterior",
+    "next": "Próximo mês"
+  },
+  "module": {
+    "title": "Ligue Finanças para começar",
+    "body": "Registre os gastos do casal, veja quem deve a quem, acompanhe as contas a pagar e o orçamento. Dá para desligar quando quiser, sem perder nada.",
+    "enable": "Ligar Finanças",
+    "offTitle": "Desligar Finanças",
+    "offHelp": "Desligar só esconde o módulo. Os gastos, o saldo e as contas continuam guardados e voltam quando você ligar de novo.",
+    "disable": "Desligar Finanças"
+  },
+  "settings": {
+    "open": "Configurações de Finanças",
+    "back": "Voltar aos gastos"
+  },
+  "form": {
+    "amount": "Valor",
+    "amountTotal": "Valor total",
+    "amountEach": "Valor de cada parcela",
+    "interpreted": "Entendi {{amount}}.",
+    "amountInvalid": "Digite um valor entre R$ 0,01 e R$ 10.000.000,00.",
+    "category": "Categoria",
+    "date": "Data",
+    "description": "Descrição (opcional)",
+    "paidBy": "Quem pagou",
+    "me": "Eu"
+  },
+  "composer": {
+    "title": "Novo gasto",
+    "editTitle": "Editar gasto",
+    "scope": "Tipo de gasto",
+    "submit": "Registrar gasto",
+    "save": "Salvar"
+  },
+  "split": {
+    "legend": "Divisão",
+    "default": "Divisão padrão do casal",
+    "equal": "Igual",
+    "mine": "Eu pago tudo",
+    "theirs": "{{name}} deve tudo",
+    "custom": "Personalizar",
+    "editor": "Parte de cada um"
+  },
+  "installments": {
+    "toggle": "Foi parcelado",
+    "count": "Número de parcelas",
+    "countInvalid": "Use de {{min}} a {{max}} parcelas.",
+    "firstOn": "Data da primeira parcela",
+    "modeLegend": "O valor digitado é",
+    "modeTotal": "O total",
+    "modeEach": "O valor da parcela",
+    "previewExact": "{{count}} × {{each}} = {{total}}",
+    "previewApprox": "{{count}} parcelas de cerca de {{each}} (total {{total}})",
+    "previewEach": "{{count}} × {{each}} = {{total}}",
+    "past": "A primeira parcela é do passado. As parcelas já vencidas entram no próximo acerto.",
+    "editHint": "Este gasto é uma parcela. Para mudar o valor ou o número de parcelas, apague a compra e registre de novo."
+  },
+  "conflict": {
+    "current": "Outra pessoa mudou este gasto. Agora ele está em {{amount}} ({{description}}). O que você digitou foi mantido: salve de novo para aplicar.",
+    "apply": "Aplicar de novo"
+  },
+  "expenses": {
+    "new": "Novo gasto",
+    "more": "Ver mais",
+    "emptyTitle": "Nenhum gasto neste mês",
+    "emptyBody": "Registre o primeiro gasto do mês. Ele entra no saldo e no resumo na hora.",
+    "emptyMine": "Você ainda não registrou gastos pessoais neste mês. Só você os vê, a menos que escolha mostrar ao parceiro."
+  },
+  "row": {
+    "open": "Ver gasto: {{title}}",
+    "paidBy": "pago por {{name}}",
+    "installment": "Parcela {{no}}/{{total}}",
+    "settled": "Acertado",
+    "sharedByPartner": "Compartilhado pelo parceiro",
+    "visibleToPartner": "Parceiro vê"
+  },
+  "detail": {
+    "edit": "Editar",
+    "delete": "Apagar",
+    "confirmDelete": "Apagar este gasto? Não tem como desfazer.",
+    "makePrivate": "Deixar só para mim",
+    "sharePartner": "Mostrar ao parceiro",
+    "wholePurchase": "Ver a compra inteira",
+    "settledHint": "Este gasto já entrou num acerto e não muda mais. Para corrigir, registre um gasto de ajuste."
+  },
+  "group": {
+    "title": "Compra parcelada",
+    "installments": "Parcelas",
+    "edit": "Editar compra",
+    "editHint": "Vale só para as parcelas abertas. Para mudar o valor ou o número de parcelas, apague a compra e registre de novo.",
+    "keepSplit": "Manter a divisão",
+    "delete": "Apagar compra",
+    "confirmDelete": "Apagar as {{open}} parcelas abertas? As {{settled}} já acertadas ficam.",
+    "deleted": "{{deleted}} parcelas apagadas. {{remaining}} já acertadas ficaram."
+  },
+  "balance": {
+    "title": "Saldo",
+    "even": "Tudo em dia",
+    "iOwe": "Você deve {{amount}} para {{name}}",
+    "owedToMe": "{{name}} deve {{amount}} para você",
+    "through": "Contas até {{date}}. Parcelas futuras ainda não contam.",
+    "settle": "Acertar",
+    "advanced": "Avançado",
+    "throughLabel": "Acertar até",
+    "paidTitle": "Quanto cada um pagou",
+    "expenses": "O que compõe o saldo",
+    "singleTitle": "O acerto precisa de duas pessoas",
+    "singleBody": "Você já pode registrar gastos. Quando a outra pessoa entrar no casal, o saldo aparece aqui.",
+    "invite": "Convidar parceiro"
+  },
+  "settle": {
+    "title": "Acertar contas",
+    "direction": "{{from}} → {{to}}",
+    "through": "Gastos até {{date}}.",
+    "offline": "O app só registra. O pagamento acontece por fora (Pix, dinheiro...).",
+    "stale": "O saldo mudou desde que você abriu esta tela. Confira o valor novo e confirme de novo.",
+    "confirm": "Registrar acerto"
+  },
+  "history": {
+    "title": "Acertos anteriores",
+    "leave": "Acerto na saída do casal"
+  },
+  "division": {
+    "title": "Divisão dos gastos",
+    "today": "Hoje os novos gastos são divididos {{split}}.",
+    "help": "Mudar a divisão não reescreve os gastos antigos: cada gasto guarda a sua.",
+    "legend": "Divisão padrão",
+    "equal": "Igual",
+    "fixed": "Combinada",
+    "proportional": "Proporcional à renda",
+    "result": "Pela renda, a divisão fica {{split}}.",
+    "save": "Salvar divisão",
+    "proportionalHelp": "Cada um paga a parte de acordo com a renda. Só vale quando os dois informam a renda e concordam.",
+    "incomeMineSet": "Você informou a sua renda.",
+    "incomeMineMissing": "Falta você informar a sua renda.",
+    "incomePartnerSet": "{{name}} informou a renda.",
+    "incomePartnerMissing": "Falta {{name}} informar a renda.",
+    "consentMine": "Você concordou.",
+    "consentMineMissing": "Você ainda não concordou.",
+    "consentPartner": "{{name}} concordou.",
+    "consentPartnerMissing": "{{name}} ainda não concordou.",
+    "consent": "Concordar com a divisão proporcional",
+    "withdraw": "Retirar minha concordância"
+  },
+  "consent": {
+    "title": "Divisão proporcional à renda",
+    "body": "Na divisão proporcional, cada um paga a parte de acordo com a renda. Como vocês dois veem o percentual de cada gasto, quem sabe a própria renda consegue calcular a renda do outro. Só ative se os dois concordarem. Qualquer um pode retirar a concordância quando quiser.",
+    "agree": "Concordo"
+  },
+  "income": {
+    "title": "Sua renda mensal",
+    "privacy": "Só você vê este valor. Ele é usado apenas para calcular a divisão proporcional, se vocês dois quiserem.",
+    "label": "Renda mensal (opcional)",
+    "save": "Salvar renda",
+    "remove": "Apagar minha renda",
+    "notifyPartner": "A divisão está proporcional à renda. Se você mudar ou apagar a renda, seu parceiro será avisado (sem ver valores) e a divisão pode voltar para igual."
+  },
+  "categories": {
+    "title": "Categorias",
+    "new": "Nova categoria",
+    "add": "Adicionar",
+    "rename": "Renomear",
+    "renameOf": "Renomear {{name}}",
+    "save": "Salvar",
+    "archive": "Arquivar",
+    "archiveOf": "Arquivar {{name}}",
+    "unarchive": "Desarquivar",
+    "unarchiveOf": "Desarquivar {{name}}",
+    "archivedTag": "arquivada"
+  },
+  "recurring": {
+    "title": "Gastos fixos",
+    "help": "Aluguel, internet, assinaturas: o gasto nasce sozinho todo mês, no dia combinado.",
+    "empty": "Nenhum gasto fixo ainda.",
+    "new": "Novo fixo",
+    "newTitle": "Novo gasto fixo",
+    "editTitle": "Editar gasto fixo",
+    "day": "Dia do mês",
+    "dayHint": "Em meses mais curtos cai no último dia.",
+    "dayInvalid": "Use um dia de 1 a 31.",
+    "everyDay": "todo dia {{day}}",
+    "startOn": "Começa em",
+    "startInvalid": "Não pode começar antes do mês atual.",
+    "endOn": "Termina em (opcional)",
+    "editHint": "Editar vale dos próximos meses em diante: o que já foi gerado não muda. Se o dia deste mês já passou, o gasto aparece na hora.",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "paused": "Pausado",
+    "confirmDelete": "Confirmar: apagar"
+  },
+  "bills": {
+    "status": "Contas",
+    "open_tab": "Abertas",
+    "paid_tab": "Pagas",
+    "new": "Nova conta",
+    "newTitle": "Nova conta a pagar",
+    "editTitle": "Editar conta",
+    "titleLabel": "Nome da conta",
+    "amount": "Valor (opcional)",
+    "amountHint": "A conta de luz, por exemplo, só tem valor depois.",
+    "dueOn": "Vencimento",
+    "responsible": "Quem paga",
+    "notifyBoth": "Avisar os dois",
+    "repeat": "Repetição",
+    "repeatNone": "Só uma vez",
+    "repeatMonthly": "Todo mês",
+    "remindersHint": "Os lembretes são automáticos: 3 dias antes e no dia do vencimento, às 9h.",
+    "emptyTitle": "Nenhuma conta a pagar",
+    "emptyBody": "Cadastre uma conta e o app avisa antes de vencer.",
+    "emptyPaid": "Nenhuma conta paga ainda",
+    "late": "Vencida",
+    "today": "Vence hoje",
+    "paid": "Paga",
+    "noAmount": "sem valor",
+    "syncPending": "lembretes em ajuste",
+    "open": "Editar conta: {{title}}",
+    "pay": "Pagar {{title}}",
+    "payAction": "Pagar",
+    "todayTitle": "Contas de hoje",
+    "seeAll": "Ver todas"
+  },
+  "pay": {
+    "title": "Pagar {{title}}",
+    "amount": "Valor pago",
+    "amountRequired": "Valor pago (obrigatório)",
+    "paidOn": "Data do pagamento",
+    "hint": "Isto registra um gasto do casal, dividido pela divisão padrão.",
+    "confirm": "Registrar pagamento"
+  },
+  "notice": {
+    "splitFallback": "A divisão proporcional não está disponível agora; dividimos igualmente.",
+    "syncPending": "Conta salva. Os lembretes serão refeitos em até uma hora.",
+    "billPaid": "Conta paga e gasto registrado.",
+    "nextBill": "Conta paga. A próxima vence em {{date}}."
+  },
+  "summary": {
+    "total": "Gastos do casal no mês",
+    "totalMine": "Meus gastos pessoais no mês",
+    "mineHint": "Só os seus gastos pessoais. Os do parceiro não entram, nem os que ele deixou à vista.",
+    "same": "Igual a {{month}}.",
+    "more": "{{amount}} a mais que em {{month}} ({{percent}}%).",
+    "moreNoPercent": "{{amount}} a mais que em {{month}}.",
+    "less": "{{amount}} a menos que em {{month}} ({{percent}}%).",
+    "lessNoPercent": "{{amount}} a menos que em {{month}}.",
+    "byCategory": "Por categoria",
+    "emptyTitle": "Sem gastos neste mês",
+    "emptyBody": "Quando houver gastos, o resumo mostra para onde foi o dinheiro.",
+    "installmentsHint": "As parcelas contam no mês de cada uma.",
+    "paidBy": "Quanto cada um pagou",
+    "usedOfLimit": "{{percent}}% do limite de {{limit}}",
+    "nearLimit": "perto do limite",
+    "overLimit": "limite ultrapassado"
+  },
+  "budget": {
+    "title": "Orçamento por categoria",
+    "help": "O limite vale todo mês e é só dos gastos do casal. Gasto pessoal não conta. Você recebe um aviso aos 80% e aos 100%.",
+    "noLimit": "Sem limite",
+    "current": "Limite atual: {{limit}}",
+    "save": "Salvar",
+    "saveOf": "Salvar limite de {{name}}",
+    "remove": "Tirar limite",
+    "removeOf": "Tirar limite de {{name}}"
+  },
+  "export": {
+    "title": "Baixar cópia dos dados",
+    "help": "Seus gastos visíveis, os acertos e as categorias (e só a sua própria renda).",
+    "csv": "Baixar CSV",
+    "json": "Baixar JSON"
+  },
+  "shopping": {
+    "title": "Registrar gasto da compra",
+    "hint": "A categoria é Mercado. O valor é o que você digita aqui: a lista de compras não guarda preços."
+  }
+}

@@ -42,6 +42,17 @@ type Task struct {
 	CompletedBy   *string    `json:"completed_by,omitempty"`
 	CompletedAt   *time.Time `json:"completed_at,omitempty"`
 	CreatedAt     time.Time  `json:"created_at"`
+	// Ref liga a tarefa a quem a criou por processo interno (por exemplo, a etapa de uma meta). Nulo nas comuns.
+	Ref *string `json:"ref,omitempty"`
+}
+
+// State é o estado de uma tarefa lido por ref, para quem a criou saber o que houve sem importar este pacote.
+type State struct {
+	Exists      bool
+	TaskID      string
+	Status      string // open, done, declined ou canceled
+	AssigneeID  *string
+	CompletedAt *time.Time
 }
 
 type Repository interface {
@@ -54,6 +65,14 @@ type Repository interface {
 	Decline(ctx context.Context, householdID, id, userID, reason string) (Task, error)
 	Reassign(ctx context.Context, householdID, id, userID string, assigneeID *string) (Task, error)
 	Cancel(ctx context.Context, householdID, id, userID string) error
+	// CreateWithRef cria a tarefa marcada com o ref, ou devolve a que já existe com ele (idempotente).
+	CreateWithRef(ctx context.Context, in Task, ref string) (Task, error)
+	// CancelByRef cancela as tarefas abertas ou recusadas com o ref e solta o ref das concluídas (ficam de histórico).
+	CancelByRef(ctx context.Context, householdID, ref string) (int64, error)
+	// StatesByRef devolve o estado de cada ref pedido; ref sem tarefa não aparece no mapa.
+	StatesByRef(ctx context.Context, householdID string, refs []string) (map[string]State, error)
+	// UpdateByRef muda título e prazo das tarefas abertas ou recusadas com o ref.
+	UpdateByRef(ctx context.Context, householdID, ref, title string, dueAt *time.Time) error
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -62,16 +81,16 @@ func NewPostgresRepo(db *sql.DB) *PostgresRepo { return &PostgresRepo{db: db} }
 
 // Colunas lidas em todas as consultas. O JOIN em users é só leitura, para mostrar o nome.
 const cols = `t.id, t.household_id, t.created_by, u.name, t.assignee_id, t.title, t.due_at,
-	t.status, t.recurrence, t.rotation, t.decline_reason, t.completed_by, t.completed_at, t.created_at`
+	t.status, t.recurrence, t.rotation, t.decline_reason, t.completed_by, t.completed_at, t.created_at, t.ref`
 
 type scanner interface{ Scan(dest ...any) error }
 
 func scan(s scanner) (Task, error) {
 	var t Task
-	var assignee, reason, completedBy sql.NullString
+	var assignee, reason, completedBy, ref sql.NullString
 	var due, completedAt sql.NullTime
 	err := s.Scan(&t.ID, &t.HouseholdID, &t.CreatedBy, &t.CreatedByName, &assignee, &t.Title, &due,
-		&t.Status, &t.Repeat, &t.Rotation, &reason, &completedBy, &completedAt, &t.CreatedAt)
+		&t.Status, &t.Repeat, &t.Rotation, &reason, &completedBy, &completedAt, &t.CreatedAt, &ref)
 	if err != nil {
 		return Task{}, err
 	}
@@ -89,6 +108,9 @@ func scan(s scanner) (Task, error) {
 	}
 	if completedAt.Valid {
 		t.CompletedAt = &completedAt.Time
+	}
+	if ref.Valid {
+		t.Ref = &ref.String
 	}
 	return t, nil
 }
@@ -109,12 +131,12 @@ func insert(ctx context.Context, tx *sql.Tx, in Task) (Task, error) {
 	}
 	return scan(tx.QueryRowContext(ctx, `
 		WITH ins AS (
-			INSERT INTO tasks (household_id, created_by, assignee_id, title, due_at, recurrence, rotation)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
+			INSERT INTO tasks (household_id, created_by, assignee_id, title, due_at, recurrence, rotation, ref)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			RETURNING *
 		)
 		SELECT `+cols+` FROM ins t JOIN users u ON u.id = t.created_by`,
-		in.HouseholdID, in.CreatedBy, in.AssigneeID, in.Title, in.DueAt, in.Repeat, in.Rotation))
+		in.HouseholdID, in.CreatedBy, in.AssigneeID, in.Title, in.DueAt, in.Repeat, in.Rotation, in.Ref))
 }
 
 func (p *PostgresRepo) Get(ctx context.Context, householdID, id string) (Task, error) {
@@ -257,6 +279,93 @@ func (p *PostgresRepo) Cancel(ctx context.Context, householdID, id, userID strin
 	})
 }
 
+func (p *PostgresRepo) CreateWithRef(ctx context.Context, in Task, ref string) (Task, error) {
+	var out Task
+	err := db.InTx(ctx, p.db, db.Scope{HouseholdID: in.HouseholdID}, func(tx *sql.Tx) error {
+		if in.Repeat == "" {
+			in.Repeat = RepeatNone
+		}
+		// com duas chamadas ao mesmo tempo, a segunda não insere nada e lê a que a primeira criou
+		made, err := scan(tx.QueryRowContext(ctx, `
+			WITH ins AS (
+				INSERT INTO tasks (household_id, created_by, assignee_id, title, due_at, recurrence, rotation, ref)
+				VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+				ON CONFLICT (household_id, ref) WHERE ref IS NOT NULL AND status <> 'canceled' DO NOTHING
+				RETURNING *
+			)
+			SELECT `+cols+` FROM ins t JOIN users u ON u.id = t.created_by`,
+			in.HouseholdID, in.CreatedBy, in.AssigneeID, in.Title, in.DueAt, in.Repeat, in.Rotation, ref))
+		if err == nil {
+			out = made
+			return nil
+		}
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		out, err = scan(tx.QueryRowContext(ctx, `
+			SELECT `+cols+` FROM tasks t JOIN users u ON u.id = t.created_by
+			WHERE t.household_id = $1 AND t.ref = $2 AND t.status <> 'canceled'`, in.HouseholdID, ref))
+		return err
+	})
+	return out, err
+}
+
+func (p *PostgresRepo) CancelByRef(ctx context.Context, householdID, ref string) (int64, error) {
+	var n int64
+	err := db.InTx(ctx, p.db, db.Scope{HouseholdID: householdID}, func(tx *sql.Tx) error {
+		res, err := tx.ExecContext(ctx, `
+			UPDATE tasks SET status = 'canceled'
+			WHERE household_id = $1 AND ref = $2 AND status IN ('open', 'declined')`, householdID, ref)
+		if err != nil {
+			return err
+		}
+		n, _ = res.RowsAffected()
+		// a concluída é histórico: só perde o vínculo, para o ref poder ser usado de novo
+		_, err = tx.ExecContext(ctx, `
+			UPDATE tasks SET ref = NULL WHERE household_id = $1 AND ref = $2 AND status = 'done'`, householdID, ref)
+		return err
+	})
+	return n, err
+}
+
+func (p *PostgresRepo) StatesByRef(ctx context.Context, householdID string, refs []string) (map[string]State, error) {
+	out := map[string]State{}
+	if len(refs) == 0 {
+		return out, nil
+	}
+	err := db.InTx(ctx, p.db, db.Scope{HouseholdID: householdID}, func(tx *sql.Tx) error {
+		// a ativa vence a cancelada; entre canceladas, a mais recente
+		rows, err := tx.QueryContext(ctx, `
+			SELECT DISTINCT ON (ref) ref, id, status, assignee_id, completed_at
+			FROM tasks
+			WHERE household_id = $1 AND ref = ANY($2)
+			ORDER BY ref, (status = 'canceled'), created_at DESC`, householdID, refs)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var ref string
+			var st State
+			var assignee sql.NullString
+			var done sql.NullTime
+			if err := rows.Scan(&ref, &st.TaskID, &st.Status, &assignee, &done); err != nil {
+				return err
+			}
+			st.Exists = true
+			if assignee.Valid {
+				st.AssigneeID = &assignee.String
+			}
+			if done.Valid {
+				st.CompletedAt = &done.Time
+			}
+			out[ref] = st
+		}
+		return rows.Err()
+	})
+	return out, err
+}
+
 // HandleLeave roda quando alguém sai do casal: as tarefas dela ainda abertas ou recusadas (que criou ou
 // recebeu) passam para quem ficou, que assume o que faltava. O que já foi concluído fica como histórico.
 // Uma tarefa recusada cujo responsável passa a ser quem a criou reabre, pois ninguém recusa a própria tarefa.
@@ -282,4 +391,13 @@ func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff
 		WHERE household_id = $1 AND status = 'declined' AND assignee_id = created_by AND created_by = $2`,
 		h.From, h.RemainingUserID)
 	return err
+}
+
+func (p *PostgresRepo) UpdateByRef(ctx context.Context, householdID, ref, title string, dueAt *time.Time) error {
+	return db.InTx(ctx, p.db, db.Scope{HouseholdID: householdID}, func(tx *sql.Tx) error {
+		_, err := tx.ExecContext(ctx, `
+			UPDATE tasks SET title = $3, due_at = $4
+			WHERE household_id = $1 AND ref = $2 AND status IN ('open', 'declined')`, householdID, ref, title, dueAt)
+		return err
+	})
 }

@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"casal/internal/identity"
 )
@@ -238,4 +239,16 @@ func safeCell(s string) string {
 		return "'" + s
 	}
 	return s
+}
+
+// CategoryMonthlySpend é o que o módulo Metas lê (por um adaptador no app): o limite atual do orçamento da categoria
+// e o que o CASAL gastou nela em cada mês entre from e to. Categoria sem limite (ou de outro casal) devolve
+// hasLimit falso. O gasto pessoal nunca entra.
+func (s *Service) CategoryMonthlySpend(ctx context.Context, householdID, categoryID string, from, to time.Time) (limit int64, hasLimit bool, spent map[string]int64, err error) {
+	limit, hasLimit, err = s.repo.BudgetLimit(ctx, householdID, categoryID)
+	if err != nil || !hasLimit {
+		return 0, false, nil, err
+	}
+	spent, err = s.repo.SpentByMonth(ctx, householdID, categoryID, from, to)
+	return limit, true, spent, err
 }

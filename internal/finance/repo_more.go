@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"time"
 
 	"casal/internal/db"
 )
@@ -547,6 +548,32 @@ func (p *PostgresRepo) PaidTotals(ctx context.Context, hh, month string) (map[st
 				return err
 			}
 			out[id] = total
+		}
+		return rows.Err()
+	})
+	return out, err
+}
+
+// SpentByMonth é o gasto do CASAL na categoria, mês a mês (AAAA-MM), de from a to (inclusive). Gasto pessoal não conta.
+func (p *PostgresRepo) SpentByMonth(ctx context.Context, hh, categoryID string, from, to time.Time) (map[string]int64, error) {
+	out := map[string]int64{}
+	err := p.inHousehold(ctx, hh, func(tx *sql.Tx) error {
+		rows, err := tx.QueryContext(ctx, `
+			SELECT to_char(spent_on, 'YYYY-MM'), sum(amount_cents) FROM expenses
+			WHERE household_id = $1 AND scope = 'household' AND category_id = $2
+			  AND spent_on >= $3 AND spent_on <= $4
+			GROUP BY 1`, hh, categoryID, from, to)
+		if err != nil {
+			return err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			var month string
+			var total int64
+			if err := rows.Scan(&month, &total); err != nil {
+				return err
+			}
+			out[month] = total
 		}
 		return rows.Err()
 	})

@@ -12,6 +12,7 @@ import (
 	"casal/internal/auth"
 	"casal/internal/config"
 	"casal/internal/finance"
+	"casal/internal/goal"
 	"casal/internal/household"
 	"casal/internal/httpx"
 	"casal/internal/module"
@@ -75,8 +76,8 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 
 	// tarefas
 	taskRepo := task.NewPostgresRepo(conn)
-	task.NewHandler(task.NewService(taskRepo, householdSvc, notifier, log), log).
-		Routes(mux, requireUser, requireHousehold)
+	taskSvc := task.NewService(taskRepo, householdSvc, notifier, log)
+	task.NewHandler(taskSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// rotina semanal
 	routineRepo := routine.NewPostgresRepo(conn)
@@ -101,6 +102,20 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	moduleSvc.OnEnable(module.Finance, finance.SeedCategories)
 	moduleSvc.AfterChange(module.Finance, financeSvc.ModuleChanged)
 
+	// metas (módulo opcional): progresso calculado no servidor; as etapas de projeto são tarefas (ligadas por ref) e o
+	// hábito pode ter lembrete. Quando uma tarefa com ref de meta é concluída ou cancelada, a meta é recalculada.
+	goalRepo := goal.NewPostgresRepo(conn)
+	goalSvc := goal.NewService(goalRepo, goalTasks{taskSvc}, goalReminders{reminderSvc}, goalPeople{householdSvc},
+		notifier, goalSpending{financeSvc}, moduleSvc, log)
+	goal.NewHandler(goalSvc, log).
+		Routes(mux, requireUser, requireHousehold, module.Require(moduleSvc, log, module.Goals))
+	moduleSvc.AfterChange(module.Goals, goalSvc.ModuleChanged)
+	taskSvc.AfterChange(func(ctx context.Context, t task.Task) {
+		if t.Ref != nil {
+			goalSvc.TaskChanged(ctx, t.HouseholdID, *t.Ref, t.Status)
+		}
+	})
+
 	// mudança de casal: cada feature leva o que é pessoal e passa adiante o que era compartilhado,
 	// na mesma transação. Registrados aqui, antes de atender qualquer requisição.
 	householdSvc.OnLeave(noteRepo.HandleLeave)
@@ -108,10 +123,12 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	householdSvc.OnLeave(taskRepo.HandleLeave)
 	householdSvc.OnLeave(reminderRepo.HandleLeave)
 	householdSvc.OnLeave(financeRepo.HandleLeave)
+	householdSvc.OnLeave(goalRepo.HandleLeave)
 	householdSvc.OnJoin(noteRepo.HandleJoin)
 	householdSvc.OnJoin(routineRepo.HandleJoin)
 	householdSvc.OnJoin(reminderRepo.HandleJoin)
 	householdSvc.OnJoin(financeRepo.HandleJoin)
+	householdSvc.OnJoin(goalRepo.HandleJoin)
 
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
@@ -127,6 +144,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 		reminder.NewWorker(reminderRepo, notifier, log).Run,
 		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
 		maintenance(log, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
+		maintenance(log, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
 	}
 	return handler, jobs, nil
 }

@@ -6,6 +6,8 @@ lembretes entre o casal e avisos por Web Push, mesmo com o app fechado.
 - Visão e escopo do produto: [docs/produto.md](docs/produto.md)
 - Como o código está organizado e as regras do projeto: [docs/arquitetura.md](docs/arquitetura.md)
 - Como o frontend vai crescer (convenções, entregas e telas): [docs/frontend-implementacao.md](docs/frontend-implementacao.md)
+- Próxima fase do backend, o módulo Finanças: [docs/spec-fase-2-financas.md](docs/spec-fase-2-financas.md)
+- Depois de Finanças e Metas, o módulo Marmita: [docs/spec-fase-4-marmita.md](docs/spec-fase-4-marmita.md)
 - Guia passo a passo da implementação: [docs/guia-implementacao.md](docs/guia-implementacao.md)
 
 ## Requisitos
@@ -110,6 +112,24 @@ Tudo sob `/v1`, JSON, autenticação por cookie de sessão.
 | `GET /routine/occurrences?from=&to=`, `/routine/free?date=`, `/routine/now` | o que acontece, horários livres dos dois e quem está onde agora |
 | `POST/GET /shopping/items`, `PUT/DELETE /shopping/items/{id}` | lista de compras do casal (itens iguais somam) |
 | `POST /shopping/items/{id}/bought`, `/unbought`, `POST /shopping/restock` | marca / desfaz a compra / repõe os recorrentes |
+| `GET /modules`, `PUT /modules/{name}` | módulos opcionais do casal (`finance`, `goals`): liga ou desliga; desligar esconde e não apaga |
+| `GET/POST /finance/categories`, `PUT .../{id}`, `POST .../{id}/archive`, `/unarchive` | **Finanças** (exige o módulo ligado; `403 module_disabled`). Categorias: as padrão nascem ao ligar; arquivar em vez de apagar |
+| `POST/GET /finance/expenses`, `GET/PUT/DELETE /finance/expenses/{id}` | gastos do casal ou pessoais, em centavos. `installments` parcela a compra (uma linha por parcela). `PUT` exige `version`; gasto acertado não muda |
+| `POST /finance/expenses/from-shopping` | gasto de mercado depois de uma compra (categoria Mercado) |
+| `GET/PUT/DELETE /finance/expense-groups/{id}` | uma compra parcelada: lê, muda descrição/categoria/pagador/divisão e apaga só as parcelas abertas |
+| `POST/GET /finance/recurring`, `PUT/DELETE .../{id}`, `POST .../{id}/pause`, `/resume` | gastos fixos (aluguel, assinaturas): um job gera o gasto do dia, no fuso de quem paga |
+| `GET/PUT /finance/settings`, `POST/DELETE /finance/settings/proportional/consent` | divisão padrão (`equal`, `fixed`, `proportional`); a proporcional exige a concordância dos dois |
+| `GET/PUT/DELETE /finance/income` | a renda mensal **da própria pessoa** (privada; nenhuma rota devolve a do parceiro) |
+| `GET /finance/balance?through=`, `POST/GET /finance/settlements` | saldo em aberto / registra o "pagamento entre nós" (valor exato do saldo, senão `409 settlement_stale`) / histórico |
+| `POST/GET /finance/bills`, `GET/PUT/DELETE .../{id}`, `POST .../{id}/pay` | contas a pagar com lembretes (3 dias antes e no dia); pagar cria o gasto na mesma transação |
+| `GET/PUT /finance/budgets`, `DELETE .../{categoria}`, `GET /finance/summary?month=&scope=` | orçamento mensal por categoria (aviso em 80% e 100%) e resumo do mês |
+| `GET /finance/export?format=csv` | cópia dos gastos que a pessoa pode ver e dos acertos (JSON ou CSV) |
+| `POST/GET /goals`, `GET/PUT/DELETE /goals/{id}` | **Metas** (exige o módulo `goals`; `403 module_disabled`). Quatro tipos: `financial`, `habit`, `shared` (do casal) e `project`. Pessoal ou do casal; a pessoal é privada (`404` ao parceiro) ou `view` (o parceiro lê só título, prazo e progresso). Toda resposta traz `progress` já calculado. `PUT` exige `version` |
+| `POST /goals/{id}/pause`, `/resume`, `/complete`, `/archive`, `/unarchive` | estados da meta; concluir nunca é automático (o app sugere com `suggest_complete`) |
+| `POST/GET /goals/{id}/contributions`, `DELETE .../{cid}` | meta financeira: aporte (ou retirada, negativa) em centavos; **não** é gasto em Finanças. Lista paginada por `before` |
+| `POST /goals/{id}/checkins`, `DELETE .../{dia}`, `GET /goals/{id}/history?from=&to=` | hábito e meta do casal: marca o dia (idempotente; até 31 dias atrás, nunca o futuro), desfaz a própria marcação, histórico por dia e por período. Sem ranking nem sequência |
+| `POST /goals/{id}/steps`, `PUT/DELETE .../{sid}`, `POST .../{sid}/done`, `/undone`, `POST/DELETE .../{sid}/task` | projeto: etapas (checklist ou ligadas a uma tarefa, cujo estado é o da tarefa) |
+| `GET /goals/export?format=csv` | cópia das metas que a pessoa pode ver, com aportes, marcações e etapas (JSON ou CSV) |
 | `GET /push/vapid-key`, `POST/DELETE /push/subscriptions`, `POST /push/test` | Web Push |
 | `GET /healthz` | saúde (fora do `/v1`) |
 

@@ -19,8 +19,9 @@ internal/
   note/              anotações (texto ou checklist), pessoais ou do casal, com visibilidade
   routine/           rotina semanal: blocos, repetição, exceções, horários livres, quem está onde
   shopping/          lista de compras do casal (itens iguais somam, comprados saem sozinhos)
-  module/            módulos opcionais por casal (Finanças): liga, desliga e o middleware que barra rota de módulo desligado
+  module/            módulos opcionais por casal (Finanças, Metas): liga, desliga e o middleware que barra rota de módulo desligado
   finance/           gastos, divisão e acerto de contas, renda, gastos fixos, contas a pagar, orçamento
+  goal/              metas: financeira, hábito, do casal e projeto (progresso calculado no servidor, privacidade entre os parceiros)
   push/              Web Push (assinaturas e envio)
 
   apperr/            classifica erros de negócio (inválido, não achou, conflito...) sem HTTP
@@ -105,6 +106,7 @@ e quem ficou) e rodam **na mesma transação** da mudança: se um falhar, nada m
 | lembretes | os pendentes entre os dois são cancelados | os da pessoa para ela mesma vêm junto |
 | compras | nada (é do casal) | nada |
 | finanças | se há saldo em aberto, um acerto `leave` (só registro) trava os gastos abertos, inclusive parcelas futuras; fixos e contas da pessoa passam para quem ficou; a divisão padrão volta para igual; o pessoal "view" vira privado | gastos e fixos pessoais, a renda e as categorias que usavam, **sempre privados** |
+| metas | as do casal ficam com quem permanece (a que exigia os dois passa a exigir só quem sobrou; as etapas da pessoa passam para quem ficou); as pessoais ficam com quem saiu e o que o parceiro lia ("view") vira privado | as pessoais deixadas para trás vêm junto, com aportes, marcações e etapas, **sempre privadas** |
 
 Lembretes criados por outro módulo com `ref` (contas a pagar) são do casal, não da pessoa: ao sair, os pendentes dela são
 cancelados (quem fica os refaz) e nenhum acompanha a pessoa a outro casal.
@@ -121,7 +123,7 @@ se algum dia houver limpeza de casais vazios, ela precisa antes migrar ou descar
 
 ## Módulos opcionais
 
-`module.Require(svc, log, "finance")` barra as rotas de um módulo desligado (`403 module_disabled`). Desligar apaga só a
+`module.Require(svc, log, "finance")` (ou `"goals"`) barra as rotas de um módulo desligado (`403 module_disabled`). Desligar apaga só a
 linha de `household_modules`: os dados ficam e voltam ao religar. O gancho `OnEnable` roda na transação que liga (as categorias
 padrão de Finanças; precisa ser idempotente, pois religar também dispara) e `AfterChange` roda depois, fora da transação
 (cancela ou refaz os lembretes das contas). Os jobs só olham casais com o módulo ligado.
@@ -148,6 +150,37 @@ padrão de Finanças; precisa ser idempotente, pois religar também dispara) e `
   `sync_pending` e o job de hora em hora recalcula.
 - **Jobs.** Gastos fixos (gera o gasto do dia no fuso de quem paga; idempotente, e apagar um gerado não o recria) e
   reconciliação de lembretes.
+
+## Metas
+
+Módulo opcional (`goals`), com a mesma base de módulos de Finanças. Quatro tipos, cada um com os parâmetros numa tabela própria
+(`goal_financial`, `goal_habit`, `goal_shared`; o projeto usa `goal_steps`), para o banco checar as regras de cada um. O `kind` não muda.
+
+- **Progresso é calculado só no servidor** (`progress.go`, funções puras testadas): financeira = aportes (ou a sobra do orçamento) ÷ alvo;
+  hábito = marcações do dono no período ÷ alvo; do casal = dias com ocorrência válida ÷ alvo; projeto = etapas concluídas ÷ ativas.
+  Concluir nunca é automático: o app só sugere (`suggest_complete`). O período é a semana civil (segunda a domingo) ou o mês civil,
+  no fuso do dono (na meta do casal, no de quem lê). Marcação fora de `weekdays` fica no histórico e não conta.
+- **Privacidade entre os parceiros vive só no código.** Todo SQL de leitura de meta usa `visibleTo` e toda escrita confere `writableBy`
+  no `WHERE`; as tabelas filhas (aportes, marcações, etapas) nunca são lidas sozinhas, sempre juntadas a `goals`. Meta pessoal `private`
+  responde `404` ao parceiro (nunca `403`) e não entra em lista, exportação, contagem do teto nem aviso. Meta `view`: o parceiro recebe só
+  título, prazo e progresso (`access = "view"`); sem notas, parâmetros, etapas, aportes nem marcações, e nunca edita (`403 goal_forbidden`).
+  Avisos existem só para metas do casal. O teste usa dois parceiros no mesmo casal e foi provado removendo o filtro.
+- **Nenhuma resposta ou aviso compara, ordena ou cobra as duas pessoas.** Não há sequência (streak), ranking nem total por pessoa; as marcações
+  de um dia vêm em ordem de id, sem significado. O push da meta do casal é neutro ("Ana marcou: Jantar fora"), no máximo um por meta por dia
+  (`goal_shared.notified_on`), só para marcações de hoje, e nunca para quem marcou.
+- **Etapa de projeto e tarefa nunca discordam.** A etapa com tarefa (`want_task`) não tem `done_at` próprio: concluída e responsável são lidos da
+  tarefa (`Tasks.StatesByRef`, por `ref = goal:<meta>:step:<etapa>`, coluna `tasks.ref` com índice único parcial por casal). Tarefa recusada
+  deixa a etapa aberta e sem responsável; tarefa cancelada por fora solta a etapa (continua, aberta, sem tarefa). O gancho `task.Service.AfterChange`
+  (concluir e cancelar, fora da transação, com `recover`) recalcula o projeto e manda o aviso único "todas as etapas estão prontas" (`all_done_notified_at`,
+  que rearma quando uma etapa reabre). Meta pessoal não gera tarefa: suas etapas são checklist.
+- **Aporte não é gasto.** Não cria nada em Finanças nem mexe no saldo do acerto. A meta `budget_savings` (só do casal) lê Finanças pela interface
+  `Spending`, que o `app` liga a `finance.Service.CategoryMonthlySpend`: por mês, `max(0, limite − gasto do casal)`, e o mês corrente é `provisional`.
+  Gasto pessoal nunca entra. Com Finanças desligado, o progresso vira `unavailable` e as metas ficam.
+- **Tarefas e lembretes ficam fora da transação.** Grava-se a meta; depois cria-se a tarefa ou o lembrete. Se falhar, a resposta é `200` com
+  `sync_pending` e os jobs de hora em hora refazem por recálculo: `ReconcileSteps` (etapas que querem tarefa e não têm) e `ReconcileHabitReminders`
+  (um lembrete por **dia** que importa, com `ref = goal:<id>:<AAAA-MM-DD>`; nenhum fora de `weekdays`, depois de marcado o dia, cumprido o período,
+  com a meta pausada ou com o horário já passado). Os jobs só olham casais com o módulo ligado.
+- **Mudança de casal** (`HandleLeave`/`HandleJoin`): veja a tabela acima. As tabelas de Metas têm a cláusula de sistema no RLS por causa dos ganchos e dos jobs.
 
 ## Códigos de erro
 

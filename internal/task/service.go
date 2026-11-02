@@ -27,6 +27,26 @@ type Service struct {
 	notifier Notifier
 	log      *slog.Logger
 	now      func() time.Time
+	after    []func(ctx context.Context, t Task)
+}
+
+// AfterChange registra uma função chamada depois de uma tarefa ser concluída ou cancelada, já fora da transação.
+// Quem registra trata as próprias falhas: o gancho não devolve erro e nunca desfaz a operação. Registre na montagem
+// do app, antes de atender requisições.
+func (s *Service) AfterChange(f func(ctx context.Context, t Task)) { s.after = append(s.after, f) }
+
+func (s *Service) changed(ctx context.Context, t Task) {
+	for _, f := range s.after {
+		func() {
+			// a tarefa já foi gravada: um gancho que quebra não pode derrubar a resposta
+			defer func() {
+				if r := recover(); r != nil {
+					s.log.Error("gancho de tarefa falhou", "task", t.ID, "panic", r)
+				}
+			}()
+			f(ctx, t)
+		}()
+	}
 }
 
 func NewService(repo Repository, members Members, notifier Notifier, log *slog.Logger) *Service {
@@ -114,6 +134,9 @@ func (s *Service) Complete(ctx context.Context, householdID, id, userID string) 
 	}
 	if created != nil {
 		s.notifyAssigned(ctx, *created, userID)
+	}
+	if done.Ref != nil {
+		s.changed(context.WithoutCancel(ctx), done)
 	}
 	return done, nil
 }
@@ -204,7 +227,59 @@ func (s *Service) Reassign(ctx context.Context, householdID, id, userID, assigne
 }
 
 func (s *Service) Cancel(ctx context.Context, householdID, id, userID string) error {
-	return s.repo.Cancel(ctx, householdID, id, userID)
+	if err := s.repo.Cancel(ctx, householdID, id, userID); err != nil {
+		return err
+	}
+	if len(s.after) > 0 {
+		// a tarefa já foi cancelada: se o cliente desconectar, o gancho ainda precisa rodar
+		bg := context.WithoutCancel(ctx)
+		if t, err := s.repo.Get(bg, householdID, id); err == nil && t.Ref != nil {
+			s.changed(bg, t)
+		}
+	}
+	return nil
+}
+
+// RefInput descreve a tarefa que outro módulo cria para si, sem passar por uma pessoa na tela.
+type RefInput struct {
+	Title      string
+	AssigneeID string // vazio: tarefa do casal
+	DueAt      *time.Time
+}
+
+// CreateWithRef é a entrada para outros módulos (por uma interface declarada neles, ligada no app): cria a tarefa
+// marcada com o ref ou devolve a que já existe com ele. Não avisa ninguém: quem chama decide se há aviso.
+func (s *Service) CreateWithRef(ctx context.Context, householdID, creatorID string, in RefInput, ref string) (Task, error) {
+	title, err := cleanText(in.Title, 200, "o título")
+	if err != nil {
+		return Task{}, err
+	}
+	if ref == "" || len(ref) > 100 {
+		return Task{}, fmt.Errorf("%w: ref inválido", ErrInvalidInput)
+	}
+	assignee, err := s.resolveAssignee(ctx, householdID, creatorID, in.AssigneeID, in.AssigneeID == "")
+	if err != nil {
+		return Task{}, err
+	}
+	var due *time.Time
+	if in.DueAt != nil {
+		u := in.DueAt.UTC()
+		due = &u
+	}
+	return s.repo.CreateWithRef(ctx, Task{
+		HouseholdID: householdID, CreatedBy: creatorID, AssigneeID: assignee, Title: title, DueAt: due, Repeat: RepeatNone,
+	}, ref)
+}
+
+// CancelByRef cancela as tarefas abertas ou recusadas com o ref e solta o vínculo das concluídas. Cancelar o que
+// não existe não é erro. Não chama o gancho AfterChange: quem cancela por aqui já sabe o que fez.
+func (s *Service) CancelByRef(ctx context.Context, householdID, ref string) (int64, error) {
+	return s.repo.CancelByRef(ctx, householdID, ref)
+}
+
+// StatesByRef lê o estado das tarefas pelos refs; um ref sem tarefa não aparece no mapa.
+func (s *Service) StatesByRef(ctx context.Context, householdID string, refs []string) (map[string]State, error) {
+	return s.repo.StatesByRef(ctx, householdID, refs)
 }
 
 // resolveAssignee devolve o responsável (nil: tarefa do casal) e confere que é do casal.
@@ -250,4 +325,17 @@ func cleanText(v string, max int, what string) (string, error) {
 		return "", fmt.Errorf("%w: %s é obrigatório (até %d caracteres)", ErrInvalidInput, what, max)
 	}
 	return v, nil
+}
+
+// UpdateByRef muda título e prazo das tarefas abertas ou recusadas com o ref (a etapa de uma meta foi editada).
+func (s *Service) UpdateByRef(ctx context.Context, householdID, ref, title string, dueAt *time.Time) error {
+	title, err := cleanText(title, 200, "o título")
+	if err != nil {
+		return err
+	}
+	if dueAt != nil {
+		u := dueAt.UTC()
+		dueAt = &u
+	}
+	return s.repo.UpdateByRef(ctx, householdID, ref, title, dueAt)
 }

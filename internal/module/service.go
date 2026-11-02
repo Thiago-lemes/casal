@@ -9,9 +9,12 @@ import (
 )
 
 // Nomes dos módulos que existem. A tabela só aceita estes.
-const Finance = "finance"
+const (
+	Finance = "finance"
+	Goals   = "goals"
+)
 
-var known = []string{Finance}
+var known = []string{Finance, Goals}
 
 var (
 	ErrNotFound = apperr.NewCoded(apperr.NotFound, "module_not_found", "módulo não encontrado")

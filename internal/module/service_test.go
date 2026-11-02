@@ -39,8 +39,13 @@ func (f *fakeRepo) Disable(_ context.Context, _, name string) error {
 func TestListShowsKnownModulesOffByDefault(t *testing.T) {
 	svc := NewService(&fakeRepo{on: map[string]time.Time{}})
 	got, err := svc.List(context.Background(), "h1")
-	if err != nil || len(got) != 1 || got[0].Name != Finance || got[0].Enabled || got[0].EnabledAt != nil {
-		t.Errorf("sem linha, o módulo é desligado: %+v %v", got, err)
+	if err != nil || len(got) != 2 || got[0].Name != Finance || got[1].Name != Goals {
+		t.Fatalf("módulos conhecidos: %+v %v", got, err)
+	}
+	for _, m := range got {
+		if m.Enabled || m.EnabledAt != nil {
+			t.Errorf("sem linha, o módulo é desligado: %+v", m)
+		}
 	}
 }
 

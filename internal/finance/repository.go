@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"time"
 
 	"casal/internal/db"
 )
@@ -80,6 +81,8 @@ type Repository interface {
 	DeleteBudget(ctx context.Context, hh, categoryID string) (bool, error)
 	BudgetLimit(ctx context.Context, hh, categoryID string) (int64, bool, error)
 	MonthUsage(ctx context.Context, hh, categoryID, month string) (int64, error)
+	// SpentByMonth é o gasto do casal na categoria por mês (AAAA-MM), de from a to; o gasto pessoal não conta.
+	SpentByMonth(ctx context.Context, hh, categoryID string, from, to time.Time) (map[string]int64, error)
 	// TryAlert grava o aviso do nível naquele mês; só o primeiro a gravar recebe true.
 	TryAlert(ctx context.Context, hh, categoryID, month string, level int) (bool, error)
 

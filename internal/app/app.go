@@ -71,7 +71,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 
 	// lembretes
 	reminderRepo := reminder.NewPostgresRepo(conn)
-	reminderSvc := reminder.NewService(reminderRepo, householdSvc)
+	reminderSvc := reminder.NewService(reminderRepo, householdSvc, notifier, log)
 	reminder.NewHandler(reminderSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// tarefas

@@ -3,6 +3,7 @@ package reminder
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -13,14 +14,19 @@ type Members interface {
 	AreMembers(ctx context.Context, householdID string, userIDs ...string) (bool, error)
 }
 
+// createNotifyTimeout limita o aviso de "lembrete novo", que roda na requisição de quem criou.
+const createNotifyTimeout = 5 * time.Second
+
 type Service struct {
-	repo    Repository
-	members Members
-	now     func() time.Time
+	repo     Repository
+	members  Members
+	notifier Notifier
+	log      *slog.Logger
+	now      func() time.Time
 }
 
-func NewService(repo Repository, members Members) *Service {
-	return &Service{repo: repo, members: members, now: time.Now}
+func NewService(repo Repository, members Members, notifier Notifier, log *slog.Logger) *Service {
+	return &Service{repo: repo, members: members, notifier: notifier, log: log, now: time.Now}
 }
 
 func (s *Service) Create(ctx context.Context, householdID, creatorID, recipientID, body string, remindAt time.Time) (Reminder, error) {
@@ -44,13 +50,34 @@ func (s *Service) Create(ctx context.Context, householdID, creatorID, recipientI
 	if !ok {
 		return Reminder{}, fmt.Errorf("%w: a pessoa não pertence ao casal", ErrInvalidInput)
 	}
-	return s.repo.Create(ctx, Reminder{
+	r, err := s.repo.Create(ctx, Reminder{
 		HouseholdID: householdID,
 		CreatedBy:   creatorID,
 		RecipientID: recipientID,
 		Body:        body,
 		RemindAt:    remindAt.UTC(),
 	})
+	if err != nil {
+		return Reminder{}, err
+	}
+	s.notifyCreated(ctx, r)
+	return r, nil
+}
+
+// notifyCreated avisa o parceiro na hora que alguém cria um lembrete para ele. Roda depois da transação
+// (rede nunca dentro dela) e o erro só vai para o log: o lembrete já existe e o aviso da hora marcada ainda sai.
+// Quem cria um lembrete para si mesmo não recebe nada. Só o Create (feito por uma pessoa) avisa, não o CreateWithRef.
+func (s *Service) notifyCreated(ctx context.Context, r Reminder) {
+	if r.RecipientID == r.CreatedBy {
+		return
+	}
+	// o contexto da requisição pode terminar logo depois da resposta, então o aviso tem prazo próprio
+	nctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), createNotifyTimeout)
+	defer cancel()
+	title := r.CreatedByName + " criou um lembrete para você"
+	if err := s.notifier.Notify(nctx, r.RecipientID, title, r.Body); err != nil {
+		s.log.Warn("aviso de lembrete novo não enviado", "reminder", r.ID, "err", err)
+	}
 }
 
 // CreateWithRef é a entrada para outros módulos (por meio de uma interface declarada neles e ligada no app):

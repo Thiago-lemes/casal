@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { useHousehold } from '@/features/household/hooks'
 import { Logo } from '@/design-system'
 import { APP_NAME } from '@/shared/config'
-import { useModuleEnabled } from '@/shared/modules/hooks'
 import styles from './Shell.module.css'
 import { UserMenu } from './UserMenu'
 
@@ -18,7 +17,7 @@ const items: Item[] = [
   { to: '/home', key: 'home', icon: House },
 ]
 
-/** Módulo opcional: só entra na navegação quando o casal o liga (antes de Casa). */
+/** Módulo opcional: sempre na navegação (antes de Casa); o casal liga dentro da página. */
 const finance: Item = { to: '/finance', key: 'finance', icon: Wallet }
 
 /** Módulo opcional: como a Semana, no celular sai da barra e vai para o menu do avatar. */
@@ -28,9 +27,8 @@ const goals: Item = { to: '/goals', key: 'goals', icon: Target, desktopOnly: tru
 export function Shell() {
   const { t } = useTranslation()
   const household = useHousehold().data
-  const financeOn = useModuleEnabled('finance', Boolean(household)).on
-  const goalsOn = useModuleEnabled('goals', Boolean(household)).on
-  const nav = [...items.slice(0, -1), ...(financeOn ? [finance] : []), ...(goalsOn ? [goals] : []), items[items.length - 1]]
+  // Finanças e Metas ficam sempre no menu (havendo casal); desligados, a página mostra o convite para ligar.
+  const nav = [...items.slice(0, -1), ...(household ? [finance, goals] : []), items[items.length - 1]]
 
   return (
     <div className={styles.shell}>

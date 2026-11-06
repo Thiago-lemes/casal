@@ -9,7 +9,6 @@ import { useHousehold } from '@/features/household/hooks'
 import { usePush } from '@/features/push/hooks'
 import { LANGUAGES } from '@/shared/i18n'
 import type { Language } from '@/shared/i18n'
-import { useModuleEnabled } from '@/shared/modules/hooks'
 import { useTheme } from '@/shared/theme'
 import type { ThemeChoice } from '@/shared/theme'
 import styles from './UserMenu.module.css'
@@ -30,7 +29,6 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const navigate = useNavigate()
   const push = usePush()
   const household = useHousehold().data
-  const goalsOn = useModuleEnabled('goals', Boolean(household)).on
   const { t: tp } = useTranslation('push')
   const current: Language = i18n.language.startsWith('en') ? 'en' : 'pt-BR'
 
@@ -60,7 +58,7 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
             {t('nav.routine')}
           </Menu.Item>
 
-          {goalsOn && (
+          {household && (
             <Menu.Item className={`${styles.item} ${styles.mobileOnly}`} onSelect={() => navigate('/goals')}>
               <Target className={styles.icon} aria-hidden="true" />
               {t('nav.goals')}

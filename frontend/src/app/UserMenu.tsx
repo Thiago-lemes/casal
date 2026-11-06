@@ -1,5 +1,5 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Sun, Target, UserRound } from 'lucide-react'
+import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Palette, Sun, Target, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -9,14 +9,18 @@ import { useHousehold } from '@/features/household/hooks'
 import { usePush } from '@/features/push/hooks'
 import { LANGUAGES } from '@/shared/i18n'
 import type { Language } from '@/shared/i18n'
-import { useTheme } from '@/shared/theme'
-import type { ThemeChoice } from '@/shared/theme'
+import { usePalette, useTheme } from '@/shared/theme'
+import type { PaletteChoice, ThemeChoice } from '@/shared/theme'
 import styles from './UserMenu.module.css'
 
 const themes: { value: ThemeChoice; key: string; icon: LucideIcon }[] = [
   { value: 'system', key: 'themeSystem', icon: Monitor },
   { value: 'light', key: 'themeLight', icon: Sun },
   { value: 'dark', key: 'themeDark', icon: Moon },
+]
+const palettes: { value: PaletteChoice; key: string }[] = [
+  { value: 'blue', key: 'paletteBlue' },
+  { value: 'orange', key: 'paletteOrange' },
 ]
 const languageNames: Record<Language, string> = { 'pt-BR': 'Português', en: 'English' }
 
@@ -25,6 +29,7 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const { t, i18n } = useTranslation()
   const me = useMe().data
   const [theme, setTheme] = useTheme()
+  const [palette, setPalette] = usePalette()
   const logout = useLogout()
   const navigate = useNavigate()
   const push = usePush()
@@ -78,6 +83,21 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
               {themes.map(({ value, key, icon: Icon }) => (
                 <Menu.RadioItem key={value} value={value} className={styles.item}>
                   <Icon className={styles.icon} aria-hidden="true" />
+                  {t(`settings.${key}`)}
+                  <Menu.ItemIndicator className={styles.check} aria-hidden="true" />
+                </Menu.RadioItem>
+              ))}
+            </Menu.RadioGroup>
+          </Menu.Group>
+
+          <Menu.Separator className={styles.separator} />
+
+          <Menu.Group>
+            <Menu.Label className={styles.label}>{t('settings.palette')}</Menu.Label>
+            <Menu.RadioGroup value={palette} onValueChange={(v) => setPalette(v as PaletteChoice)}>
+              {palettes.map(({ value, key }) => (
+                <Menu.RadioItem key={value} value={value} className={styles.item}>
+                  <Palette className={styles.icon} aria-hidden="true" />
                   {t(`settings.${key}`)}
                   <Menu.ItemIndicator className={styles.check} aria-hidden="true" />
                 </Menu.RadioItem>

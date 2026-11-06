@@ -102,7 +102,7 @@
   /* o trilho é o campo de laranja; o conteúdo é uma folha com o canto de dentro arredondado */
   .shell {
     padding-bottom: 0;
-    background: var(--color-accent);
+    background: var(--color-hero);
   }
 
   .top {
@@ -113,7 +113,7 @@
     width: var(--rail-w);
     padding: var(--space-6) var(--space-5) 0;
     background: transparent;
-    color: var(--color-on-accent);
+    color: var(--color-on-hero);
   }
 
   .brandMobile {
@@ -123,6 +123,15 @@
   .brandRail {
     display: block;
     height: 2.5rem;
+  }
+
+  /* na paleta laranja o trilho é laranja: a logo troca para a versão escura/creme */
+  :global(:root[data-palette='orange']) .brandRail {
+    --logo-ink: #15171b;
+    --logo-a: #15171b;
+    --logo-b: #fff6ee;
+    --logo-face-a: #fff6ee;
+    --logo-face-b: #15171b;
   }
 
   .main {
@@ -141,7 +150,7 @@
     flex-direction: column;
     padding: 5rem var(--space-4) var(--space-4);
     background: transparent;
-    color: var(--color-on-accent);
+    color: var(--color-on-hero);
     border-top: 0;
   }
 
@@ -166,8 +175,8 @@
     display: grid;
     margin-top: auto;
     place-items: stretch;
-    --avatar-bg: var(--color-on-accent);
-    --avatar-fg: var(--color-on-dark);
+    --avatar-bg: var(--color-cta);
+    --avatar-fg: var(--color-on-cta);
   }
 
   .link {
@@ -177,7 +186,7 @@
     height: var(--tap);
     padding: 0 var(--space-4);
     border-radius: var(--radius-pill);
-    color: var(--color-on-accent);
+    color: var(--color-on-hero);
     font-size: var(--text-md);
     text-align: left;
   }
@@ -187,12 +196,12 @@
   }
 
   .link:hover:not([aria-disabled='true']) {
-    background: rgb(21 23 27 / 0.12);
+    background: var(--color-hero-hover);
   }
 
   .link:global(.active) {
-    background: var(--color-on-accent);
-    color: var(--color-on-dark);
+    background: var(--color-cta);
+    color: var(--color-on-cta);
     box-shadow: none;
   }
 

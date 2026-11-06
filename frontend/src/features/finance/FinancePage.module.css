@@ -12,8 +12,8 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-hero);
+  color: var(--color-on-hero);
   border-radius: var(--radius-l);
 }
 
@@ -28,15 +28,15 @@
   flex: none;
   width: var(--tap);
   height: var(--tap);
-  border: 2px solid var(--color-on-accent);
+  border: 2px solid var(--color-on-hero);
   border-radius: var(--radius-pill);
   background: transparent;
-  color: var(--color-on-accent);
+  color: var(--color-on-hero);
 }
 
 .gear[aria-pressed='true'] {
-  background: var(--color-on-accent);
-  color: var(--color-on-dark);
+  background: var(--color-cta);
+  color: var(--color-on-cta);
 }
 
 @media (min-width: 48rem) {

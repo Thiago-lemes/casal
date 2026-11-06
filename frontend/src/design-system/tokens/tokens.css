@@ -47,6 +47,9 @@
   --c-orange-press: #d9560c;
   --c-orange-text: #b8430a; /* laranja que passa AA como texto sobre o fundo claro */
   --c-orange-wash: #fde7d8;
+  --c-hero: #12204a; /* campo grande das páginas e trilho: azul-tinta da logo */
+  --c-blue: #2747c9;
+  --c-on-blue: #ffffff;
   --c-person-a: #2459d9;
   --c-person-b: #0b7a5e;
   --c-danger: #b42318;
@@ -67,6 +70,9 @@
     --c-orange-press: #ffa066;
     --c-orange-text: #ff9d5c;
     --c-orange-wash: #40322a;
+    --c-hero: #1b2a5c;
+    --c-blue: #6d8bff;
+    --c-on-blue: #0d1330;
     --c-person-a: #7aa2ff;
     --c-person-b: #3fcb9e;
     --c-danger: #ff8f85;
@@ -87,6 +93,9 @@
   --c-orange-press: #ffa066;
   --c-orange-text: #ff9d5c;
   --c-orange-wash: #40322a;
+  --c-hero: #1b2a5c;
+  --c-blue: #6d8bff;
+  --c-on-blue: #0d1330;
   --c-person-a: #7aa2ff;
   --c-person-b: #3fcb9e;
   --c-danger: #ff8f85;
@@ -108,6 +117,15 @@
   --color-accent-press: var(--c-orange-press);
   --color-accent-text: var(--c-orange-text);
   --color-accent-wash: var(--c-orange-wash);
+  --color-hero: var(--c-hero);
+  --color-on-hero: #f1f2f4;
+  --color-cta: var(--c-orange);
+  --color-on-cta: var(--color-on-accent);
+  --color-cta-hover: var(--color-accent-press);
+  --color-hero-hover: rgb(255 255 255 / 0.12);
+  --color-link: var(--color-signal);
+  --color-signal: var(--c-blue);
+  --color-on-signal: var(--c-on-blue);
   /* texto sobre laranja é sempre tinta escura, nos dois temas */
   --color-on-accent: #15171b;
   --color-on-dark: #f1f2f4; /* texto sobre tinta escura fixa, nos dois temas */
@@ -117,6 +135,19 @@
   --color-person-a: var(--c-person-a);
   --color-person-b: var(--c-person-b);
   --color-on-person: var(--c-on-person);
+}
+
+/* paleta laranja (opcional, escolhida no menu): campos grandes em laranja, ações em tinta */
+:root[data-palette='orange'] {
+  --color-hero: var(--c-orange);
+  --color-on-hero: #15171b;
+  --color-cta: #15171b;
+  --color-cta-hover: #3a3d44;
+  --color-on-cta: #f1f2f4;
+  --color-hero-hover: rgb(21 23 27 / 0.12);
+  --color-link: var(--color-accent-text);
+  --color-signal: var(--c-orange);
+  --color-on-signal: var(--color-on-accent);
 }
 
 @media (min-width: 48rem) {

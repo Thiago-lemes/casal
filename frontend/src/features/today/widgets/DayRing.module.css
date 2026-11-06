@@ -20,7 +20,7 @@
 }
 
 .value {
-  stroke: var(--color-accent);
+  stroke: var(--color-signal);
   stroke-linecap: round;
   transition: stroke-dashoffset var(--dur-base) var(--ease-out);
 }

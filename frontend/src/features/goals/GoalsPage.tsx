@@ -55,7 +55,7 @@ export function GoalsPage({ ctx, finance }: { ctx: Ctx; finance?: FinanceOptions
           <h1 className={styles.title}>{t('title')}</h1>
         </div>
         {mod.on && (
-          <Button variant="secondary" onClick={() => setCreating(true)}>
+          <Button variant="primary" className={styles.cta} onClick={() => setCreating(true)}>
             {t('new')}
           </Button>
         )}

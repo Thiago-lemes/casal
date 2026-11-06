@@ -21,6 +21,9 @@
     "themeSystem": "Sistema",
     "themeLight": "Claro",
     "themeDark": "Escuro",
+    "palette": "Cor",
+    "paletteBlue": "Azul",
+    "paletteOrange": "Laranja",
     "language": "Idioma",
     "signOut": "Sair da conta"
   },

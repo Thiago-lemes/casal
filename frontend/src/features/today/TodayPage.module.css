@@ -11,8 +11,8 @@
   display: grid;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-hero);
+  color: var(--color-on-hero);
   border-radius: var(--radius-l);
 }
 
@@ -45,8 +45,9 @@
 .day .cta {
   align-self: flex-start;
   border-radius: var(--radius-pill);
-  background: var(--color-on-accent);
-  color: var(--color-on-dark);
+  background: var(--color-cta);
+  --cta-hover-bg: var(--color-cta-hover);
+  color: var(--color-on-cta);
 }
 
 .counts {

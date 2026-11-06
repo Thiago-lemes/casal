@@ -21,6 +21,9 @@
     "themeSystem": "System",
     "themeLight": "Light",
     "themeDark": "Dark",
+    "palette": "Color",
+    "paletteBlue": "Blue",
+    "paletteOrange": "Orange",
     "language": "Language",
     "signOut": "Sign out"
   },

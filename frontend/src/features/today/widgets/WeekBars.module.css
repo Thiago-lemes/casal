@@ -35,7 +35,7 @@
 }
 
 .bar[data-today] {
-  background: var(--color-accent);
+  background: var(--color-signal);
 }
 
 .day {

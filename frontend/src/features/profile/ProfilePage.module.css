@@ -10,15 +10,15 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-hero);
+  color: var(--color-on-hero);
   border-radius: var(--radius-l);
 }
 
 .avatar {
   --avatar-size: 4rem;
-  --avatar-bg: var(--color-on-accent);
-  --avatar-fg: var(--color-on-dark);
+  --avatar-bg: var(--color-cta);
+  --avatar-fg: var(--color-on-cta);
   font-size: var(--text-xl);
 }
 

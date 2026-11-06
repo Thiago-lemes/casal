@@ -1,0 +1,35 @@
+{
+  "title": "First steps",
+  "progress": "{{done}} of {{total}}",
+  "dismiss": "Dismiss",
+  "dismissLabel": "Dismiss the first steps",
+  "done": "Done",
+  "steps": {
+    "city": {
+      "title": "Check your city",
+      "hint": "It sets the time of your reminders and routine.",
+      "action": "Open profile"
+    },
+    "reminder": {
+      "title": "Create your first reminder",
+      "hint": "Leave a note for yourself or for the other person. It arrives as an alert at the set time.",
+      "action": "New reminder"
+    },
+    "invite": {
+      "title": "Invite the other person",
+      "hint": "Until then, the app works just for you. Reminders, tasks and shopping are better together.",
+      "action": "Create invite"
+    },
+    "push": {
+      "title": "Turn on alerts",
+      "hint": "Get reminders at the right time, even with the app closed.",
+      "hintInstall": "On iPhone, alerts only work with the app on the home screen.",
+      "action": "Turn on alerts"
+    },
+    "modules": {
+      "title": "Pick what you'll use most",
+      "hint": "Finance and Goals are optional. You can turn them on and off any time.",
+      "action": "See modules"
+    }
+  }
+}

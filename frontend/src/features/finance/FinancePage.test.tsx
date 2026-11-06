@@ -62,7 +62,7 @@ describe('FinancePage', () => {
     expect(await screen.findByText('Parcela 3/10')).toBeInTheDocument()
     expect(screen.getByText('Acertado')).toBeInTheDocument()
     expect(screen.getByText('Fixo')).toBeInTheDocument()
-    expect(screen.getByText('Compartilhado pelo parceiro')).toBeInTheDocument()
+    expect(screen.getByText('Compartilhado pela outra pessoa')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Ver gasto: Presente' }))
     let dialog = await screen.findByRole('dialog')

@@ -28,7 +28,7 @@
     "by": "de {{name}}",
     "visibility": {
       "private": "Só você",
-      "view": "Seu parceiro lê",
+      "view": "A outra pessoa lê",
       "household": "Do casal"
     }
   },

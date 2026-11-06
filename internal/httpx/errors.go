@@ -49,6 +49,9 @@ func Fail(w http.ResponseWriter, r *http.Request, log *slog.Logger, err error) {
 func logFailure(log *slog.Logger, r *http.Request, err error, level slog.Level) {
 	log.Log(r.Context(), level, "falha ao atender requisição",
 		"err", err, "method", r.Method, "path", r.URL.Path, "request_id", RequestIDFrom(r.Context()))
+	if level >= slog.LevelError {
+		reportServerError(r, err, nil)
+	}
 }
 
 // Bind lê o corpo JSON em dst. Se for inválido, já responde 400 e devolve false.

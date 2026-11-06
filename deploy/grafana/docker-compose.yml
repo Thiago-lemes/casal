@@ -1,0 +1,27 @@
+# Grafana só para o desenvolvimento local, lendo as views do schema `ops` com o papel `casal_ops`.
+# Suba com: make grafana-up   (abre em http://localhost:3000, sem login; só escuta em 127.0.0.1)
+services:
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: casal-grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      # local e preso ao 127.0.0.1: entra direto como administrador, sem tela de login
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      # a fonte de dados lê estas duas variáveis (provisioning/datasources)
+      OPS_DB_PASSWORD: ${OPS_DB_PASSWORD:?defina OPS_DB_PASSWORD no .env (veja .env.example)}
+      DB_NAME: ${DB_NAME:-casal}
+    # o banco do compose da raiz publica a 5432 no host; daqui se chega a ele por este nome
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  grafana-data:

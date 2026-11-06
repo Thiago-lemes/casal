@@ -14,7 +14,7 @@ Esta spec cobre a parte **operacional** da Fase 5 do produto ("abrir para 5 a 10
 | 2 | Finanças | Spec em [spec-fase-2-financas.md](spec-fase-2-financas.md) |
 | 3 | Metas | Spec em [spec-fase-3-metas.md](spec-fase-3-metas.md) |
 | 4 | Marmita | Spec em [spec-fase-4-marmita.md](spec-fase-4-marmita.md) |
-| **5** | **Abrir para outros casais: operação (esta spec); planos pagos (fora)** | **Esta spec** |
+| **5** | **Abrir para outros casais: operação (esta spec); planos pagos (fora)** | **Esta spec; O1 a O5 implementadas (ver [operacao.md](operacao.md))** |
 
 **Saída desta spec:** quem opera (o casal criador) consegue responder, sem abrir o banco à mão, a três perguntas: o app está funcionando? Os casais de teste estão usando e voltando? A pessoa que reclamou do aviso tem algum problema na conta?
 

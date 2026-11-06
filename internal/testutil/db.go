@@ -128,3 +128,22 @@ func SystemStrings(t *testing.T, conn *sql.DB, query string, args ...any) []stri
 	}
 	return out
 }
+
+// OpenOpsDB conecta como casal_ops (o papel do Grafana, que só lê as views do schema ops). Pula o teste sem
+// TEST_OPS_URL; o make test-integration sempre define.
+func OpenOpsDB(t *testing.T) *sql.DB {
+	t.Helper()
+	url := os.Getenv("TEST_OPS_URL")
+	if url == "" {
+		t.Skip("defina TEST_OPS_URL (papel casal_ops) para rodar os testes do papel de agregados")
+	}
+	conn, err := sql.Open("pgx", url)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { conn.Close() })
+	if err := conn.Ping(); err != nil {
+		t.Fatalf("banco de teste indisponível para casal_ops: %v", err)
+	}
+	return conn
+}

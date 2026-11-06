@@ -303,7 +303,7 @@ describe('estados e edição a dois', () => {
     await userEvent.type(within(dialog).getByLabelText('Título'), ' hoje')
     await userEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }))
 
-    expect(await within(dialog).findByText(/Seu par mudou esta meta antes de você/)).toBeInTheDocument()
+    expect(await within(dialog).findByText(/A outra pessoa mudou esta meta antes de você/)).toBeInTheDocument()
     expect(server.sent('PUT', '/v1/goals/g1')).toHaveLength(1)
     expect(server.sent('PUT', '/v1/goals/g1')[0].body).toMatchObject({ version: 1 })
 

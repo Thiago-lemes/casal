@@ -31,7 +31,7 @@
   "visibility": {
     "legend": "Quem vê",
     "private": "Só eu",
-    "view": "Meu parceiro pode ver"
+    "view": "A outra pessoa pode ver"
   },
   "month": {
     "previous": "Mês anterior",
@@ -112,22 +112,22 @@
     "more": "Ver mais",
     "emptyTitle": "Nenhum gasto neste mês",
     "emptyBody": "Registre o primeiro gasto do mês. Ele entra no saldo e no resumo na hora.",
-    "emptyMine": "Você ainda não registrou gastos pessoais neste mês. Só você os vê, a menos que escolha mostrar ao parceiro."
+    "emptyMine": "Você ainda não registrou gastos pessoais neste mês. Só você os vê, a menos que escolha mostrar à outra pessoa."
   },
   "row": {
     "open": "Ver gasto: {{title}}",
     "paidBy": "pago por {{name}}",
     "installment": "Parcela {{no}}/{{total}}",
     "settled": "Acertado",
-    "sharedByPartner": "Compartilhado pelo parceiro",
-    "visibleToPartner": "Parceiro vê"
+    "sharedByPartner": "Compartilhado pela outra pessoa",
+    "visibleToPartner": "A outra pessoa vê"
   },
   "detail": {
     "edit": "Editar",
     "delete": "Apagar",
     "confirmDelete": "Apagar este gasto? Não tem como desfazer.",
     "makePrivate": "Deixar só para mim",
-    "sharePartner": "Mostrar ao parceiro",
+    "sharePartner": "Mostrar à outra pessoa",
     "wholePurchase": "Ver a compra inteira",
     "settledHint": "Este gasto já entrou num acerto e não muda mais. Para corrigir, registre um gasto de ajuste."
   },
@@ -138,8 +138,14 @@
     "editHint": "Vale só para as parcelas abertas. Para mudar o valor ou o número de parcelas, apague a compra e registre de novo.",
     "keepSplit": "Manter a divisão",
     "delete": "Apagar compra",
-    "confirmDelete": "Apagar as {{open}} parcelas abertas? As {{settled}} já acertadas ficam.",
-    "deleted": "{{deleted}} parcelas apagadas. {{remaining}} já acertadas ficaram."
+    "confirmDelete_one": "Apagar a parcela aberta?",
+    "confirmDelete_other": "Apagar as {{count}} parcelas abertas?",
+    "confirmKept_one": "A parcela já acertada fica.",
+    "confirmKept_other": "As {{count}} já acertadas ficam.",
+    "deleted_one": "Parcela apagada.",
+    "deleted_other": "{{count}} parcelas apagadas.",
+    "remaining_one": "{{count}} parcela já acertada ficou.",
+    "remaining_other": "{{count}} parcelas já acertadas ficaram."
   },
   "balance": {
     "title": "Saldo",
@@ -154,7 +160,7 @@
     "expenses": "O que compõe o saldo",
     "singleTitle": "O acerto precisa de duas pessoas",
     "singleBody": "Você já pode registrar gastos. Quando a outra pessoa entrar no casal, o saldo aparece aqui.",
-    "invite": "Convidar parceiro"
+    "invite": "Convidar a outra pessoa"
   },
   "settle": {
     "title": "Acertar contas",
@@ -201,7 +207,7 @@
     "label": "Renda mensal (opcional)",
     "save": "Salvar renda",
     "remove": "Apagar minha renda",
-    "notifyPartner": "A divisão está proporcional à renda. Se você mudar ou apagar a renda, seu parceiro será avisado (sem ver valores) e a divisão pode voltar para igual."
+    "notifyPartner": "A divisão está proporcional à renda. Se você mudar ou apagar a renda, a outra pessoa será avisada (sem ver valores) e a divisão pode voltar para igual."
   },
   "categories": {
     "title": "Categorias",
@@ -284,7 +290,7 @@
   "summary": {
     "total": "Gastos do casal no mês",
     "totalMine": "Meus gastos pessoais no mês",
-    "mineHint": "Só os seus gastos pessoais. Os do parceiro não entram, nem os que ele deixou à vista.",
+    "mineHint": "Só os seus gastos pessoais. Os da outra pessoa não entram, nem os que foram deixados à vista.",
     "same": "Igual a {{month}}.",
     "more": "{{amount}} a mais que em {{month}} ({{percent}}%).",
     "moreNoPercent": "{{amount}} a mais que em {{month}}.",
@@ -297,7 +303,7 @@
     "paidBy": "Quanto cada um pagou",
     "byCard": "Nos seus cartões",
     "withoutCard": "Sem cartão",
-    "byCardHint": "Só os seus cartões aparecem. O que o parceiro pagou no cartão dele não entra aqui.",
+    "byCardHint": "Só os seus cartões aparecem. Os cartões da outra pessoa não entram aqui.",
     "usedOfLimit": "{{percent}}% do limite de {{limit}}",
     "nearLimit": "perto do limite",
     "overLimit": "limite ultrapassado"

@@ -16,6 +16,15 @@ type Config struct {
 	VAPIDPublicKey  string
 	VAPIDPrivateKey string
 	VAPIDSubject    string
+
+	// observabilidade (tudo opcional; sem valor, o recurso fica desligado)
+	SentryDSN    string // relatório de erros sem conteúdo (Sentry ou GlitchTip)
+	Environment  string // nome do ambiente nos relatórios (beta, producao...)
+	Release      string // versão do app nos relatórios
+	MetricsAddr  string // endereço interno separado para o /metrics (ex.: 127.0.0.1:9090)
+	AdminEnabled bool   // liga o painel de suporte em /admin/v1 (desligado por padrão: sem isso, 404)
+	SignupMode   string // "open" (padrão) ou "invite": o cadastro exige um código do beta
+	MetricsToken string // se definido, o /metrics também sai na porta principal, com Bearer
 }
 
 func Load() (Config, error) {
@@ -25,6 +34,15 @@ func Load() (Config, error) {
 		VAPIDPublicKey:  os.Getenv("VAPID_PUBLIC_KEY"),
 		VAPIDPrivateKey: os.Getenv("VAPID_PRIVATE_KEY"),
 		VAPIDSubject:    getenv("VAPID_SUBJECT", "mailto:voce@exemplo.com"),
+		SentryDSN:       os.Getenv("SENTRY_DSN"),
+		Environment:     getenv("APP_ENV", "beta"),
+		Release:         os.Getenv("APP_RELEASE"),
+		MetricsAddr:     os.Getenv("METRICS_ADDR"),
+		MetricsToken:    os.Getenv("METRICS_TOKEN"),
+		SignupMode:      getenv("SIGNUP_MODE", "open"),
+	}
+	if cfg.SignupMode != "open" && cfg.SignupMode != "invite" {
+		return Config{}, fmt.Errorf("SIGNUP_MODE inválida: use open ou invite")
 	}
 	if cfg.DatabaseURL == "" {
 		return Config{}, fmt.Errorf("DATABASE_URL é obrigatória")
@@ -36,6 +54,9 @@ func Load() (Config, error) {
 		return Config{}, err
 	}
 	if cfg.TrustProxy, err = parseBool("TRUST_PROXY", false); err != nil {
+		return Config{}, err
+	}
+	if cfg.AdminEnabled, err = parseBool("ADMIN_ENABLED", false); err != nil {
 		return Config{}, err
 	}
 

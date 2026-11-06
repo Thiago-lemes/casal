@@ -4,8 +4,10 @@ import './design-system/tokens/global.css'
 import './shared/i18n'
 import { initTheme } from './shared/theme'
 import { App } from './app/App'
+import { initErrorReporting } from './shared/errors/report'
 
 initTheme()
+void initErrorReporting()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

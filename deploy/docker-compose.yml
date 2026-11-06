@@ -7,6 +7,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
       APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      OPS_DB_PASSWORD: ${OPS_DB_PASSWORD}
     volumes:
       - casal-data:/var/lib/postgresql/data
       - ./db-init.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
@@ -39,6 +40,12 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:voce@exemplo.com}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      APP_ENV: beta
+      APP_RELEASE: ${APP_RELEASE:-}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      SIGNUP_MODE: ${SIGNUP_MODE:-invite}
+      ADMIN_ENABLED: ${ADMIN_ENABLED:-false}
 
   web:
     build: { context: .., dockerfile: deploy/Dockerfile.web }

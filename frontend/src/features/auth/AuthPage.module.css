@@ -55,3 +55,9 @@
     padding: var(--space-7);
   }
 }
+
+/* a promessa de privacidade fica à vista antes de criar a conta */
+.privacy {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}

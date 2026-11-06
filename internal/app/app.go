@@ -9,18 +9,22 @@ import (
 	"net/http"
 	"time"
 
+	"casal/internal/admin"
 	"casal/internal/auth"
 	"casal/internal/config"
+	"casal/internal/feedback"
 	"casal/internal/finance"
 	"casal/internal/goal"
 	"casal/internal/household"
 	"casal/internal/httpx"
 	"casal/internal/module"
 	"casal/internal/note"
+	"casal/internal/ops"
 	"casal/internal/push"
 	"casal/internal/reminder"
 	"casal/internal/routine"
 	"casal/internal/shopping"
+	"casal/internal/signup"
 	"casal/internal/task"
 )
 
@@ -29,7 +33,19 @@ type Job func(ctx context.Context)
 
 // New liga as features e devolve o handler HTTP e os jobs. Não abre portas nem inicia nada.
 func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job, error) {
+	obs, err := newObservability(cfg, conn, log)
+	if err != nil {
+		return nil, nil, err
+	}
+	if obs.reporter != nil {
+		httpx.OnServerError(obs.reporter.Hook())
+	}
+
 	mux := http.NewServeMux()
+	// com METRICS_TOKEN, o /metrics também sai na porta principal, exigindo o token; sem ele, só no METRICS_ADDR
+	if cfg.MetricsToken != "" {
+		mux.Handle("GET /metrics", ops.RequireBearer(cfg.MetricsToken, obs.reg.Handler()))
+	}
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := conn.PingContext(r.Context()); err != nil {
 			httpx.Error(w, http.StatusServiceUnavailable, "banco indisponível")
@@ -43,16 +59,25 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	if err != nil {
 		return nil, nil, err
 	}
+	events := ops.NewEvents(conn, log)
+	authSvc.OnEvent(events.Record)
+	signupSvc := signup.NewService(conn)
+	if cfg.SignupMode == "invite" {
+		authSvc.RequireSignupCode(signupSvc)
+		log.Info("cadastro por convite ligado (SIGNUP_MODE=invite)")
+	}
 	auth.NewHandler(authSvc, log, auth.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
 	requireUser := auth.Require(authSvc)
 
 	// casal e convite
 	householdSvc := household.NewService(household.NewPostgresRepo(conn))
+	householdSvc.OnEvent(events.Record)
 	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
 	requireHousehold := household.RequireHousehold(householdSvc, log)
 
 	// módulos opcionais do casal; as features de cada módulo usam module.Require(moduleSvc, log, nome) nas rotas
 	moduleSvc := module.NewService(module.NewPostgresRepo(conn))
+	moduleSvc.OnEvent(events.Record)
 	module.NewHandler(moduleSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// push, com o notificador de log como alternativa quando o VAPID não está configurado
@@ -63,6 +88,8 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 			push.NewWebPushSender(cfg.VAPIDSubject, cfg.VAPIDPublicKey, cfg.VAPIDPrivateKey),
 			log,
 		)
+		pushSvc.Observe(obs.observePush)
+		pushSvc.OnEvent(events.Record)
 		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
 		notifier = pushSvc
 	} else {
@@ -71,7 +98,9 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 
 	// lembretes
 	reminderRepo := reminder.NewPostgresRepo(conn)
+	obs.watchQueue(reminderRepo, log)
 	reminderSvc := reminder.NewService(reminderRepo, householdSvc, notifier, log)
+	reminderSvc.OnEvent(events.Record)
 	reminder.NewHandler(reminderSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// tarefas
@@ -116,6 +145,34 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 		}
 	})
 
+	// feedback: o casal só escreve; quem lê é o painel de suporte
+	feedbackSvc := feedback.NewService(conn)
+	feedbackSvc.OnEvent(events.Record)
+	feedback.NewHandler(feedbackSvc, log).Routes(mux, requireUser, requireHousehold)
+
+	// painel de suporte: ligado só com ADMIN_ENABLED=true; sem isso, tudo em /admin/v1 responde 404
+	adminCleanup := func(context.Context) (int64, error) { return 0, nil }
+	if cfg.AdminEnabled {
+		adminSvc, err := admin.NewService(admin.NewPostgresRepo(conn), admin.Deps{
+			Directory:   adminDirectory{ops.NewInspector(conn)},
+			Modules:     adminModules{moduleSvc},
+			Users:       authSvc,
+			SignupCodes: adminCodes{signupSvc},
+			Feedback:    adminFeedback{feedbackSvc},
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		admin.NewHandler(adminSvc, log, admin.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
+		adminCleanup = adminSvc.PurgeExpired
+		log.Warn("painel de suporte ligado (ADMIN_ENABLED=true)")
+	} else {
+		// um padrão por método: "/admin/v1/" sem método conflitaria com o "GET /" da página de teste
+		for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
+			mux.Handle(method+" /admin/v1/", admin.Disabled())
+		}
+	}
+
 	// mudança de casal: cada feature leva o que é pessoal e passa adiante o que era compartilhado,
 	// na mesma transação. Registrados aqui, antes de atender qualquer requisição.
 	householdSvc.OnLeave(noteRepo.HandleLeave)
@@ -133,18 +190,25 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
 
-	handler := httpx.Chain(mux,
+	reminderWorker := reminder.NewWorker(reminderRepo, obs.meter(notifier), log)
+	reminderWorker.OnTick(func() { obs.lastTick.SetNow() })
+
+	handler := httpx.Chain(obs.http.Wrap(mux),
 		httpx.RequestID(), // o mais externo: todo log abaixo carrega o ID
+		httpx.RouteHolder(),
 		httpx.Recover(log),
 		httpx.Logging(log),
 		httpx.SecurityHeaders(cfg.CookieSecure), // CookieSecure indica que o site é servido por HTTPS
 		httpx.Timeout(15*time.Second),
 	)
 	jobs := []Job{
-		reminder.NewWorker(reminderRepo, notifier, log).Run,
-		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
-		maintenance(log, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
-		maintenance(log, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
+		reminderWorker.Run,
+		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought, events.Purge, adminCleanup),
+		maintenance(log, "financas", obs.markMaintenance, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
+		maintenance(log, "metas", obs.markMaintenance, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
+	}
+	if cfg.MetricsAddr != "" {
+		jobs = append(jobs, obs.metricsJob(cfg.MetricsAddr, cfg.MetricsToken, log))
 	}
 	return handler, jobs, nil
 }

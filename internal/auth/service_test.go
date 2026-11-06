@@ -246,6 +246,49 @@ func (f *fakeRepo) UpdateProfile(_ context.Context, userID, name, timezone strin
 	return User{}, ErrNotFound
 }
 
+func (f *fakeRepo) SetBlocked(_ context.Context, userID string, at *time.Time) error {
+	for email, u := range f.users {
+		if u.ID == userID {
+			u.BlockedAt = at
+			f.users[email] = u
+			return nil
+		}
+	}
+	return ErrNotFound
+}
+
+// Bloquear derruba as sessões abertas e o login passa a responder account_blocked, mas só para quem acerta a senha.
+func TestBloqueioDerrubaSessoesEImpedeLogin(t *testing.T) {
+	ctx := context.Background()
+	svc := newTestService(t)
+	u, session, err := svc.Register(ctx, "ana@exemplo.com", "Ana", "senha-forte-123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := svc.SetBlocked(ctx, u.ID, true); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := svc.UserFromToken(ctx, session); err == nil {
+		t.Error("a sessão antiga deveria cair com o bloqueio")
+	}
+	if _, _, err := svc.Login(ctx, "ana@exemplo.com", "senha-forte-123"); !errors.Is(err, ErrAccountBlocked) {
+		t.Errorf("senha certa em conta bloqueada: esperava ErrAccountBlocked, veio %v", err)
+	}
+	if _, _, err := svc.Login(ctx, "ana@exemplo.com", "errada"); !errors.Is(err, ErrInvalidCredentials) {
+		t.Errorf("senha errada não pode revelar o bloqueio, veio %v", err)
+	}
+
+	if err := svc.SetBlocked(ctx, u.ID, false); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := svc.Login(ctx, "ana@exemplo.com", "senha-forte-123"); err != nil {
+		t.Errorf("depois do desbloqueio o login deve voltar: %v", err)
+	}
+	if err := svc.SetBlocked(ctx, "u-que-nao-existe", true); !errors.Is(err, ErrNotFound) {
+		t.Errorf("pessoa inexistente: %v", err)
+	}
+}
+
 func TestUpdateProfile(t *testing.T) {
 	svc := newTestService(t)
 	ctx := context.Background()

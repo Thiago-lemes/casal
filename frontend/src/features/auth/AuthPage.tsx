@@ -5,7 +5,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { Button, Logo, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
 import { APP_NAME } from '@/shared/config'
-import { useLogin, useMe, useRegister } from './hooks'
+import { useLogin, useMe, useRegister, useSignupMode } from './hooks'
 import styles from './AuthPage.module.css'
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
@@ -14,9 +14,11 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const me = useMe()
   const login = useLogin()
   const register = useRegister()
+  const inviteOnly = useSignupMode().data?.signup_mode === 'invite'
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
+  const [signupCode, setSignupCode] = useState('')
 
   if (me.data) return <Navigate to="/" replace />
 
@@ -25,7 +27,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   function submit(e: FormEvent) {
     e.preventDefault()
     if (mode === 'login') login.mutate({ email, password })
-    else register.mutate({ email, name, password })
+    else register.mutate({ email, name, password, signupCode: inviteOnly ? signupCode.trim() : undefined })
   }
 
   return (
@@ -62,6 +64,18 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
           minLength={mode === 'register' ? 10 : undefined}
           required
         />
+        {mode === 'register' && inviteOnly && (
+          <TextField
+            label={t('fields.signupCode')}
+            hint={t('fields.signupCodeHint')}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            value={signupCode}
+            onChange={(e) => setSignupCode(e.target.value)}
+            required
+          />
+        )}
         {action.isError && (
           <p className={styles.error} role="alert">
             {errorMessage(tc, action.error)}
@@ -70,6 +84,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         <Button type="submit" variant="primary" loading={action.isPending}>
           {t(`${mode}.submit`)}
         </Button>
+        {mode === 'register' && <p className={styles.privacy}>{t('register.privacy')}</p>}
         <p className={styles.switch}>
           {t(`${mode}.switch`)} <Link to={mode === 'login' ? '/register' : '/login'}>{t(`${mode}.switchAction`)}</Link>
         </p>

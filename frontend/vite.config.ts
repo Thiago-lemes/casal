@@ -11,7 +11,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     // mesma origem em desenvolvimento: o cookie de sessão funciona sem CORS
-    proxy: { '/v1': 'http://localhost:8080', '/healthz': 'http://localhost:8080' },
+    proxy: { '/v1': 'http://localhost:8080', '/admin/v1': 'http://localhost:8080', '/healthz': 'http://localhost:8080' },
   },
   plugins: [
     react(),

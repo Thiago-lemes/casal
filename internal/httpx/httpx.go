@@ -53,6 +53,7 @@ func Recover(log *slog.Logger) Middleware {
 			defer func() {
 				if rec := recover(); rec != nil {
 					log.Error("panic", "err", rec, "path", r.URL.Path, "request_id", RequestIDFrom(r.Context()))
+					reportServerError(r, nil, rec)
 					Error(w, http.StatusInternalServerError, "erro interno")
 				}
 			}()

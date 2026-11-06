@@ -1,10 +1,12 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, Monitor, Moon, Palette, Sun, Target, UserRound } from 'lucide-react'
+import { Bell, BellOff, BellRing, CalendarClock, Globe, LogOut, MessageSquareText, Monitor, Moon, Palette, Sun, Target, UserRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar } from '@/design-system'
 import { useLogout, useMe } from '@/features/auth/hooks'
+import { FeedbackDialog } from '@/features/feedback/FeedbackDialog'
 import { useHousehold } from '@/features/household/hooks'
 import { usePush } from '@/features/push/hooks'
 import { LANGUAGES } from '@/shared/i18n'
@@ -36,10 +38,12 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
   const household = useHousehold().data
   const { t: tp } = useTranslation('push')
   const current: Language = i18n.language.startsWith('en') ? 'en' : 'pt-BR'
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   if (!me) return null
 
   return (
+    <>
     <Menu.Root>
       <Menu.Trigger className={styles.trigger} aria-label={t('userMenu.label', { name: me.name })}>
         <Avatar name={me.name} />
@@ -156,6 +160,13 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
 
           <Menu.Separator className={styles.separator} />
 
+          {household && (
+            <Menu.Item className={styles.item} onSelect={() => setFeedbackOpen(true)}>
+              <MessageSquareText className={styles.icon} aria-hidden="true" />
+              {t('userMenu.feedback')}
+            </Menu.Item>
+          )}
+
           <Menu.Item className={styles.item} onSelect={() => logout.mutate()}>
             <LogOut className={styles.icon} aria-hidden="true" />
             {t('settings.signOut')}
@@ -163,5 +174,7 @@ export function UserMenu({ side = 'top' }: { side?: 'top' | 'bottom' }) {
         </Menu.Content>
       </Menu.Portal>
     </Menu.Root>
+    <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+    </>
   )
 }

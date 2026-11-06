@@ -23,9 +23,15 @@ internal/
   finance/           gastos, divisão e acerto de contas, renda, gastos fixos, contas a pagar, orçamento
   goal/              metas: financeira, hábito, do casal e projeto (progresso calculado no servidor, privacidade entre os parceiros)
   push/              Web Push (assinaturas e envio)
+  ops/               observabilidade do beta: /metrics (Prometheus), relatório de erros sem conteúdo, eventos de produto e metadados para o painel
+  admin/             painel de suporte (/admin/v1): contas separadas, 2FA, sessão própria, ações e auditoria
+  signup/            códigos de cadastro do beta (SIGNUP_MODE=invite)
+  feedback/          mensagens que as pessoas escrevem para o time (o casal só escreve; o painel lê)
 
   apperr/            classifica erros de negócio (inválido, não achou, conflito...) sem HTTP
   identity/          "quem está chamando": Principal{UserID, HouseholdID} no contexto
+  event/             nomes dos eventos de produto e a função que os registra (as features emitem, o ops guarda)
+  password/          hash de senha (PBKDF2), usado por auth e admin
   token/             gera e faz hash de tokens (sessão, convite)
   httpx/             utilidades HTTP: JSON, Fail, Bind, middlewares, rate limit, headers
   db/                abrir o pool, transação com escopo de casal (RLS), erro de chave duplicada
@@ -195,6 +201,17 @@ Módulo opcional (`goals`), com a mesma base de módulos de Finanças. Quatro ti
 `forbidden`, `not_found`, `conflict`, `upstream`, `internal`) ou um específico, declarado com
 `apperr.NewCoded(kind, "note_conflict", msg)`. O cliente traduz pelo `code` e nunca mostra a frase.
 Use código próprio quando a tela precisa agir diferente (por exemplo, recarregar ao receber `note_conflict`).
+
+## Operação do beta
+
+Detalhes de uso em [operacao.md](operacao.md). Pontos de arquitetura:
+
+- **Sem conteúdo.** Métricas, eventos, relatório de erros e views do Grafana nunca levam texto digitado pelas pessoas. Rótulos de métrica são só rota (padrão), status e resultado; `product_events` não tem coluna de texto; o evento enviado ao Sentry leva rota, tipo do erro, pilha, `request_id` e `user_id`. Há teste com texto reconhecível para cada um.
+- **O painel não lê tabelas de negócio.** O `admin` declara interfaces (`Directory`, `Modules`, `Users`, `SignupCodes`, `Feedback`) e o `app` as liga (`adapters_admin.go`). Os metadados vêm do `ops.Inspector` (só `count(*)`, no escopo de sistema); módulo e bloqueio passam pelos serviços de domínio.
+- **Papel `casal_ops`** só enxerga views do schema `ops` (agregados, com células de menos de 3 viram nulas). As views pertencem ao dono do banco, que ignora o RLS: por isso nenhuma tabela pode usar `FORCE ROW LEVEL SECURITY`.
+- **Bloqueio de conta** (`users.blocked_at`) é checado no login e em toda requisição autenticada; bloquear derruba as sessões e não apaga nada.
+- **Sessão do painel** é outra tabela, outro cookie (`admin_session`, `Path=/admin`, `SameSite=Strict`) e outro middleware; o TOTP guarda o último passo aceito para o código não valer duas vezes.
+- **Auditoria** (`admin_audit`) é somente inserção para o `casal_app`.
 
 ## Agendador de lembretes
 

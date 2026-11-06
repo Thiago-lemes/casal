@@ -1,0 +1,198 @@
+{
+  "uid": "zoog-beta",
+  "title": "Zoog · beta",
+  "tags": [
+    "zoog"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5m",
+  "time": {
+    "from": "now-90d",
+    "to": "now"
+  },
+  "description": "Só agregados (schema ops). Célula com menos de 3 casais ou pessoas vem vazia de propósito.",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Cadastros por dia",
+      "type": "barchart",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT day::timestamp AS time, signups AS \"Cadastros\", households_created AS \"Casais criados\", partners_joined AS \"Parceiros que entraram\" FROM ops.daily_activation ORDER BY day"
+        }
+      ],
+      "options": {
+        "xField": "time",
+        "xTickLabelRotation": 0
+      }
+    },
+    {
+      "id": 2,
+      "title": "Ativos por semana",
+      "type": "timeseries",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT week::timestamp AS time, active_people AS \"Pessoas\", active_households AS \"Casais\" FROM ops.weekly_active ORDER BY week"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Casais com cada módulo ligado",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT module AS \"Módulo\", households AS \"Casais\" FROM ops.module_adoption ORDER BY module"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Casais com aviso ativo",
+      "type": "stat",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 8,
+        "w": 6,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT households_with_push AS \"Com aviso\", households AS \"Casais\" FROM ops.push_coverage"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Uso por módulo e semana",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 14,
+        "y": 8,
+        "w": 10,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT week AS \"Semana\", module AS \"Módulo\", households AS \"Casais\" FROM ops.module_usage ORDER BY week DESC, module"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Retenção por coorte semanal",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "zoog-ops"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 15,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "postgres",
+            "uid": "zoog-ops"
+          },
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code",
+          "rawSql": "SELECT cohort_week AS \"Coorte\", weeks_since_signup AS \"Semanas depois\", active_people AS \"Ativas\", cohort_size AS \"Na coorte\" FROM ops.retention ORDER BY cohort_week DESC, weeks_since_signup"
+        }
+      ]
+    }
+  ]
+}

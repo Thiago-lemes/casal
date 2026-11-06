@@ -11,6 +11,8 @@ import (
 	_ "time/tzdata" // fusos embutidos: não dependem do sistema (no Windows e em contêineres mínimos faltam)
 	"unicode/utf8"
 
+	"casal/internal/event"
+	pw "casal/internal/password"
 	"casal/internal/token"
 )
 
@@ -20,10 +22,27 @@ type Service struct {
 	now        func() time.Time
 	dummyHash  string        // usado para gastar o mesmo tempo quando o e-mail não existe
 	hashSlots  chan struct{} // limita quantos hashes de senha rodam ao mesmo tempo
+	events     event.Func
+	gate       SignupGate // nulo = cadastro aberto
 }
 
+// SignupGate controla quem pode criar conta (modo invite do beta). Consume reserva um uso do código; ok=false quando
+// o código não vale (a causa não é revelada) e release devolve o uso se o cadastro falhar depois.
+type SignupGate interface {
+	Consume(ctx context.Context, code string) (release func(context.Context), ok bool, err error)
+}
+
+// RequireSignupCode liga o modo por convite: sem um código válido ninguém cria conta. Chame na montagem do app.
+func (s *Service) RequireSignupCode(g SignupGate) { s.gate = g }
+
+// InviteOnly diz se o cadastro exige código (o front mostra o campo).
+func (s *Service) InviteOnly() bool { return s.gate != nil }
+
+// OnEvent registra quem guarda os eventos de produto (cadastro). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
+
 func NewService(repo Repository, sessionTTL time.Duration) (*Service, error) {
-	dummy, err := HashPassword("senha-que-nunca-sera-usada")
+	dummy, err := pw.Hash("senha-que-nunca-sera-usada")
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +53,11 @@ func NewService(repo Repository, sessionTTL time.Duration) (*Service, error) {
 
 // Register cria a conta e já abre uma sessão. Devolve o token bruto para o cookie.
 func (s *Service) Register(ctx context.Context, email, name, password string) (User, string, error) {
+	return s.RegisterWithCode(ctx, email, name, password, "")
+}
+
+// RegisterWithCode é o Register com o código de cadastro do beta; em modo aberto o código é ignorado.
+func (s *Service) RegisterWithCode(ctx context.Context, email, name, password, signupCode string) (User, string, error) {
 	email = strings.ToLower(strings.TrimSpace(email))
 	name = strings.TrimSpace(name)
 	if addr, err := mail.ParseAddress(email); err != nil || addr.Address != email {
@@ -50,11 +74,27 @@ func (s *Service) Register(ctx context.Context, email, name, password string) (U
 	if err != nil {
 		return User{}, "", err
 	}
+	// o código só é gasto depois de os dados serem válidos e a senha, calculada; se a criação falhar, o uso volta
+	release := func(context.Context) {}
+	if s.gate != nil {
+		rel, ok, err := s.gate.Consume(ctx, signupCode)
+		if err != nil {
+			return User{}, "", err
+		}
+		if !ok {
+			return User{}, "", ErrSignupCodeInvalid
+		}
+		release = rel
+	}
 	u, err := s.repo.CreateUser(ctx, email, name, hash)
 	if err != nil {
+		release(context.WithoutCancel(ctx))
 		return User{}, "", err
 	}
 	session, err := s.openSession(ctx, u.ID)
+	if err == nil {
+		s.events.Emit(ctx, event.UserRegistered, u.ID, "")
+	}
 	return u, session, err
 }
 
@@ -74,6 +114,10 @@ func (s *Service) Login(ctx context.Context, email, password string) (User, stri
 	}
 	if !ok {
 		return User{}, "", ErrInvalidCredentials
+	}
+	// só depois da senha certa: quem erra a senha não descobre se a conta existe nem se está bloqueada
+	if u.BlockedAt != nil {
+		return User{}, "", ErrAccountBlocked
 	}
 	session, err := s.openSession(ctx, u.ID)
 	return u, session, err
@@ -116,7 +160,7 @@ func (s *Service) hashPassword(ctx context.Context, password string) (string, er
 		return "", err
 	}
 	defer release()
-	return HashPassword(password)
+	return pw.Hash(password)
 }
 
 func (s *Service) verifyPassword(ctx context.Context, password, hash string) (bool, error) {
@@ -125,7 +169,24 @@ func (s *Service) verifyPassword(ctx context.Context, password, hash string) (bo
 		return false, err
 	}
 	defer release()
-	return VerifyPassword(password, hash), nil
+	return pw.Verify(password, hash), nil
+}
+
+// SetBlocked bloqueia ou desbloqueia a conta. Bloquear derruba todas as sessões (e UserBySession já recusa
+// qualquer uma que sobrar); nenhum dado é apagado. É o que o painel de suporte usa.
+func (s *Service) SetBlocked(ctx context.Context, userID string, blocked bool) error {
+	var at *time.Time
+	if blocked {
+		now := s.now()
+		at = &now
+	}
+	if err := s.repo.SetBlocked(ctx, userID, at); err != nil {
+		return err
+	}
+	if blocked {
+		return s.repo.DeleteUserSessions(ctx, userID)
+	}
+	return nil
 }
 
 // LogoutAll encerra as sessões da pessoa em todos os aparelhos.

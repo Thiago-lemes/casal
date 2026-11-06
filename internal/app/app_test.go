@@ -82,8 +82,13 @@ func (c *client) register(name string) string {
 
 func startApp(t *testing.T) (*httptest.Server, []Job) {
 	t.Helper()
+	return startAppWith(t, config.Config{SessionTTL: time.Hour})
+}
+
+func startAppWith(t *testing.T, cfg config.Config) (*httptest.Server, []Job) {
+	t.Helper()
 	conn := testutil.OpenDB(t)
-	handler, jobs, err := New(config.Config{SessionTTL: time.Hour}, conn, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	handler, jobs, err := New(cfg, conn, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
 		t.Fatal(err)
 	}

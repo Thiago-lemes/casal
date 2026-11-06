@@ -138,8 +138,14 @@
     "editHint": "Applies only to open installments. To change the amount or the number of installments, delete the purchase and log it again.",
     "keepSplit": "Keep the split",
     "delete": "Delete purchase",
-    "confirmDelete": "Delete the {{open}} open installments? The {{settled}} already settled stay.",
-    "deleted": "{{deleted}} installments deleted. {{remaining}} already settled stayed."
+    "confirmDelete_one": "Delete the open installment?",
+    "confirmDelete_other": "Delete the {{count}} open installments?",
+    "confirmKept_one": "The settled installment stays.",
+    "confirmKept_other": "The {{count}} already settled stay.",
+    "deleted_one": "Installment deleted.",
+    "deleted_other": "{{count}} installments deleted.",
+    "remaining_one": "{{count}} settled installment stayed.",
+    "remaining_other": "{{count}} settled installments stayed."
   },
   "balance": {
     "title": "Balance",

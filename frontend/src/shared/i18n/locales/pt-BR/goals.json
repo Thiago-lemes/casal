@@ -3,7 +3,7 @@
   "new": "Nova meta",
   "back": "← Metas",
   "loadError": "Não deu para carregar as metas",
-  "sharedSection": "Compartilhadas pelo seu par",
+  "sharedSection": "Compartilhadas pela outra pessoa",
   "tabs": {
     "household": "Do casal",
     "mine": "Minhas"
@@ -34,7 +34,7 @@
     "household": "Do casal"
   },
   "scopeHint": {
-    "personal": "Só você marca e edita. Seu par só vê se você deixar.",
+    "personal": "Só você marca e edita. A outra pessoa só vê se você deixar.",
     "household": "Os dois acompanham e editam."
   },
   "scopeLine": {
@@ -51,7 +51,7 @@
     "due": "Prazo: {{date}}",
     "readyToComplete": "Pronta para concluir",
     "sharedBy": "Compartilhada por {{name}}",
-    "partner": "seu par",
+    "partner": "alguém",
     "viewOnly": "{{name}} compartilhou esta meta com você. Você vê o título, o prazo e o progresso."
   },
   "progress": {
@@ -150,9 +150,9 @@
   "visibility": {
     "legend": "Quem pode ver",
     "private": "Só eu",
-    "view": "Meu par pode ver o progresso",
+    "view": "A outra pessoa pode ver o progresso",
     "privateHint": "Ninguém mais vê esta meta.",
-    "viewHint": "Seu par vê o título, o prazo e o progresso. Notas, aportes, marcações e etapas continuam só seus."
+    "viewHint": "A outra pessoa vê o título, o prazo e o progresso. Notas, aportes, marcações e etapas continuam só seus."
   },
   "actions": {
     "edit": "Editar",
@@ -178,7 +178,7 @@
   "edit": {
     "title": "Editar meta",
     "save": "Salvar",
-    "conflict": "Seu par mudou esta meta antes de você. Carregamos a versão atual: confira e salve de novo.",
+    "conflict": "A outra pessoa mudou esta meta antes de você. Carregamos a versão atual: confira e salve de novo.",
     "loadNew": "Ver a versão atual"
   },
   "delete": {

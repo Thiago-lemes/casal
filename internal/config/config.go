@@ -16,6 +16,13 @@ type Config struct {
 	VAPIDPublicKey  string
 	VAPIDPrivateKey string
 	VAPIDSubject    string
+
+	// observabilidade (tudo opcional; sem valor, o recurso fica desligado)
+	SentryDSN    string // relatório de erros sem conteúdo (Sentry ou GlitchTip)
+	Environment  string // nome do ambiente nos relatórios (beta, producao...)
+	Release      string // versão do app nos relatórios
+	MetricsAddr  string // endereço interno separado para o /metrics (ex.: 127.0.0.1:9090)
+	MetricsToken string // se definido, o /metrics também sai na porta principal, com Bearer
 }
 
 func Load() (Config, error) {
@@ -25,6 +32,11 @@ func Load() (Config, error) {
 		VAPIDPublicKey:  os.Getenv("VAPID_PUBLIC_KEY"),
 		VAPIDPrivateKey: os.Getenv("VAPID_PRIVATE_KEY"),
 		VAPIDSubject:    getenv("VAPID_SUBJECT", "mailto:voce@exemplo.com"),
+		SentryDSN:       os.Getenv("SENTRY_DSN"),
+		Environment:     getenv("APP_ENV", "beta"),
+		Release:         os.Getenv("APP_RELEASE"),
+		MetricsAddr:     os.Getenv("METRICS_ADDR"),
+		MetricsToken:    os.Getenv("METRICS_TOKEN"),
 	}
 	if cfg.DatabaseURL == "" {
 		return Config{}, fmt.Errorf("DATABASE_URL é obrigatória")

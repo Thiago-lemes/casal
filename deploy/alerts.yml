@@ -1,0 +1,38 @@
+# Regras de alerta (formato Prometheus / Grafana Alerting). Os nomes das métricas vêm do /metrics da API.
+# "App fora do ar" não está aqui: é o monitor externo em /healthz (UptimeRobot, Better Stack...), 2 falhas seguidas.
+groups:
+  - name: casal
+    rules:
+      - alert: AgendadorParado
+        expr: time() - reminder_worker_last_tick_timestamp > 120
+        labels: { severity: critical }
+        annotations:
+          summary: O agendador de lembretes não completa um ciclo há mais de 2 minutos
+
+      - alert: LembretesAtrasados
+        expr: reminder_queue_due > 0
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: Há lembretes que passaram da hora há mais de 1 minuto e seguem sem sair
+
+      - alert: PushRecusado
+        expr: increase(push_send_total{status="403"}[10m]) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: O serviço de push respondeu 403 (chave VAPID trocada ou assinatura inválida)
+
+      - alert: TaxaDeErro5xx
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[10m]))
+            / sum(rate(http_requests_total[10m])) > 0.02
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: Mais de 2% das respostas são 5xx há 10 minutos
+
+      - alert: ManutencaoParada
+        expr: time() - maintenance_last_success_timestamp > 7200
+        labels: { severity: warning }
+        annotations:
+          summary: 'Um job de manutenção (recorrentes, reconciliações) não conclui há mais de 2 horas'

@@ -31,18 +31,25 @@ type Worker struct {
 	interval time.Duration
 	batch    int
 	now      func() time.Time
+	onTick   func()
 }
 
 func NewWorker(queue Queue, notifier Notifier, log *slog.Logger) *Worker {
 	return &Worker{queue: queue, notifier: notifier, log: log, interval: 15 * time.Second, batch: 50, now: time.Now}
 }
 
+// OnTick registra uma função chamada ao fim de cada ciclo que conseguiu falar com o banco. Serve de prova de vida
+// para as métricas: se ela para de ser chamada, o agendador parou ou o banco caiu.
+func (w *Worker) OnTick(f func()) { w.onTick = f }
+
 // Run bloqueia até o contexto ser cancelado. Rode com: go worker.Run(ctx)
 func (w *Worker) Run(ctx context.Context) {
 	ticker := time.NewTicker(w.interval)
 	defer ticker.Stop()
 	for {
-		w.tick(ctx)
+		if w.tick(ctx) && w.onTick != nil {
+			w.onTick()
+		}
 		select {
 		case <-ctx.Done():
 			return
@@ -51,20 +58,22 @@ func (w *Worker) Run(ctx context.Context) {
 	}
 }
 
-func (w *Worker) tick(ctx context.Context) {
+// tick esvazia a fila de vencidos; devolve false se não conseguiu reservar (banco fora, por exemplo).
+func (w *Worker) tick(ctx context.Context) bool {
 	for ctx.Err() == nil {
 		due, err := w.queue.Claim(ctx, w.now(), w.batch, claimLease)
 		if err != nil {
 			w.log.Error("falha ao reservar lembretes", "err", err)
-			return
+			return false
 		}
 		for _, r := range due {
 			w.deliver(ctx, r)
 		}
 		if len(due) < w.batch {
-			return // não há mais vencidos agora
+			return true // não há mais vencidos agora
 		}
 	}
+	return false
 }
 
 // deliver avisa a pessoa fora de qualquer transação. Se o aviso falhar, o lembrete

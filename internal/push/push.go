@@ -37,10 +37,15 @@ type Repository interface {
 }
 
 type Service struct {
-	repo   Repository
-	sender Sender
-	log    *slog.Logger
+	repo     Repository
+	sender   Sender
+	log      *slog.Logger
+	observer func(status int, host string, err error)
 }
+
+// Observe registra uma função chamada a cada envio a um aparelho (status HTTP do serviço de push, host e erro de
+// rede). Alimenta as métricas; recebe só o host, nunca o endereço completo do aparelho.
+func (s *Service) Observe(f func(status int, host string, err error)) { s.observer = f }
 
 func NewService(repo Repository, sender Sender, log *slog.Logger) *Service {
 	return &Service{repo: repo, sender: sender, log: log}
@@ -75,6 +80,9 @@ func (s *Service) Notify(ctx context.Context, userID, title, body string) error 
 	var firstErr error
 	for _, sub := range subs {
 		status, err := s.sender.Send(ctx, sub, payload)
+		if s.observer != nil {
+			s.observer(status, hostOf(sub.Endpoint), err)
+		}
 		switch {
 		case status == 404 || status == 410:
 			// o aparelho cancelou ou a assinatura expirou: apague para não tentar de novo

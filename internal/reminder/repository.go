@@ -289,3 +289,15 @@ func (p *PostgresRepo) HandleJoin(ctx context.Context, tx *sql.Tx, h db.Handoff)
 		WHERE created_by = $1 AND recipient_id = $1 AND household_id <> $2 AND ref IS NULL`, h.UserID, h.To)
 	return err
 }
+
+// CountOverdue conta os lembretes agendados que já deviam ter saído há mais de grace. Com o agendador sadio o
+// resultado é zero; diferente disso por minutos é fila travada. Não lê conteúdo, só conta (escopo de sistema).
+func (p *PostgresRepo) CountOverdue(ctx context.Context, now time.Time, grace time.Duration) (int, error) {
+	var n int
+	err := db.InTx(ctx, p.db, db.Scope{System: true}, func(tx *sql.Tx) error {
+		return tx.QueryRowContext(ctx,
+			`SELECT count(*) FROM reminders WHERE status = 'scheduled' AND remind_at <= $1`,
+			now.Add(-grace)).Scan(&n)
+	})
+	return n, err
+}

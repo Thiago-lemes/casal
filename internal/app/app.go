@@ -17,6 +17,7 @@ import (
 	"casal/internal/httpx"
 	"casal/internal/module"
 	"casal/internal/note"
+	"casal/internal/ops"
 	"casal/internal/push"
 	"casal/internal/reminder"
 	"casal/internal/routine"
@@ -29,7 +30,19 @@ type Job func(ctx context.Context)
 
 // New liga as features e devolve o handler HTTP e os jobs. Não abre portas nem inicia nada.
 func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job, error) {
+	obs, err := newObservability(cfg, conn, log)
+	if err != nil {
+		return nil, nil, err
+	}
+	if obs.reporter != nil {
+		httpx.OnServerError(obs.reporter.Hook())
+	}
+
 	mux := http.NewServeMux()
+	// com METRICS_TOKEN, o /metrics também sai na porta principal, exigindo o token; sem ele, só no METRICS_ADDR
+	if cfg.MetricsToken != "" {
+		mux.Handle("GET /metrics", ops.RequireBearer(cfg.MetricsToken, obs.reg.Handler()))
+	}
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := conn.PingContext(r.Context()); err != nil {
 			httpx.Error(w, http.StatusServiceUnavailable, "banco indisponível")
@@ -63,6 +76,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 			push.NewWebPushSender(cfg.VAPIDSubject, cfg.VAPIDPublicKey, cfg.VAPIDPrivateKey),
 			log,
 		)
+		pushSvc.Observe(obs.observePush)
 		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
 		notifier = pushSvc
 	} else {
@@ -71,6 +85,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 
 	// lembretes
 	reminderRepo := reminder.NewPostgresRepo(conn)
+	obs.watchQueue(reminderRepo, log)
 	reminderSvc := reminder.NewService(reminderRepo, householdSvc, notifier, log)
 	reminder.NewHandler(reminderSvc, log).Routes(mux, requireUser, requireHousehold)
 
@@ -133,18 +148,25 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	// página de teste do PWA
 	mux.Handle("GET /", http.FileServer(http.Dir("web")))
 
-	handler := httpx.Chain(mux,
+	reminderWorker := reminder.NewWorker(reminderRepo, obs.meter(notifier), log)
+	reminderWorker.OnTick(func() { obs.lastTick.SetNow() })
+
+	handler := httpx.Chain(obs.http.Wrap(mux),
 		httpx.RequestID(), // o mais externo: todo log abaixo carrega o ID
+		httpx.RouteHolder(),
 		httpx.Recover(log),
 		httpx.Logging(log),
 		httpx.SecurityHeaders(cfg.CookieSecure), // CookieSecure indica que o site é servido por HTTPS
 		httpx.Timeout(15*time.Second),
 	)
 	jobs := []Job{
-		reminder.NewWorker(reminderRepo, notifier, log).Run,
-		maintenance(log, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
-		maintenance(log, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
-		maintenance(log, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
+		reminderWorker.Run,
+		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
+		maintenance(log, "financas", obs.markMaintenance, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
+		maintenance(log, "metas", obs.markMaintenance, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
+	}
+	if cfg.MetricsAddr != "" {
+		jobs = append(jobs, obs.metricsJob(cfg.MetricsAddr, cfg.MetricsToken, log))
 	}
 	return handler, jobs, nil
 }

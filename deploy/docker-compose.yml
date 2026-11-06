@@ -39,6 +39,10 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:voce@exemplo.com}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      APP_ENV: beta
+      APP_RELEASE: ${APP_RELEASE:-}
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
 
   web:
     build: { context: .., dockerfile: deploy/Dockerfile.web }

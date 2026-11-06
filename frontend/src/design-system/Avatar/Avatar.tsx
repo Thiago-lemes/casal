@@ -1,8 +1,8 @@
 import styles from './Avatar.module.css'
 
 /** Círculo com as iniciais. Sem foto por enquanto; a foto opcional do produto entra aqui depois. */
-export function Avatar({ name, className }: { name: string; className?: string }) {
-  const initials = name
+export function Avatar({ name, className }: { name?: string | null; className?: string }) {
+  const initials = (name ?? '')
     .trim()
     .split(/\s+/)
     .slice(0, 2)

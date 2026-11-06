@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    volumes:
+      - casal-data:/var/lib/postgresql/data
+      - ./db-init.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build: { context: .., dockerfile: deploy/Dockerfile.api }
+    image: casal-api
+    depends_on: { db: { condition: service_healthy } }
+    restart: "no"
+    entrypoint: ["goose", "-dir", "/migrations", "postgres",
+      "postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable", "up"]
+
+  api:
+    image: casal-api
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    environment:
+      DATABASE_URL: postgres://casal_app:${APP_DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+      HTTP_ADDR: ":8080"
+      COOKIE_SECURE: "true"
+      TRUST_PROXY: "true"
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-720}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:voce@exemplo.com}
+
+  web:
+    build: { context: .., dockerfile: deploy/Dockerfile.web }
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy-data:/data
+
+volumes:
+  casal-data:
+  caddy-data:

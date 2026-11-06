@@ -66,3 +66,33 @@ func TestUltimoUsoDaSessaoUmaVezPorHora(t *testing.T) {
 		t.Error("sessão vencida não deveria autenticar")
 	}
 }
+
+// A checagem de bloqueio vale a cada requisição, independente de as sessões terem sido apagadas: uma sessão que
+// sobrar (corrida entre o bloqueio e uma requisição em andamento) não autentica conta bloqueada.
+func TestSessaoDeContaBloqueadaNaoAutentica(t *testing.T) {
+	conn := testutil.OpenDB(t)
+	repo := NewPostgresRepo(conn)
+	ctx := context.Background()
+	userID := testutil.NewUser(t, conn, "bloqueio-repo")
+	hash := "hash-bloqueio-" + userID
+	if err := repo.CreateSession(ctx, userID, hash, time.Now().Add(time.Hour)); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.UserBySession(ctx, hash, time.Now()); err != nil {
+		t.Fatalf("antes do bloqueio a sessão vale: %v", err)
+	}
+
+	now := time.Now()
+	if err := repo.SetBlocked(ctx, userID, &now); err != nil { // bloqueia SEM apagar a sessão
+		t.Fatal(err)
+	}
+	if _, err := repo.UserBySession(ctx, hash, time.Now()); err == nil {
+		t.Fatal("a sessão de uma conta bloqueada não pode autenticar")
+	}
+	if err := repo.SetBlocked(ctx, userID, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := repo.UserBySession(ctx, hash, time.Now()); err != nil {
+		t.Errorf("desbloqueada, a sessão volta a valer: %v", err)
+	}
+}

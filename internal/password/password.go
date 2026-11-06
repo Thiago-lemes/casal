@@ -1,4 +1,6 @@
-package auth
+// Package password calcula e confere o hash de senha (PBKDF2-SHA256). É neutro: o auth (contas dos casais) e o admin
+// (contas de administração) usam o mesmo código sem se importarem.
+package password
 
 import (
 	"crypto/pbkdf2"
@@ -19,8 +21,8 @@ const (
 
 var b64 = base64.RawStdEncoding
 
-// HashPassword devolve "pbkdf2-sha256$iterações$salt$chave".
-func HashPassword(password string) (string, error) {
+// Hash devolve "pbkdf2-sha256$iterações$salt$chave".
+func Hash(password string) (string, error) {
 	salt := make([]byte, saltLen)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
@@ -32,7 +34,7 @@ func HashPassword(password string) (string, error) {
 	return fmt.Sprintf("pbkdf2-sha256$%d$%s$%s", pbkdf2Iterations, b64.EncodeToString(salt), b64.EncodeToString(key)), nil
 }
 
-func VerifyPassword(password, encoded string) bool {
+func Verify(password, encoded string) bool {
 	parts := strings.Split(encoded, "$")
 	if len(parts) != 4 || parts[0] != "pbkdf2-sha256" {
 		return false

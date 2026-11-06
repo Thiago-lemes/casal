@@ -27,6 +27,9 @@ func TestLoadDefaultsAreSafe(t *testing.T) {
 	if cfg.TrustProxy {
 		t.Error("TRUST_PROXY deveria ser false por padrão")
 	}
+	if cfg.AdminEnabled {
+		t.Error("o painel de suporte deve vir desligado por padrão")
+	}
 	if cfg.SessionTTL != 720*time.Hour || cfg.HTTPAddr != ":8080" {
 		t.Errorf("padrões inesperados: %+v", cfg)
 	}
@@ -48,7 +51,7 @@ func TestLoadReadsOverrides(t *testing.T) {
 
 func TestLoadRejectsInvalidValues(t *testing.T) {
 	t.Setenv("DATABASE_URL", "postgres://x")
-	for key, bad := range map[string]string{"COOKIE_SECURE": "talvez", "TRUST_PROXY": "2", "SESSION_TTL_HOURS": "0", "SIGNUP_MODE": "fechado"} {
+	for key, bad := range map[string]string{"COOKIE_SECURE": "talvez", "TRUST_PROXY": "2", "ADMIN_ENABLED": "sim", "SESSION_TTL_HOURS": "0", "SIGNUP_MODE": "fechado"} {
 		t.Run(key, func(t *testing.T) {
 			t.Setenv(key, bad)
 			if _, err := Load(); err == nil {

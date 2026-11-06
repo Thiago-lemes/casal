@@ -12,6 +12,7 @@ import (
 	"unicode/utf8"
 
 	"casal/internal/event"
+	pw "casal/internal/password"
 	"casal/internal/token"
 )
 
@@ -41,7 +42,7 @@ func (s *Service) InviteOnly() bool { return s.gate != nil }
 func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 func NewService(repo Repository, sessionTTL time.Duration) (*Service, error) {
-	dummy, err := HashPassword("senha-que-nunca-sera-usada")
+	dummy, err := pw.Hash("senha-que-nunca-sera-usada")
 	if err != nil {
 		return nil, err
 	}
@@ -114,6 +115,10 @@ func (s *Service) Login(ctx context.Context, email, password string) (User, stri
 	if !ok {
 		return User{}, "", ErrInvalidCredentials
 	}
+	// só depois da senha certa: quem erra a senha não descobre se a conta existe nem se está bloqueada
+	if u.BlockedAt != nil {
+		return User{}, "", ErrAccountBlocked
+	}
 	session, err := s.openSession(ctx, u.ID)
 	return u, session, err
 }
@@ -155,7 +160,7 @@ func (s *Service) hashPassword(ctx context.Context, password string) (string, er
 		return "", err
 	}
 	defer release()
-	return HashPassword(password)
+	return pw.Hash(password)
 }
 
 func (s *Service) verifyPassword(ctx context.Context, password, hash string) (bool, error) {
@@ -164,7 +169,24 @@ func (s *Service) verifyPassword(ctx context.Context, password, hash string) (bo
 		return false, err
 	}
 	defer release()
-	return VerifyPassword(password, hash), nil
+	return pw.Verify(password, hash), nil
+}
+
+// SetBlocked bloqueia ou desbloqueia a conta. Bloquear derruba todas as sessões (e UserBySession já recusa
+// qualquer uma que sobrar); nenhum dado é apagado. É o que o painel de suporte usa.
+func (s *Service) SetBlocked(ctx context.Context, userID string, blocked bool) error {
+	var at *time.Time
+	if blocked {
+		now := s.now()
+		at = &now
+	}
+	if err := s.repo.SetBlocked(ctx, userID, at); err != nil {
+		return err
+	}
+	if blocked {
+		return s.repo.DeleteUserSessions(ctx, userID)
+	}
+	return nil
 }
 
 // LogoutAll encerra as sessões da pessoa em todos os aparelhos.

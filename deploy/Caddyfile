@@ -2,7 +2,7 @@
 	encode gzip
 
 	# a API: mesma origem do frontend, então o cookie de sessão não precisa de CORS
-	@api path /v1/* /healthz
+	@api path /v1/* /healthz /admin/v1/*
 	reverse_proxy @api api:8080
 
 	# o service worker nunca pode ficar em cache, senão as atualizações do PWA não chegam

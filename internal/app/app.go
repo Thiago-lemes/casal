@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"casal/internal/admin"
 	"casal/internal/auth"
 	"casal/internal/config"
 	"casal/internal/finance"
@@ -143,6 +144,28 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 		}
 	})
 
+	// painel de suporte: ligado só com ADMIN_ENABLED=true; sem isso, tudo em /admin/v1 responde 404
+	adminCleanup := func(context.Context) (int64, error) { return 0, nil }
+	if cfg.AdminEnabled {
+		adminSvc, err := admin.NewService(admin.NewPostgresRepo(conn), admin.Deps{
+			Directory:   adminDirectory{ops.NewInspector(conn)},
+			Modules:     adminModules{moduleSvc},
+			Users:       authSvc,
+			SignupCodes: adminCodes{signupSvc},
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+		admin.NewHandler(adminSvc, log, admin.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
+		adminCleanup = adminSvc.PurgeExpired
+		log.Warn("painel de suporte ligado (ADMIN_ENABLED=true)")
+	} else {
+		// um padrão por método: "/admin/v1/" sem método conflitaria com o "GET /" da página de teste
+		for _, method := range []string{"GET", "POST", "PUT", "PATCH", "DELETE"} {
+			mux.Handle(method+" /admin/v1/", admin.Disabled())
+		}
+	}
+
 	// mudança de casal: cada feature leva o que é pessoal e passa adiante o que era compartilhado,
 	// na mesma transação. Registrados aqui, antes de atender qualquer requisição.
 	householdSvc.OnLeave(noteRepo.HandleLeave)
@@ -173,7 +196,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	)
 	jobs := []Job{
 		reminderWorker.Run,
-		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought, events.Purge),
+		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought, events.Purge, adminCleanup),
 		maintenance(log, "financas", obs.markMaintenance, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
 		maintenance(log, "metas", obs.markMaintenance, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
 	}

@@ -15,11 +15,14 @@ type User struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Timezone string `json:"timezone"`
+	// BlockedAt só é preenchido na busca por e-mail (o login); quem tem sessão aberta nunca está bloqueado
+	BlockedAt *time.Time `json:"-"`
 }
 
 var (
 	ErrEmailTaken         = apperr.NewCoded(apperr.Conflict, "email_taken", "e-mail já cadastrado")
 	ErrNotFound           = apperr.New(apperr.NotFound, "não encontrado")
+	ErrAccountBlocked     = apperr.NewCoded(apperr.Forbidden, "account_blocked", "conta bloqueada")
 	ErrInvalidCredentials = apperr.NewCoded(apperr.Unauthorized, "invalid_credentials", "e-mail ou senha inválidos")
 	ErrInvalidInput       = apperr.New(apperr.Invalid, "dados inválidos")
 	// ErrSignupCodeInvalid cobre código ausente, errado, vencido, revogado ou esgotado: a resposta não diz qual.
@@ -36,6 +39,8 @@ type Repository interface {
 	DeleteUserSessions(ctx context.Context, userID string) error
 	DeleteExpiredSessions(ctx context.Context, now time.Time) (int64, error)
 	UpdateProfile(ctx context.Context, userID, name, timezone string) (User, error)
+	// SetBlocked bloqueia (at != nil) ou desbloqueia (at == nil) a conta. Não apaga dado nenhum.
+	SetBlocked(ctx context.Context, userID string, at *time.Time) error
 }
 
 type PostgresRepo struct{ db *sql.DB }
@@ -60,9 +65,9 @@ func (r *PostgresRepo) UserByEmail(ctx context.Context, email string) (User, str
 	var u User
 	var hash string
 	err := r.db.QueryRowContext(ctx, `
-		SELECT id, email, name, timezone, password_hash
+		SELECT id, email, name, timezone, password_hash, blocked_at
 		FROM users WHERE lower(email) = lower($1)`, email).
-		Scan(&u.ID, &u.Email, &u.Name, &u.Timezone, &hash)
+		Scan(&u.ID, &u.Email, &u.Name, &u.Timezone, &hash, &u.BlockedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return User{}, "", ErrNotFound
 	}
@@ -82,7 +87,8 @@ func (r *PostgresRepo) UserBySession(ctx context.Context, tokenHash string, now 
 	// da pessoa (base das métricas de ativos e retenção). Nas demais requisições o UPDATE não toca em nada.
 	err := r.db.QueryRowContext(ctx, `
 		WITH s AS (
-			SELECT id, user_id FROM sessions WHERE token_hash = $1 AND expires_at > $2
+			SELECT s.id, s.user_id FROM sessions s JOIN users b ON b.id = s.user_id
+			WHERE s.token_hash = $1 AND s.expires_at > $2 AND b.blocked_at IS NULL  -- conta bloqueada: a sessão antiga não vale
 		), touched AS (
 			UPDATE sessions SET last_used_at = $2
 			WHERE id IN (SELECT id FROM s) AND (last_used_at IS NULL OR last_used_at < $2 - interval '1 hour')
@@ -104,6 +110,17 @@ func (r *PostgresRepo) UserBySession(ctx context.Context, tokenHash string, now 
 func (r *PostgresRepo) DeleteSession(ctx context.Context, tokenHash string) error {
 	_, err := r.db.ExecContext(ctx, `DELETE FROM sessions WHERE token_hash = $1`, tokenHash)
 	return err
+}
+
+func (r *PostgresRepo) SetBlocked(ctx context.Context, userID string, at *time.Time) error {
+	res, err := r.db.ExecContext(ctx, `UPDATE users SET blocked_at = $2 WHERE id = $1`, userID, at)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // DeleteUserSessions encerra todas as sessões da pessoa (todos os aparelhos).

@@ -45,6 +45,7 @@ services:
       APP_RELEASE: ${APP_RELEASE:-}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
       SIGNUP_MODE: ${SIGNUP_MODE:-invite}
+      ADMIN_ENABLED: ${ADMIN_ENABLED:-false}
 
   web:
     build: { context: .., dockerfile: deploy/Dockerfile.web }

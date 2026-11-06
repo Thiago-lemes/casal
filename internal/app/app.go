@@ -12,6 +12,7 @@ import (
 	"casal/internal/admin"
 	"casal/internal/auth"
 	"casal/internal/config"
+	"casal/internal/feedback"
 	"casal/internal/finance"
 	"casal/internal/goal"
 	"casal/internal/household"
@@ -144,6 +145,11 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 		}
 	})
 
+	// feedback: o casal só escreve; quem lê é o painel de suporte
+	feedbackSvc := feedback.NewService(conn)
+	feedbackSvc.OnEvent(events.Record)
+	feedback.NewHandler(feedbackSvc, log).Routes(mux, requireUser, requireHousehold)
+
 	// painel de suporte: ligado só com ADMIN_ENABLED=true; sem isso, tudo em /admin/v1 responde 404
 	adminCleanup := func(context.Context) (int64, error) { return 0, nil }
 	if cfg.AdminEnabled {
@@ -152,6 +158,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 			Modules:     adminModules{moduleSvc},
 			Users:       authSvc,
 			SignupCodes: adminCodes{signupSvc},
+			Feedback:    adminFeedback{feedbackSvc},
 		})
 		if err != nil {
 			return nil, nil, err

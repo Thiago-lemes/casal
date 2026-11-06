@@ -489,3 +489,71 @@ func TestAuditoriaSoAceitaInsercao(t *testing.T) {
 		}
 	}
 }
+
+// A mensagem escrita no app chega ao painel; é a única exceção ao "nunca ver conteúdo", e só vive na tabela de feedback.
+func TestFeedbackDoAppAoPainel(t *testing.T) {
+	const msg = "mensagem-de-teste-feedback: o botão sumiu"
+	conn := testutil.OpenDB(t)
+	cfg := adminConfig()
+	cfg.MetricsToken = "token-feedback"
+	srv, _ := startAppWith(t, cfg)
+
+	ana := newClient(t, srv.URL)
+	anaID := ana.register("fb-ana")
+	// sem casal ainda: 403
+	ana.mustStatus(403, "POST", "/v1/feedback", map[string]string{"message": msg})
+	ana.mustStatus(201, "POST", "/v1/household", nil)
+
+	ana.mustStatus(400, "POST", "/v1/feedback", map[string]string{"message": "   "})
+	ana.mustStatus(400, "POST", "/v1/feedback", map[string]string{"message": "oi", "screen": "tela-inventada"})
+	ana.mustStatus(204, "POST", "/v1/feedback", map[string]string{"message": msg, "screen": "tasks"})
+	// o casal não tem como ler (nem o próprio, nem o dos outros): a rota de leitura não existe
+	if st, _, _, _ := ana.call("GET", "/v1/feedback", nil); st != 404 && st != 405 {
+		t.Errorf("GET /v1/feedback não deveria existir, deu %d", st)
+	}
+
+	adm := loggedInAdmin(t, srv, conn)
+	_, _, raw, _ := adm.do("GET", "/admin/v1/feedback?unread=true", nil, false)
+	var items []struct {
+		ID      string `json:"id"`
+		Author  string `json:"author"`
+		Message string `json:"message"`
+		Screen  string `json:"screen"`
+		ReadAt  any    `json:"read_at"`
+	}
+	_ = json.Unmarshal(raw, &items)
+	var id string
+	for _, it := range items {
+		if it.Message == msg {
+			id = it.ID
+			if it.Author != "fb-ana" || it.Screen != "tasks" || it.ReadAt != nil {
+				t.Errorf("mensagem no painel: %+v", it)
+			}
+		}
+	}
+	if id == "" {
+		t.Fatalf("o painel não achou a mensagem: %s", raw)
+	}
+
+	adm.must(204, "POST", "/admin/v1/feedback/"+id+"/read", nil)
+	_, _, raw, _ = adm.do("GET", "/admin/v1/feedback?unread=true", nil, false)
+	if bytes.Contains(raw, []byte(msg)) {
+		t.Errorf("depois de lida, a mensagem não pode estar nas não lidas: %s", raw)
+	}
+	adm.must(404, "POST", "/admin/v1/feedback/00000000-0000-0000-0000-000000000000/read", nil)
+
+	// a auditoria registra a leitura sem copiar o texto
+	_, _, audit, _ := adm.do("GET", "/admin/v1/audit?limit=500", nil, false)
+	if count(auditActions(t, adm), "feedback_read") != 1 || bytes.Contains(audit, []byte(msg)) {
+		t.Errorf("auditoria do feedback: %v / vazou o texto: %v", auditActions(t, adm), bytes.Contains(audit, []byte(msg)))
+	}
+
+	// o texto não vai para métricas nem para eventos
+	if _, out := scrape(t, srv.URL, "token-feedback"); strings.Contains(out, "mensagem-de-teste") {
+		t.Errorf("o /metrics vazou o feedback:\n%s", out)
+	}
+	names := testutil.SystemStrings(t, conn, `SELECT name FROM product_events WHERE user_id = $1`, anaID)
+	if count(names, "feedback_sent") != 1 {
+		t.Errorf("evento feedback_sent: %v", names)
+	}
+}

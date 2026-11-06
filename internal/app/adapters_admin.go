@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"casal/internal/admin"
+	"casal/internal/feedback"
 	"casal/internal/module"
 	"casal/internal/ops"
 	"casal/internal/signup"
@@ -107,3 +108,26 @@ func (c adminCodes) List(ctx context.Context) ([]admin.SignupCode, error) {
 }
 
 func (c adminCodes) Revoke(ctx context.Context, id string) error { return c.codes.Revoke(ctx, id) }
+
+// adminFeedback entrega ao painel as mensagens que as pessoas escreveram para o time.
+type adminFeedback struct{ fb *feedback.Service }
+
+func (f adminFeedback) List(ctx context.Context, onlyUnread bool) ([]admin.FeedbackItem, error) {
+	list, err := f.fb.List(ctx, onlyUnread)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]admin.FeedbackItem, 0, len(list))
+	for _, it := range list {
+		out = append(out, admin.FeedbackItem(it))
+	}
+	return out, nil
+}
+
+func (f adminFeedback) MarkRead(ctx context.Context, id string) error {
+	err := f.fb.MarkRead(ctx, id)
+	if errors.Is(err, feedback.ErrNotFound) {
+		return admin.ErrNotFound
+	}
+	return err
+}

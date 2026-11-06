@@ -1,0 +1,41 @@
+.screen {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.light {
+  display: block;
+}
+
+.dark {
+  display: none;
+}
+
+/* mesmas regras de tema do tokens.css: data-theme manda; sem ele, vale o sistema */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .light {
+    display: none;
+  }
+
+  :root:not([data-theme='light']) .dark {
+    display: block;
+  }
+}
+
+:root[data-theme='dark'] .light {
+  display: none;
+}
+
+:root[data-theme='dark'] .dark {
+  display: block;
+}

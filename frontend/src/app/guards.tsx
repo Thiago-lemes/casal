@@ -1,15 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { Skeleton } from '@/design-system'
+import { useTranslation } from 'react-i18next'
+import { LoadingScreen } from '@/design-system'
 import { useMe } from '@/features/auth/hooks'
 import { useHousehold } from '@/features/household/hooks'
 import { SetupPage } from '@/features/household/SetupPage'
 
 function Loading() {
-  return (
-    <div style={{ padding: 'var(--space-5)' }}>
-      <Skeleton height="6rem" />
-    </div>
-  )
+  const { t } = useTranslation()
+  return <LoadingScreen label={t('loading')} />
 }
 
 /** Só passa quem tem sessão; sem sessão, vai para o login. */

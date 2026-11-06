@@ -12,9 +12,11 @@ import ptShopping from './locales/pt-BR/shopping.json'
 import ptFinance from './locales/pt-BR/finance.json'
 import ptGoals from './locales/pt-BR/goals.json'
 import ptAdmin from './locales/pt-BR/admin.json'
+import ptOnboarding from './locales/pt-BR/onboarding.json'
 import ptFeedback from './locales/pt-BR/feedback.json'
 import enGoals from './locales/en/goals.json'
 import enAdmin from './locales/en/admin.json'
+import enOnboarding from './locales/en/onboarding.json'
 import enFeedback from './locales/en/feedback.json'
 import enFinance from './locales/en/finance.json'
 import enCommon from './locales/en/common.json'
@@ -30,6 +32,6 @@ import enReminders from './locales/en/reminders.json'
 import enShopping from './locales/en/shopping.json'
 
 export const resources = {
-  'pt-BR': { common: ptCommon, auth: ptAuth, today: ptToday, household: ptHousehold, push: ptPush, tasks: ptTasks, profile: ptProfile, notes: ptNotes, routine: ptRoutine, reminders: ptReminders, shopping: ptShopping, finance: ptFinance, goals: ptGoals, feedback: ptFeedback, admin: ptAdmin },
-  en: { common: enCommon, auth: enAuth, today: enToday, household: enHousehold, push: enPush, tasks: enTasks, profile: enProfile, notes: enNotes, routine: enRoutine, reminders: enReminders, shopping: enShopping, finance: enFinance, goals: enGoals, feedback: enFeedback, admin: enAdmin },
+  'pt-BR': { common: ptCommon, auth: ptAuth, today: ptToday, household: ptHousehold, push: ptPush, tasks: ptTasks, profile: ptProfile, notes: ptNotes, routine: ptRoutine, reminders: ptReminders, shopping: ptShopping, finance: ptFinance, goals: ptGoals, feedback: ptFeedback, onboarding: ptOnboarding, admin: ptAdmin },
+  en: { common: enCommon, auth: enAuth, today: enToday, household: enHousehold, push: enPush, tasks: enTasks, profile: enProfile, notes: enNotes, routine: enRoutine, reminders: enReminders, shopping: enShopping, finance: enFinance, goals: enGoals, feedback: enFeedback, onboarding: enOnboarding, admin: enAdmin },
 } as const

@@ -9,13 +9,13 @@ import { useHousehold } from '@/features/household/hooks'
 import { isPending } from '@/features/reminders/api'
 import { Composer } from '@/features/reminders/Composer'
 import { ReminderLabel } from '@/features/reminders/ReminderLabel'
-import { PushPrompt } from '@/features/push/PushPrompt'
 import { tasksForToday } from '@/features/tasks/today'
 import { useTaskActions, useTasks } from '@/features/tasks/hooks'
 import { useReminderActions, useReminders } from '@/features/reminders/hooks'
 import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
 import { useModuleEnabled } from '@/shared/modules/hooks'
+import { FirstStepsSection } from './FirstStepsSection'
 import { TodayTasks } from './widgets/TodayTasks'
 import { DayRing } from './widgets/DayRing'
 import { MonthCalendar } from './widgets/MonthCalendar'
@@ -54,7 +54,7 @@ export function TodayPage() {
 
   return (
     <>
-      <PushPrompt />
+      <FirstStepsSection meId={me.id} hasPartner={Boolean(partner)} onNewReminder={() => setComposing(true)} />
       <div className={styles.page}>
       <header className={styles.day}>
         <div className={styles.dayTop}>

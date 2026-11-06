@@ -5,10 +5,19 @@
   padding: var(--space-6) var(--space-5);
 }
 
+.hero {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* cada caminho é um bloco com o seu próprio botão */
 .block {
   display: grid;
   justify-items: start;
   gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-card);
+  border-radius: var(--radius-l);
 }
 
 .block > * {

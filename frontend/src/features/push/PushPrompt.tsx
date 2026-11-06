@@ -17,14 +17,14 @@ function wasDismissed() {
   }
 }
 
-/** Convite para ativar os avisos; no iPhone, o passo a passo para instalar o app antes. */
-export function PushPrompt() {
+/** Convite para ativar os avisos; no iPhone, o passo a passo para instalar o app antes. `ready` deixa quem usa escolher o momento. */
+export function PushPrompt({ ready = true }: { ready?: boolean }) {
   const { t } = useTranslation('push')
   const { t: tc } = useTranslation('common')
   const { status, enable } = usePush()
   const [dismissed, setDismissed] = useState(wasDismissed)
 
-  if (dismissed || (status !== 'off' && status !== 'install')) return null
+  if (!ready || dismissed || (status !== 'off' && status !== 'install')) return null
 
   function dismiss() {
     try {

@@ -1,0 +1,35 @@
+{
+  "title": "Primeiros passos",
+  "progress": "{{done}} de {{total}}",
+  "dismiss": "Dispensar",
+  "dismissLabel": "Dispensar os primeiros passos",
+  "done": "Feito",
+  "steps": {
+    "city": {
+      "title": "Confira a sua cidade",
+      "hint": "É ela que define a hora dos lembretes e da rotina.",
+      "action": "Abrir o perfil"
+    },
+    "reminder": {
+      "title": "Crie o primeiro lembrete",
+      "hint": "Deixe um recado para você ou para a outra pessoa. Ele chega como aviso na hora marcada.",
+      "action": "Novo lembrete"
+    },
+    "invite": {
+      "title": "Convide a outra pessoa",
+      "hint": "Até lá, o app funciona só com você. Lembretes, tarefas e compras ficam melhores a dois.",
+      "action": "Gerar convite"
+    },
+    "push": {
+      "title": "Ative os avisos",
+      "hint": "Receba os lembretes na hora certa, mesmo com o app fechado.",
+      "hintInstall": "No iPhone, os avisos só funcionam com o app na tela inicial.",
+      "action": "Ativar avisos"
+    },
+    "modules": {
+      "title": "Escolha o que mais vai usar",
+      "hint": "Finanças e Metas são opcionais. Dá para ligar e desligar quando quiser.",
+      "action": "Ver módulos"
+    }
+  }
+}

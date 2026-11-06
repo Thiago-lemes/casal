@@ -40,6 +40,12 @@ db-role: require-app-password require-ops-password
 		-c "GRANT CONNECT ON DATABASE $(DB_NAME) TO casal_app;" \
 		-c "GRANT USAGE ON SCHEMA public TO casal_app;" 		-c "DO \$$\$$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'casal_ops') THEN CREATE ROLE casal_ops LOGIN PASSWORD '$(OPS_DB_PASSWORD)'; END IF; END \$$\$$;" 		-c "ALTER ROLE casal_ops LOGIN PASSWORD '$(OPS_DB_PASSWORD)';" 		-c "GRANT CONNECT ON DATABASE $(DB_NAME) TO casal_ops;"
 
+# Grafana local (http://localhost:3000), já ligado às views do schema ops; precisa do db-up e do db-role
+grafana-up: require-ops-password
+	docker compose --env-file .env -f deploy/grafana/docker-compose.yml up -d
+
+grafana-down:
+	docker compose --env-file .env -f deploy/grafana/docker-compose.yml down
 
 # ---- qualidade ----
 
@@ -71,4 +77,4 @@ test-integration: test-db
 
 check: lint test-integration  ## tudo o que o CI roda
 
-.PHONY: require-app-password require-ops-password db-up db-down db-psql db-role migrate-up migrate-down migrate-status run test vet fmt-check lint test-db test-integration check
+.PHONY: grafana-up grafana-down require-app-password require-ops-password db-up db-down db-psql db-role migrate-up migrate-down migrate-status run test vet fmt-check lint test-db test-integration check

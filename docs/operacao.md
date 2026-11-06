@@ -48,6 +48,13 @@ Conecte a fonte PostgreSQL com o usuário `casal_ops` (ele só lê o schema `ops
 
 Célula com menos de 3 casais (ou pessoas) vem **nula** de propósito: no começo do beta muitos valores aparecerão vazios. As regras de alerta estão em `deploy/alerts.yml`; o alerta de "app fora do ar" é do monitor externo em `/healthz`.
 
+## Rodando tudo local
+
+1. `make db-up db-role migrate-up` (o `.env` precisa de `OPS_DB_PASSWORD`) e, no `.env`, `ADMIN_ENABLED=true`.
+2. Painel: crie a conta (`go run ./cmd/admin admin create voce@email.com`), rode `make run` e `npm run dev` em `frontend/` e abra http://localhost:5173/admin.
+3. Grafana: `make grafana-up` e abra http://localhost:3000 (sem login; só escuta em 127.0.0.1). A fonte de dados `Zoog ops` e o dashboard `Zoog · beta` já vêm prontos, em `deploy/grafana/`. `make grafana-down` desliga.
+4. Sentry: não há instância local. Use o DSN de um projeto no sentry.io ou no GlitchTip em `SENTRY_DSN` (backend) e `VITE_SENTRY_DSN` (frontend, em `frontend/.env.local`).
+
 ## Desvios da spec
 
 - Resposta do código inválido é `400` com `code: signup_code_invalid` (o restante da API usa 400 para `Invalid`; o front traduz pelo `code`).

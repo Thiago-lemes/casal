@@ -1,0 +1,15 @@
+apiVersion: 1
+datasources:
+  - name: Zoog ops
+    uid: zoog-ops
+    type: postgres
+    access: proxy
+    isDefault: true
+    url: host.docker.internal:5432
+    user: casal_ops
+    jsonData:
+      database: $DB_NAME
+      sslmode: disable
+      postgresVersion: 1700
+    secureJsonData:
+      password: $OPS_DB_PASSWORD

@@ -22,6 +22,7 @@ import (
 	"casal/internal/reminder"
 	"casal/internal/routine"
 	"casal/internal/shopping"
+	"casal/internal/signup"
 	"casal/internal/task"
 )
 
@@ -58,6 +59,11 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	}
 	events := ops.NewEvents(conn, log)
 	authSvc.OnEvent(events.Record)
+	signupSvc := signup.NewService(conn)
+	if cfg.SignupMode == "invite" {
+		authSvc.RequireSignupCode(signupSvc)
+		log.Info("cadastro por convite ligado (SIGNUP_MODE=invite)")
+	}
 	auth.NewHandler(authSvc, log, auth.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
 	requireUser := auth.Require(authSvc)
 

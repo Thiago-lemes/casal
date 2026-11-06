@@ -22,6 +22,8 @@ var (
 	ErrNotFound           = apperr.New(apperr.NotFound, "não encontrado")
 	ErrInvalidCredentials = apperr.NewCoded(apperr.Unauthorized, "invalid_credentials", "e-mail ou senha inválidos")
 	ErrInvalidInput       = apperr.New(apperr.Invalid, "dados inválidos")
+	// ErrSignupCodeInvalid cobre código ausente, errado, vencido, revogado ou esgotado: a resposta não diz qual.
+	ErrSignupCodeInvalid = apperr.NewCoded(apperr.Invalid, "signup_code_invalid", "código de cadastro inválido")
 )
 
 // Repository é o que o service precisa do banco. Em testes, troque por um fake.

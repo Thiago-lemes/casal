@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,6 +15,7 @@ import (
 
 	"casal/internal/config"
 	"casal/internal/db"
+	"casal/internal/signup"
 	"casal/internal/testutil"
 )
 
@@ -155,4 +157,85 @@ func TestEventosDeProdutoSemConteudo(t *testing.T) {
 		}
 		rows.Close()
 	}
+}
+
+func TestCadastroPorConvite(t *testing.T) {
+	conn := testutil.OpenDB(t)
+	// o cadastro tem limite de 5 seguidos por IP; um segundo servidor (com o próprio limite) cobre o resto
+	cfg := config.Config{SessionTTL: time.Hour, SignupMode: "invite"}
+	srv, _ := startAppWith(t, cfg)
+	srv2, _ := startAppWith(t, cfg)
+	svc := signup.NewService(conn)
+	create := func(uses int) (signup.Code, string) {
+		c, raw, err := svc.Create(context.Background(), "e2e", uses, 24*time.Hour, "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { conn.Exec(`DELETE FROM signup_codes WHERE id = $1`, c.ID) })
+		return c, raw
+	}
+	register := func(srv *httptest.Server, name, code string) (int, string) {
+		c := newClient(t, srv.URL)
+		body := map[string]string{"email": name + e2eDomain, "name": name, "password": "senha-forte-123"}
+		if code != "" {
+			body["signup_code"] = code
+		}
+		status, obj, _, _ := c.call("POST", "/v1/auth/register", body)
+		code2, _ := obj["code"].(string)
+		return status, code2
+	}
+
+	// o front descobre o modo antes de montar o formulário
+	if _, obj, _, _ := newClient(t, srv.URL).call("GET", "/v1/auth/config", nil); obj["signup_mode"] != "invite" {
+		t.Errorf("config = %v", obj)
+	}
+
+	if st, code := register(srv, "conv-sem", ""); st != 400 || code != "signup_code_invalid" {
+		t.Errorf("sem código: %d %q", st, code)
+	}
+	if st, code := register(srv, "conv-errado", "codigo-que-nao-existe"); st != 400 || code != "signup_code_invalid" {
+		t.Errorf("código errado: %d %q", st, code)
+	}
+
+	revoked, rawRevoked := create(1)
+	if err := svc.Revoke(context.Background(), revoked.ID); err != nil {
+		t.Fatal(err)
+	}
+	if st, code := register(srv, "conv-revogado", rawRevoked); st != 400 || code != "signup_code_invalid" {
+		t.Errorf("revogado: %d %q", st, code)
+	}
+
+	expired, rawExpired := create(1)
+	conn.Exec(`UPDATE signup_codes SET expires_at = now() - interval '1 minute' WHERE id = $1`, expired.ID)
+	if st, code := register(srv, "conv-vencido", rawExpired); st != 400 || code != "signup_code_invalid" {
+		t.Errorf("vencido: %d %q", st, code)
+	}
+
+	// um código de 1 uso: o primeiro cadastro entra, o segundo não; e-mail repetido não gasta o uso
+	_, raw := create(1)
+	if st, _ := register(srv, "conv-bom", raw); st != 201 {
+		t.Errorf("código válido deveria criar a conta, deu %d", st)
+	}
+	if st, code := register(srv2, "conv-outro", raw); st != 400 || code != "signup_code_invalid" {
+		t.Errorf("código esgotado: %d %q", st, code)
+	}
+
+	_, raw2 := create(1)
+	if st, code := register(srv2, "conv-bom", raw2); st != 409 || code != "email_taken" {
+		t.Errorf("e-mail repetido: %d %q", st, code)
+	}
+	if st, _ := register(srv2, "conv-bom2", raw2); st != 201 {
+		t.Errorf("o uso devia ter voltado depois do e-mail repetido, deu %d", st)
+	}
+}
+
+func TestCadastroAbertoIgnoraOCodigo(t *testing.T) {
+	srv, _ := startApp(t)
+	if _, obj, _, _ := newClient(t, srv.URL).call("GET", "/v1/auth/config", nil); obj["signup_mode"] != "open" {
+		t.Errorf("config = %v", obj)
+	}
+	c := newClient(t, srv.URL)
+	c.mustStatus(201, "POST", "/v1/auth/register", map[string]string{
+		"email": "aberto" + e2eDomain, "name": "Aberto", "password": "senha-forte-123", "signup_code": "ignorado",
+	})
 }

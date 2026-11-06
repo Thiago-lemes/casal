@@ -44,6 +44,7 @@ services:
       APP_ENV: beta
       APP_RELEASE: ${APP_RELEASE:-}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
+      SIGNUP_MODE: ${SIGNUP_MODE:-invite}
 
   web:
     build: { context: .., dockerfile: deploy/Dockerfile.web }

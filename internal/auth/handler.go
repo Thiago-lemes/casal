@@ -38,6 +38,7 @@ func NewHandler(svc *Service, log *slog.Logger, opts Options) *Handler {
 
 func (h *Handler) Routes(mux *http.ServeMux) {
 	requireUser := Require(h.svc)
+	mux.HandleFunc("GET /v1/auth/config", h.config)
 	mux.HandleFunc("POST /v1/auth/register", h.register)
 	mux.HandleFunc("POST /v1/auth/login", h.login)
 	mux.HandleFunc("POST /v1/auth/logout", h.logout)
@@ -50,6 +51,8 @@ type credentials struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
+	// SignupCode só vale no cadastro, e só é exigido no modo invite do beta
+	SignupCode string `json:"signup_code"`
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
@@ -60,13 +63,22 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	if !httpx.Bind(w, r, &in) {
 		return
 	}
-	u, session, err := h.svc.Register(r.Context(), in.Email, in.Name, in.Password)
+	u, session, err := h.svc.RegisterWithCode(r.Context(), in.Email, in.Name, in.Password, in.SignupCode)
 	if err != nil {
 		httpx.Fail(w, r, h.log, err)
 		return
 	}
 	h.setCookie(w, session)
 	httpx.JSON(w, http.StatusCreated, u)
+}
+
+// config diz ao front como o cadastro funciona (aberto ou por código), antes de a pessoa preencher o formulário.
+func (h *Handler) config(w http.ResponseWriter, _ *http.Request) {
+	mode := "open"
+	if h.svc.InviteOnly() {
+		mode = "invite"
+	}
+	httpx.JSON(w, http.StatusOK, map[string]string{"signup_mode": mode})
 }
 
 func (h *Handler) login(w http.ResponseWriter, r *http.Request) {

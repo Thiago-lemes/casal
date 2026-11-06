@@ -22,6 +22,7 @@ type Config struct {
 	Environment  string // nome do ambiente nos relatórios (beta, producao...)
 	Release      string // versão do app nos relatórios
 	MetricsAddr  string // endereço interno separado para o /metrics (ex.: 127.0.0.1:9090)
+	SignupMode   string // "open" (padrão) ou "invite": o cadastro exige um código do beta
 	MetricsToken string // se definido, o /metrics também sai na porta principal, com Bearer
 }
 
@@ -37,6 +38,10 @@ func Load() (Config, error) {
 		Release:         os.Getenv("APP_RELEASE"),
 		MetricsAddr:     os.Getenv("METRICS_ADDR"),
 		MetricsToken:    os.Getenv("METRICS_TOKEN"),
+		SignupMode:      getenv("SIGNUP_MODE", "open"),
+	}
+	if cfg.SignupMode != "open" && cfg.SignupMode != "invite" {
+		return Config{}, fmt.Errorf("SIGNUP_MODE inválida: use open ou invite")
 	}
 	if cfg.DatabaseURL == "" {
 		return Config{}, fmt.Errorf("DATABASE_URL é obrigatória")

@@ -48,7 +48,7 @@ func TestLoadReadsOverrides(t *testing.T) {
 
 func TestLoadRejectsInvalidValues(t *testing.T) {
 	t.Setenv("DATABASE_URL", "postgres://x")
-	for key, bad := range map[string]string{"COOKIE_SECURE": "talvez", "TRUST_PROXY": "2", "SESSION_TTL_HOURS": "0"} {
+	for key, bad := range map[string]string{"COOKIE_SECURE": "talvez", "TRUST_PROXY": "2", "SESSION_TTL_HOURS": "0", "SIGNUP_MODE": "fechado"} {
 		t.Run(key, func(t *testing.T) {
 			t.Setenv(key, bad)
 			if _, err := Load(); err == nil {

@@ -27,7 +27,8 @@ type ExpenseInput struct {
 	Split        map[string]int
 	Installments *InstallmentsInput
 	Source       string
-	Version      int // só na edição: a versão que a pessoa viu
+	CardID       string // opcional: um cartão de quem pagou
+	Version      int    // só na edição: a versão que a pessoa viu
 }
 
 type CreateResult struct {
@@ -105,6 +106,10 @@ func (s *Service) CreateExpense(ctx context.Context, p identity.Principal, in Ex
 	if err := s.usableCategory(ctx, p.HouseholdID, base.CategoryID); err != nil {
 		return CreateResult{}, err
 	}
+	if err := s.usableCard(ctx, p, base.PaidBy, in.CardID, ""); err != nil {
+		return CreateResult{}, err
+	}
+	base.CardID = in.CardID // as parcelas herdam o cartão da compra
 
 	var res CreateResult
 	if base.Scope == ScopeHousehold {
@@ -298,6 +303,9 @@ func (s *Service) UpdateExpense(ctx context.Context, p identity.Principal, id st
 		return Expense{}, err
 	}
 	next.ID, next.AmountCents, next.UpdatedBy = cur.ID, in.AmountCents, p.UserID
+	if next.CardID, err = s.cardOnUpdate(ctx, p, cur, next.PaidBy, in.CardID); err != nil {
+		return Expense{}, err
+	}
 	if cur.Scope == ScopeHousehold {
 		next.Split = cur.Split
 		if in.Split != nil {
@@ -379,6 +387,7 @@ type GroupInput struct {
 	CategoryID  *string
 	PaidBy      *string
 	Split       map[string]int
+	CardID      *string // nil = não mexe; "" = tira o cartão
 }
 
 // UpdateGroup muda descrição, categoria, quem pagou e divisão nas parcelas ainda abertas. Valor e número de
@@ -419,6 +428,19 @@ func (s *Service) UpdateGroup(ctx context.Context, p identity.Principal, groupID
 		if patch.Split, err = NormalizeSplit(in.Split, ids(ps)); err != nil {
 			return Group{}, err
 		}
+	}
+	if in.CardID != nil { // o cartão é de quem pagou: só ele troca, e vale para a compra inteira
+		payer := first.PaidBy
+		if in.PaidBy != nil {
+			payer = *in.PaidBy
+		}
+		if payer != p.UserID {
+			return Group{}, ErrCardInvalid
+		}
+		if err := s.usableCard(ctx, p, payer, *in.CardID, first.CardID); err != nil {
+			return Group{}, err
+		}
+		patch.CardSet, patch.CardID = true, *in.CardID
 	}
 	n, err := s.repo.UpdateGroup(ctx, p.HouseholdID, groupID, p.UserID, patch)
 	if err != nil {

@@ -3,11 +3,12 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import type { QueryClient } from '@tanstack/react-query'
 import { isModuleDisabled, modulesKey } from '@/shared/modules/hooks'
 import { financeApi } from './api'
-import type { BillInput, ExpenseInput, GroupInput, PayInput, RecurringInput, SettingsInput } from './api'
+import type { BillInput, CardInput, ExpenseInput, GroupInput, PayInput, RecurringInput, SettingsInput } from './api'
 
 export const financeKey = ['finance'] as const
 
 export const keys = {
+  cards: (archived: boolean) => ['finance', 'cards', archived] as const,
   categories: (archived: boolean) => ['finance', 'categories', archived] as const,
   expenses: (month: string, scope: string) => ['finance', 'expenses', { month, scope }] as const,
   group: (id: string) => ['finance', 'group', id] as const,
@@ -41,6 +42,22 @@ export function useCategoryActions() {
     rename: useMutation({ mutationFn: (v: { id: string; name: string }) => financeApi.renameCategory(v.id, v.name), onSuccess: refresh }),
     archive: useMutation({ mutationFn: financeApi.archiveCategory, onSuccess: refresh }),
     unarchive: useMutation({ mutationFn: financeApi.unarchiveCategory, onSuccess: refresh }),
+  }
+}
+
+/** Meus cartões; os arquivados só vêm quando se pede. */
+export function useCards(archived = false, enabled = true) {
+  return useQuery({ queryKey: keys.cards(archived), queryFn: () => financeApi.cards(archived), staleTime: 60_000, enabled })
+}
+
+export function useCardActions() {
+  const qc = useQueryClient()
+  const refresh = () => qc.invalidateQueries({ queryKey: ['finance', 'cards'] })
+  return {
+    create: useMutation({ mutationFn: (v: CardInput) => financeApi.createCard(v), onSuccess: refresh }),
+    update: useMutation({ mutationFn: (v: { id: string; body: CardInput }) => financeApi.updateCard(v.id, v.body), onSuccess: refresh }),
+    archive: useMutation({ mutationFn: financeApi.archiveCard, onSuccess: refresh }),
+    unarchive: useMutation({ mutationFn: financeApi.unarchiveCard, onSuccess: refresh }),
   }
 }
 

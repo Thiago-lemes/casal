@@ -5,7 +5,7 @@ import { errorMessage } from '@/shared/api/errorMessage'
 import type { Category, Expense } from '../api'
 import { categoryName } from '../categories'
 import { formatDay } from '@/shared/lib/dates'
-import { useExpenseActions } from '../hooks'
+import { useCards, useExpenseActions } from '../hooks'
 import { formatBRL, splitLabel } from '@/shared/lib/money'
 import { expenseActions } from '../permissions'
 import { nameOf } from '../types'
@@ -27,6 +27,8 @@ export function ExpenseDialog({ expense, ctx, category, onClose, onEdit, onGroup
   const { t, i18n } = useTranslation('finance')
   const { t: tc } = useTranslation('common')
   const actions = useExpenseActions()
+  const cards = useCards(true, Boolean(expense.card_id))
+  const card = cards.data?.find((c) => c.id === expense.card_id)
   const can = expenseActions(expense, ctx.me.id)
   const [confirming, setConfirming] = useState(false)
   const lang = i18n.language
@@ -45,6 +47,7 @@ export function ExpenseDialog({ expense, ctx, category, onClose, onEdit, onGroup
         category_id: expense.category_id,
         spent_on: expense.spent_on,
         description: expense.description,
+        card_id: expense.card_id,
         version: expense.version,
       },
     })
@@ -62,6 +65,12 @@ export function ExpenseDialog({ expense, ctx, category, onClose, onEdit, onGroup
           <dd>{categoryName(t, category)}</dd>
           <dt>{t('form.date')}</dt>
           <dd>{formatDay(expense.spent_on, lang, { day: 'numeric', month: 'long', year: 'numeric' })}</dd>
+          {card && (
+            <>
+              <dt>{t('card.label')}</dt>
+              <dd>{card.last4 ? `${card.name} · ${card.last4}` : card.name}</dd>
+            </>
+          )}
           {expense.scope === 'household' && (
             <>
               <dt>{t('form.paidBy')}</dt>

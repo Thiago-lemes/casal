@@ -112,4 +112,55 @@ describe('ExpenseComposer', () => {
     expect(server.sent('PUT', '/v1/finance/expenses/e1')[0].body).toMatchObject({ version: 1 })
     expect(server.sent('PUT', '/v1/finance/expenses/e1')[1].body).toMatchObject({ version: 2, description: 'Minha edição' })
   })
+
+  it('o cartão é opcional: sem escolher, não envia card_id', async () => {
+    const server = fakeServer({ 'POST /v1/finance/expenses': expense(), 'GET /v1/finance/cards': [{ id: 'k1', name: 'Nubank', last4: '4321', archived: false }] })
+    await open()
+    await screen.findByRole('option', { name: 'Nubank · 4321' })
+    await userEvent.type(screen.getByLabelText('Valor'), '10')
+    await userEvent.click(screen.getByRole('button', { name: 'Registrar gasto' }))
+    await waitFor(() => expect(server.sent('POST', '/v1/finance/expenses')).toHaveLength(1))
+    expect(server.sent('POST', '/v1/finance/expenses')[0].body).not.toHaveProperty('card_id')
+  })
+
+  it('escolher um cartão envia card_id; cadastrar na hora já deixa o novo escolhido', async () => {
+    const server = fakeServer({
+      'POST /v1/finance/expenses': expense(),
+      'GET /v1/finance/cards': [{ id: 'k1', name: 'Nubank', archived: false }],
+      'POST /v1/finance/cards': { id: 'k2', name: 'Itaú', archived: false },
+    })
+    await open()
+    await screen.findByRole('option', { name: 'Nubank' })
+    await userEvent.type(screen.getByLabelText('Valor'), '10')
+    await userEvent.selectOptions(screen.getByLabelText('Cartão'), 'k1')
+    await userEvent.click(screen.getByRole('button', { name: 'Registrar gasto' }))
+    await waitFor(() => expect(server.sent('POST', '/v1/finance/expenses')).toHaveLength(1))
+    expect(server.sent('POST', '/v1/finance/expenses')[0].body).toMatchObject({ card_id: 'k1' })
+
+    await userEvent.selectOptions(screen.getByLabelText('Cartão'), '__new__')
+    await userEvent.type(screen.getByLabelText('Nome do cartão'), 'Itaú')
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar cartão' }))
+    await waitFor(() => expect(server.sent('POST', '/v1/finance/cards')).toHaveLength(1))
+    expect(server.sent('POST', '/v1/finance/cards')[0].body).toEqual({ name: 'Itaú' })
+  })
+
+  it('quando o parceiro pagou, o campo de cartão some (cartão é de quem pagou)', async () => {
+    fakeServer({})
+    await open()
+    expect(screen.getByLabelText('Cartão')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('radio', { name: ctx.partner!.name }))
+    expect(screen.queryByLabelText('Cartão')).not.toBeInTheDocument()
+  })
+
+  it('editar mantém o cartão do gasto e o envia de volta', async () => {
+    const server = fakeServer({
+      'PUT /v1/finance/expenses/e1': expense({ card_id: 'k1' }),
+      'GET /v1/finance/cards': [{ id: 'k1', name: 'Nubank', archived: false }],
+    })
+    await open({ expense: expense({ card_id: 'k1' }) as never })
+    await screen.findByRole('option', { name: 'Nubank' })
+    await userEvent.click(screen.getByRole('button', { name: 'Salvar' }))
+    await waitFor(() => expect(server.sent('PUT', '/v1/finance/expenses/e1')).toHaveLength(1))
+    expect(server.sent('PUT', '/v1/finance/expenses/e1')[0].body).toMatchObject({ card_id: 'k1' })
+  })
 })

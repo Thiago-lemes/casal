@@ -28,6 +28,12 @@ func (h *Handler) Routes(mux *http.ServeMux, requireUser, requireHousehold, requ
 	mux.Handle("POST "+v+"/categories/{id}/archive", wrap(h.archiveCategory(true)))
 	mux.Handle("POST "+v+"/categories/{id}/unarchive", wrap(h.archiveCategory(false)))
 
+	mux.Handle("GET "+v+"/cards", wrap(h.listCards))
+	mux.Handle("POST "+v+"/cards", wrap(h.createCard))
+	mux.Handle("PUT "+v+"/cards/{id}", wrap(h.updateCard))
+	mux.Handle("POST "+v+"/cards/{id}/archive", wrap(h.archiveCard(true)))
+	mux.Handle("POST "+v+"/cards/{id}/unarchive", wrap(h.archiveCard(false)))
+
 	mux.Handle("POST "+v+"/expenses", wrap(h.createExpense))
 	mux.Handle("GET "+v+"/expenses", wrap(h.listExpenses))
 	mux.Handle("POST "+v+"/expenses/from-shopping", wrap(h.fromShopping))
@@ -157,6 +163,7 @@ type expenseBody struct {
 	SpentOn      string         `json:"spent_on"`
 	Description  string         `json:"description"`
 	Split        map[string]int `json:"split"`
+	CardID       string         `json:"card_id"`
 	Version      int            `json:"version"`
 	Installments *struct {
 		Count                  int    `json:"count"`
@@ -168,7 +175,7 @@ type expenseBody struct {
 func (b expenseBody) input() ExpenseInput {
 	in := ExpenseInput{
 		Scope: b.Scope, Visibility: b.Visibility, PaidBy: b.PaidBy, AmountCents: b.AmountCents, CategoryID: b.CategoryID,
-		SpentOn: b.SpentOn, Description: b.Description, Split: b.Split, Version: b.Version,
+		SpentOn: b.SpentOn, Description: b.Description, Split: b.Split, CardID: b.CardID, Version: b.Version,
 	}
 	if b.Installments != nil {
 		in.Installments = &InstallmentsInput{
@@ -230,7 +237,7 @@ func (h *Handler) listExpenses(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	limit, _ := strconv.Atoi(q.Get("limit"))
 	out, err := h.svc.ListExpenses(r.Context(), who(r), ExpenseFilter{
-		Month: q.Get("month"), Scope: q.Get("scope"), CategoryID: q.Get("category"), PaidBy: q.Get("paid_by"),
+		Month: q.Get("month"), Scope: q.Get("scope"), CategoryID: q.Get("category"), PaidBy: q.Get("paid_by"), CardID: q.Get("card"),
 		Before: q.Get("before"), Limit: limit,
 	})
 	reply(h, w, r, out, err)
@@ -290,6 +297,7 @@ func (h *Handler) updateGroup(w http.ResponseWriter, r *http.Request) {
 		CategoryID  *string        `json:"category_id"`
 		PaidBy      *string        `json:"paid_by"`
 		Split       map[string]int `json:"split"`
+		CardID      *string        `json:"card_id"`
 	}
 	if !httpx.Bind(w, r, &in) {
 		return

@@ -105,7 +105,7 @@ e quem ficou) e rodam **na mesma transação** da mudança: se um falhar, nada m
 | tarefas | as abertas e recusadas viram de quem ficou | nada (tarefas são do casal) |
 | lembretes | os pendentes entre os dois são cancelados | os da pessoa para ela mesma vêm junto |
 | compras | nada (é do casal) | nada |
-| finanças | se há saldo em aberto, um acerto `leave` (só registro) trava os gastos abertos, inclusive parcelas futuras; fixos e contas da pessoa passam para quem ficou; a divisão padrão volta para igual; o pessoal "view" vira privado | gastos e fixos pessoais, a renda e as categorias que usavam, **sempre privados** |
+| finanças | se há saldo em aberto, um acerto `leave` (só registro) trava os gastos abertos, inclusive parcelas futuras; fixos e contas da pessoa passam para quem ficou; a divisão padrão volta para igual; o pessoal "view" vira privado; o cartão vai com a pessoa e os gastos do casal pagos com ele perdem a ligação | gastos e fixos pessoais, a renda, os cartões e as categorias que usavam, **sempre privados** |
 | metas | as do casal ficam com quem permanece (a que exigia os dois passa a exigir só quem sobrou; as etapas da pessoa passam para quem ficou); as pessoais ficam com quem saiu e o que o parceiro lia ("view") vira privado | as pessoais deixadas para trás vêm junto, com aportes, marcações e etapas, **sempre privadas** |
 
 Lembretes criados por outro módulo com `ref` (contas a pagar) são do casal, não da pessoa: ao sair, os pendentes dela são
@@ -145,6 +145,13 @@ padrão de Finanças; precisa ser idempotente, pois religar também dispara) e `
 - **Renda.** Só o dono lê a própria (`finance_incomes` é consultada por `user_id = quem pergunta`). A divisão proporcional lê as
   duas dentro do service, mas só devolve a **divisão resultante**, e só vale com as duas rendas e a concordância dos dois; senão
   o gasto cai em igual com `split_fallback`. Mudar a renda avisa o parceiro sem valores.
+- **Cartões** (`finance_cards`) são pessoais e opcionais no gasto (`expenses.card_id`, nulo = sem cartão). Só o dono lista, edita, arquiva
+  e usa o cartão (toda consulta filtra por `owner_id`; cartão de outra pessoa responde `404`, nunca `403`). O cartão é de **quem pagou**:
+  gasto pago pelo parceiro não usa o meu (`card_invalid`) e, se o pagador muda, o cartão sai. O parceiro vê o gasto do casal normalmente, mas
+  sem o cartão: `card_id` só sai no JSON para quem pagou (`MyCardID`), e o resumo (`cards`, `without_card_cents`), a exportação e o filtro
+  `?card=` só olham os cartões de quem pergunta. As parcelas herdam o cartão e `PUT /expense-groups/{id}` o troca na compra inteira.
+  Cartão não se apaga: arquiva (some da escolha, o gasto antigo mantém). Fechamento e vencimento ficam guardados para a fatura, que ainda não existe.
+  O teste usa dois parceiros no mesmo casal e foi provado removendo o filtro de dono.
 - **Lembretes das contas** vivem na feature `reminder` (fora da transação da conta). Cada um leva um `ref` com o vencimento e a
   pessoa; mudar um dos dois muda os refs, e o sincronismo cancela os velhos e cria os novos. Se falhar, a resposta é `200` com
   `sync_pending` e o job de hora em hora recalcula.

@@ -8,11 +8,12 @@ import { financeApi, isInstallmentsResult } from '../api'
 import type { Expense, ExpenseInput, Split } from '../api'
 import { categoryName, selectable } from '../categories'
 import { todayIn } from '@/shared/lib/dates'
-import { useCategories, useExpenseActions } from '../hooks'
+import { useCards, useCategories, useExpenseActions } from '../hooks'
 import { centsToInput, formatBRL, interpretedHint, MAX_CENTS, parseMoney } from '@/shared/lib/money'
 import { equalSplit, splitFor } from '../split'
 import type { SplitMode } from '../split'
 import type { Ctx } from '../types'
+import { CardField } from './CardField'
 import { InstallmentFields, installmentCount } from './InstallmentFields'
 import type { InstallmentValue } from './InstallmentFields'
 import { SplitEditor } from './SplitEditor'
@@ -40,6 +41,7 @@ export function ExpenseComposer({ ctx, open, onOpenChange, expense, presetCatego
   const actions = useExpenseActions()
   const editing = Boolean(expense)
   const categories = useCategories(editing)
+  const cards = useCards(editing)
   const today = todayIn(ctx.me.timezone)
 
   const [scope, setScope] = useState<'household' | 'personal'>(expense?.scope ?? 'household')
@@ -52,12 +54,15 @@ export function ExpenseComposer({ ctx, open, onOpenChange, expense, presetCatego
   const [custom, setCustom] = useState<Split>(expense?.split ?? equalSplit(ctx.people))
   const [visibility, setVisibility] = useState<'private' | 'view'>(expense?.visibility === 'view' ? 'view' : 'private')
   const [inst, setInst] = useState<InstallmentValue>({ on: false, count: '2', firstOn: today, mode: 'total' })
+  const [cardId, setCardId] = useState(expense?.card_id ?? '')
   const [version, setVersion] = useState(expense?.version ?? 0)
   const [conflict, setConflict] = useState<Expense>()
   const [error, setError] = useState<unknown>()
 
   const household = scope === 'household'
   const hasPartner = Boolean(ctx.partner)
+  // o cartão é de quem pagou: só aparece quando eu pago (e, editando o gasto do parceiro, nunca)
+  const showCard = household ? paidBy === ctx.me.id : true
   const list = selectable(categories.data ?? [], expense?.category_id)
   const preset = presetCategoryKey ? list.find((c) => c.key === presetCategoryKey)?.id : undefined
   const category = categoryId || preset || list[0]?.id || ''
@@ -81,6 +86,8 @@ export function ExpenseComposer({ ctx, open, onOpenChange, expense, presetCatego
       spent_on: spentOn,
       description: description.trim(),
     }
+    // fora da edição, só envia se escolheu; editando, vazio tira o cartão (quem não vê o campo não o envia)
+    if (showCard && (cardId || editing)) body.card_id = cardId
     if (household) {
       body.paid_by = paidBy
       const split = splitToSend()
@@ -219,6 +226,8 @@ export function ExpenseComposer({ ctx, open, onOpenChange, expense, presetCatego
             onChange={setPaidBy}
           />
         )}
+
+        {showCard && <CardField cards={cards.data ?? []} value={cardId} onChange={setCardId} keep={expense?.card_id} />}
 
         {household && hasPartner && (
           <>

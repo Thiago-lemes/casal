@@ -9,7 +9,8 @@ import (
 
 const expCols = `e.id, e.household_id, e.created_by, e.updated_by, e.paid_by, e.scope, e.visibility, e.amount_cents,
 	e.category_id, to_char(e.spent_on, 'YYYY-MM-DD'), e.description, e.split, e.source, e.recurring_id, e.bill_id,
-	e.installment_group_id, e.installment_no, e.installments_total, e.settlement_id, e.version, e.created_at, e.updated_at`
+	e.installment_group_id, e.installment_no, e.installments_total, e.settlement_id, e.version, e.created_at, e.updated_at,
+	e.card_id`
 
 // visibleTo é o filtro de privacidade que TODA leitura de gasto usa: o do casal é dos dois; o pessoal é de quem o
 // criou, e do parceiro só se estiver em "view". O RLS não separa os parceiros, então só este filtro faz isso.
@@ -20,16 +21,20 @@ func visibleTo(n int) string {
 
 func scanExpense(s scanner, viewer string) (Expense, error) {
 	var e Expense
-	var updatedBy, recurring, bill, group, settlement sql.NullString
+	var updatedBy, recurring, bill, group, settlement, card sql.NullString
 	var no, total sql.NullInt32
 	var split []byte
 	if err := s.Scan(&e.ID, &e.HouseholdID, &e.CreatedBy, &updatedBy, &e.PaidBy, &e.Scope, &e.Visibility,
 		&e.AmountCents, &e.CategoryID, &e.SpentOn, &e.Description, &split, &e.Source, &recurring, &bill,
-		&group, &no, &total, &settlement, &e.Version, &e.CreatedAt, &e.UpdatedAt); err != nil {
+		&group, &no, &total, &settlement, &e.Version, &e.CreatedAt, &e.UpdatedAt, &card); err != nil {
 		return Expense{}, err
 	}
 	e.UpdatedBy, e.RecurringID, e.BillID, e.SettlementID = updatedBy.String, recurring.String, bill.String, settlement.String
 	e.Settled = settlement.Valid
+	e.CardID = card.String
+	if viewer != "" && viewer == e.PaidBy { // o cartão é de quem pagou: o parceiro não o vê
+		e.MyCardID = e.CardID
+	}
 	e.Split = parseSplit(split)
 	if group.Valid {
 		e.Installment = &Installment{GroupID: group.String, No: int(no.Int32), Total: int(total.Int32)}
@@ -63,13 +68,13 @@ func insertExpense(ctx context.Context, tx *sql.Tx, e Expense) (Expense, error) 
 	return scanExpense(tx.QueryRowContext(ctx, `
 		WITH ins AS (
 			INSERT INTO expenses (household_id, created_by, paid_by, scope, visibility, amount_cents, category_id, spent_on,
-				description, split, source, recurring_id, bill_id, installment_group_id, installment_no, installments_total)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9, $10::jsonb, $11, $12::uuid, $13::uuid, $14::uuid, $15, $16)
+				description, split, source, recurring_id, bill_id, installment_group_id, installment_no, installments_total, card_id)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8::date, $9, $10::jsonb, $11, $12::uuid, $13::uuid, $14::uuid, $15, $16, $17::uuid)
 			RETURNING *
 		)
 		SELECT `+expCols+` FROM ins e`,
 		e.HouseholdID, e.CreatedBy, e.PaidBy, e.Scope, e.Visibility, e.AmountCents, e.CategoryID, e.SpentOn,
-		e.Description, jsonArg(e.Split), e.Source, nullable(e.RecurringID), nullable(e.BillID), group, no, total), e.CreatedBy)
+		e.Description, jsonArg(e.Split), e.Source, nullable(e.RecurringID), nullable(e.BillID), group, no, total, nullable(e.CardID)), e.CreatedBy)
 }
 
 // InsertExpenses grava todos os gastos numa transação (as parcelas de uma compra: ou todas, ou nenhuma).
@@ -127,6 +132,10 @@ func (p *PostgresRepo) ListExpenses(ctx context.Context, hh, viewer string, f Ex
 	if f.PaidBy != "" {
 		add(`e.paid_by = ?::uuid`, f.PaidBy)
 	}
+	if f.CardID != "" { // o cartão é pessoal: só acha o que EU paguei com ele
+		add(`e.card_id = ?::uuid`, f.CardID)
+		add(`e.paid_by = ?::uuid`, viewer)
+	}
 	if f.Before != "" {
 		date, id, _ := strings.Cut(f.Before, ",")
 		args = append(args, date, id)
@@ -153,14 +162,14 @@ func (p *PostgresRepo) UpdateExpense(ctx context.Context, hh string, e Expense, 
 		out, err = scanExpense(tx.QueryRowContext(ctx, `
 			WITH upd AS (
 				UPDATE expenses SET paid_by = $4, visibility = $5, amount_cents = $6, category_id = $7, spent_on = $8::date,
-					description = $9, split = $10::jsonb, updated_by = $11, version = version + 1, updated_at = now()
+					description = $9, split = $10::jsonb, updated_by = $11, card_id = $12::uuid, version = version + 1, updated_at = now()
 				WHERE id = $1 AND household_id = $2 AND version = $3 AND settlement_id IS NULL
 				  AND (scope = 'household' OR created_by = $11)
 				RETURNING *
 			)
 			SELECT `+expCols+` FROM upd e`,
 			e.ID, hh, version, e.PaidBy, e.Visibility, e.AmountCents, e.CategoryID, e.SpentOn, e.Description,
-			jsonArg(e.Split), viewer), viewer)
+			jsonArg(e.Split), viewer, nullable(e.CardID)), viewer)
 		return err
 	})
 	return out, err
@@ -200,10 +209,15 @@ func (p *PostgresRepo) UpdateGroup(ctx context.Context, hh, groupID, viewer stri
 		res, err := tx.ExecContext(ctx, `
 			UPDATE expenses SET description = coalesce($4, description), category_id = coalesce($5::uuid, category_id),
 				paid_by = coalesce($6::uuid, paid_by), split = coalesce($7::jsonb, split),
+				card_id = CASE WHEN $8 THEN $9::uuid
+				               WHEN $6::uuid IS NOT NULL AND $6::uuid <> paid_by THEN NULL -- outro pagador: o cartão não vale
+				               ELSE card_id END,
 				updated_by = $3, version = version + 1, updated_at = now()
 			WHERE installment_group_id = $1 AND household_id = $2 AND settlement_id IS NULL
-			  AND (scope = 'household' OR created_by = $3)`,
-			groupID, hh, viewer, patch.Description, patch.CategoryID, patch.PaidBy, jsonArg(patch.Split))
+			  AND (scope = 'household' OR created_by = $3)
+			  AND (NOT $8 OR paid_by = $3 OR $6::uuid = $3)`, // trocar o cartão só vale nas parcelas que eu paguei
+			groupID, hh, viewer, patch.Description, patch.CategoryID, patch.PaidBy, jsonArg(patch.Split),
+			patch.CardSet, nullable(patch.CardID))
 		if err != nil {
 			return err
 		}

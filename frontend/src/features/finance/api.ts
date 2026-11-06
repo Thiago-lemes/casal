@@ -4,6 +4,19 @@ import { api } from '@/shared/api/client'
 
 export type Category = { id: string; name: string; key?: string; archived: boolean }
 
+/** Cartão de crédito. É pessoal: o parceiro nunca o vê. */
+export type Card = {
+  id: string
+  name: string
+  brand?: string
+  last4?: string
+  closing_day?: number
+  due_day?: number
+  archived: boolean
+}
+
+export type CardInput = { name: string; brand?: string; last4?: string; closing_day?: number; due_day?: number }
+
 /** Pontos-base por pessoa (1% = 100); a soma é 10000. */
 export type Split = Record<string, number>
 
@@ -19,6 +32,8 @@ export type Expense = {
   spent_on: string
   description: string
   split?: Split
+  /** só vem para quem pagou com o cartão */
+  card_id?: string
   source: 'manual' | 'shopping' | 'recurring' | 'bill'
   recurring_id?: string
   bill_id?: string
@@ -43,6 +58,8 @@ export type ExpenseInput = {
   spent_on: string
   description: string
   split?: Split
+  /** na edição, vazio tira o cartão; fora da edição, omita para "sem cartão" */
+  card_id?: string
   version?: number
   installments?: { count: number; first_on: string; installment_amount_cents?: number }
 }
@@ -50,7 +67,7 @@ export type ExpenseInput = {
 export type CreateExpenseResult = Expense & { split_fallback?: boolean }
 export type CreateInstallmentsResult = { expenses: Expense[]; split_fallback?: boolean }
 
-export type GroupInput = { description?: string; category_id?: string; paid_by?: string; split?: Split }
+export type GroupInput = { description?: string; category_id?: string; paid_by?: string; split?: Split; card_id?: string }
 
 export type Balance = {
   through: string
@@ -163,6 +180,9 @@ export type Summary = {
     used_percent?: number
   }[]
   paid_by?: Record<string, number>
+  /** totais nos MEUS cartões; o cartão do parceiro não aparece */
+  cards: { card_id: string; total_cents: number }[]
+  without_card_cents: number
 }
 
 export type ExpenseQuery = { month: string; scope: 'household' | 'mine'; before?: string; limit?: number }
@@ -184,6 +204,12 @@ export const financeApi = {
   renameCategory: (id: string, name: string) => api<Category>(`/v1/finance/categories/${id}`, json('PUT', { name })),
   archiveCategory: (id: string) => api<Category>(`/v1/finance/categories/${id}/archive`, json('POST')),
   unarchiveCategory: (id: string) => api<Category>(`/v1/finance/categories/${id}/unarchive`, json('POST')),
+
+  cards: async (archived = false) => (await api<Card[] | null>(`/v1/finance/cards${qs({ archived: archived ? 'true' : undefined })}`)) ?? [],
+  createCard: (v: CardInput) => api<Card>('/v1/finance/cards', json('POST', v)),
+  updateCard: (id: string, v: CardInput) => api<Card>(`/v1/finance/cards/${id}`, json('PUT', v)),
+  archiveCard: (id: string) => api<Card>(`/v1/finance/cards/${id}/archive`, json('POST')),
+  unarchiveCard: (id: string) => api<Card>(`/v1/finance/cards/${id}/unarchive`, json('POST')),
 
   expenses: async (q: ExpenseQuery) => {
     const page = await api<ExpensePage>(`/v1/finance/expenses${qs({ month: q.month, scope: q.scope, before: q.before, limit: q.limit ?? 50 })}`)
@@ -237,7 +263,7 @@ export const financeApi = {
   removeBudget: (categoryId: string) => api<void>(`/v1/finance/budgets/${categoryId}`, json('DELETE')),
   summary: async (month: string, scope: 'household' | 'mine') => {
     const s = await api<Summary>(`/v1/finance/summary${qs({ month, scope })}`)
-    return { ...s, categories: s.categories ?? [] }
+    return { ...s, categories: s.categories ?? [], cards: s.cards ?? [], without_card_cents: s.without_card_cents ?? 0 }
   },
 }
 

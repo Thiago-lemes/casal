@@ -30,7 +30,7 @@ export function fakeServer(routes: Routes) {
       const call: Call = { method, url, body: init.body ? JSON.parse(init.body) : undefined }
       calls.push(call)
       const key = `${method} ${url.split('?')[0]}`
-      const route = routes[key] ?? (key === 'GET /v1/finance/categories' ? categories : undefined)
+      const route = routes[key] ?? (key === 'GET /v1/finance/categories' ? categories : key === 'GET /v1/finance/cards' ? [] : undefined)
       if (route === undefined) return { ok: false, status: 404, json: async () => ({ code: 'not_found' }) }
       const out = typeof route === 'function' ? (route as (c: Call) => unknown)(call) : route
       if (out && typeof out === 'object' && 'status' in (out as object) && 'code' in (out as object)) {

@@ -61,6 +61,18 @@
     "paidBy": "Quem pagou",
     "me": "Eu"
   },
+  "card": {
+    "label": "Cartão",
+    "none": "Sem cartão",
+    "new": "+ Novo cartão",
+    "name": "Nome do cartão",
+    "last4": "Final (4 dígitos)",
+    "last4Invalid": "Use 4 números.",
+    "closingDay": "Fecha dia",
+    "dueDay": "Vence dia",
+    "hint": "Só você vê os seus cartões. Final, fechamento e vencimento são opcionais.",
+    "save": "Salvar cartão"
+  },
   "composer": {
     "title": "Novo gasto",
     "editTitle": "Editar gasto",
@@ -283,6 +295,9 @@
     "emptyBody": "Quando houver gastos, o resumo mostra para onde foi o dinheiro.",
     "installmentsHint": "As parcelas contam no mês de cada uma.",
     "paidBy": "Quanto cada um pagou",
+    "byCard": "Nos seus cartões",
+    "withoutCard": "Sem cartão",
+    "byCardHint": "Só os seus cartões aparecem. O que o parceiro pagou no cartão dele não entra aqui.",
     "usedOfLimit": "{{percent}}% do limite de {{limit}}",
     "nearLimit": "perto do limite",
     "overLimit": "limite ultrapassado"

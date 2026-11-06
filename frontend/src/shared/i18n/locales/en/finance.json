@@ -61,6 +61,18 @@
     "paidBy": "Paid by",
     "me": "Me"
   },
+  "card": {
+    "label": "Card",
+    "none": "No card",
+    "new": "+ New card",
+    "name": "Card name",
+    "last4": "Last 4 digits",
+    "last4Invalid": "Use 4 digits.",
+    "closingDay": "Closes on day",
+    "dueDay": "Due on day",
+    "hint": "Only you see your cards. Last digits, closing and due days are optional.",
+    "save": "Save card"
+  },
   "composer": {
     "title": "New expense",
     "editTitle": "Edit expense",
@@ -283,6 +295,9 @@
     "emptyBody": "Once there are expenses, the summary shows where the money went.",
     "installmentsHint": "Installments count in the month of each one.",
     "paidBy": "How much each paid",
+    "byCard": "On your cards",
+    "withoutCard": "No card",
+    "byCardHint": "Only your cards show up. What your partner paid on their card is not listed here.",
     "usedOfLimit": "{{percent}}% of the {{limit}} limit",
     "nearLimit": "close to the limit",
     "overLimit": "limit exceeded"

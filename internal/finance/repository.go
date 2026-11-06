@@ -14,6 +14,15 @@ import (
 // Repository é tudo o que o service precisa do banco. Todo método leva o casal e filtra por ele; a privacidade
 // entre os parceiros (gasto pessoal, renda) vive só no código e por isso quem lê recebe também quem está perguntando.
 type Repository interface {
+	// cartões (pessoais: toda consulta filtra por dono)
+	ListCards(ctx context.Context, hh, owner string, archived bool) ([]Card, error)
+	GetCard(ctx context.Context, hh, owner, id string) (Card, error)
+	CreateCard(ctx context.Context, c Card) (Card, error)
+	UpdateCard(ctx context.Context, c Card) (Card, error)
+	SetCardArchived(ctx context.Context, hh, owner, id string, archived bool) (Card, error)
+	// CardTotals soma o mês nos cartões de quem pergunta e nos gastos sem cartão (cartão do parceiro não entra em nenhum).
+	CardTotals(ctx context.Context, hh, viewer, scope, month string) (byCard map[string]int64, without int64, err error)
+
 	// categorias
 	ListCategories(ctx context.Context, hh string, archived bool) ([]Category, error)
 	GetCategory(ctx context.Context, hh, id string) (Category, error)
@@ -98,6 +107,9 @@ type GroupPatch struct {
 	PaidBy      *string
 	Split       map[string]int
 	UpdatedBy   string
+	// CardSet diz que o cartão deve mudar para CardID (vazio = tirar o cartão).
+	CardSet bool
+	CardID  string
 }
 
 // DueRecurring é um gasto fixo ativo com o fuso de quem paga, para o job decidir o dia.

@@ -115,6 +115,10 @@ type Summary struct {
 	PreviousTotalCents int64             `json:"previous_total_cents"`
 	Categories         []CategorySummary `json:"categories"`
 	PaidBy             map[string]int64  `json:"paid_by,omitempty"`
+	// Cards são os totais nos cartões de quem pergunta e WithoutCardCents o que ficou sem cartão. O cartão do parceiro
+	// não aparece em nenhum dos dois (a diferença para o total é o que ele pagou com cartão).
+	Cards            []CardSummary `json:"cards"`
+	WithoutCardCents int64         `json:"without_card_cents"`
 }
 
 // Summary soma o mês por categoria, compara com o mês anterior e mostra o uso do orçamento. Em "mine" só entram os
@@ -143,7 +147,22 @@ func (s *Service) Summary(ctx context.Context, p identity.Principal, month, scop
 		return Summary{}, err
 	}
 	limits := map[string]int64{}
-	out := Summary{Month: month, Scope: scope, Categories: []CategorySummary{}}
+	out := Summary{Month: month, Scope: scope, Categories: []CategorySummary{}, Cards: []CardSummary{}}
+	byCard, without, err := s.repo.CardTotals(ctx, p.HouseholdID, p.UserID, scope, month)
+	if err != nil {
+		return Summary{}, err
+	}
+	out.WithoutCardCents = without
+	for id, total := range byCard {
+		out.Cards = append(out.Cards, CardSummary{CardID: id, TotalCents: total})
+	}
+	sort.Slice(out.Cards, func(i, j int) bool {
+		a, b := out.Cards[i], out.Cards[j]
+		if a.TotalCents != b.TotalCents {
+			return a.TotalCents > b.TotalCents
+		}
+		return a.CardID < b.CardID
+	})
 	if scope == "household" {
 		if out.PaidBy, err = s.repo.PaidTotals(ctx, p.HouseholdID, month); err != nil {
 			return Summary{}, err
@@ -191,6 +210,7 @@ type ExportData struct {
 	Categories    []Category   `json:"categories"`
 	Expenses      []Expense    `json:"expenses"`
 	Settlements   []Settlement `json:"settlements"`
+	Cards         []Card       `json:"cards"` // só os meus
 	MyIncomeCents *int64       `json:"my_monthly_income_cents,omitempty"`
 }
 
@@ -198,6 +218,9 @@ func (s *Service) Export(ctx context.Context, p identity.Principal) (ExportData,
 	var d ExportData
 	var err error
 	if d.Categories, err = s.repo.ListCategories(ctx, p.HouseholdID, true); err != nil {
+		return d, err
+	}
+	if d.Cards, err = s.repo.ListCards(ctx, p.HouseholdID, p.UserID, true); err != nil {
 		return d, err
 	}
 	if d.Expenses, err = s.repo.VisibleExpenses(ctx, p.HouseholdID, p.UserID, exportLimit); err != nil {
@@ -217,18 +240,22 @@ func (d ExportData) WriteCSV(w io.Writer) error {
 	for _, c := range d.Categories {
 		names[c.ID] = c.Name
 	}
+	cards := map[string]string{}
+	for _, c := range d.Cards {
+		cards[c.ID] = c.Name
+	}
 	cw := csv.NewWriter(w)
-	_ = cw.Write([]string{"tipo", "data", "descricao", "categoria", "valor_centavos", "pago_por", "escopo", "parcela", "acertado", "de", "para"})
+	_ = cw.Write([]string{"tipo", "data", "descricao", "categoria", "valor_centavos", "pago_por", "escopo", "parcela", "acertado", "de", "para", "cartao"})
 	for _, e := range d.Expenses {
 		inst := ""
 		if e.Installment != nil {
 			inst = fmt.Sprintf("%d/%d", e.Installment.No, e.Installment.Total)
 		}
 		_ = cw.Write([]string{"gasto", e.SpentOn, safeCell(e.Description), safeCell(names[e.CategoryID]),
-			strconv.FormatInt(e.AmountCents, 10), e.PaidBy, e.Scope, inst, strconv.FormatBool(e.Settled), "", ""})
+			strconv.FormatInt(e.AmountCents, 10), e.PaidBy, e.Scope, inst, strconv.FormatBool(e.Settled), "", "", safeCell(cards[e.MyCardID])})
 	}
 	for _, st := range d.Settlements {
-		_ = cw.Write([]string{"acerto", st.ThroughOn, st.Kind, "", strconv.FormatInt(st.AmountCents, 10), "", "", "", "", st.FromUser, st.ToUser})
+		_ = cw.Write([]string{"acerto", st.ThroughOn, st.Kind, "", strconv.FormatInt(st.AmountCents, 10), "", "", "", "", st.FromUser, st.ToUser, ""})
 	}
 	cw.Flush()
 	return cw.Error()

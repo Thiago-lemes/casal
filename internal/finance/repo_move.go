@@ -12,7 +12,7 @@ import (
 //   - Se há saldo em aberto, registra um acerto "leave" (só um registro: o app não cobra ninguém) e carimba todos os
 //     gastos abertos do casal, inclusive as parcelas futuras, para a dívida não crescer em silêncio depois da saída.
 //   - Gastos fixos e contas da pessoa passam para quem ficou; a divisão padrão volta para igual.
-//   - O que é pessoal acompanha quem saiu e o que o parceiro lia ("view") vira privado. A renda também segue a pessoa.
+//   - O que é pessoal acompanha quem saiu e o que o parceiro lia ("view") vira privado. A renda e os cartões também seguem a pessoa.
 func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff) error {
 	if err := db.SetScope(ctx, tx, db.Scope{System: true}); err != nil {
 		return err
@@ -38,6 +38,13 @@ func (p *PostgresRepo) HandleLeave(ctx context.Context, tx *sql.Tx, h db.Handoff
 	if _, err := tx.ExecContext(ctx, `
 		UPDATE finance_settings SET split_mode = 'equal', fixed_split = NULL, proportional_consent = '[]', updated_at = now()
 		WHERE household_id = $1 AND (split_mode <> 'equal' OR proportional_consent <> '[]'::jsonb)`, h.From); err != nil {
+		return err
+	}
+	// o cartão vai com a pessoa: o gasto do casal que ficou para trás perde a ligação (o parceiro nunca o via)
+	if _, err := tx.ExecContext(ctx, `
+		UPDATE expenses SET card_id = NULL
+		WHERE household_id = $1 AND scope = 'household' AND card_id IN (SELECT id FROM finance_cards WHERE owner_id = $2)`,
+		h.From, h.UserID); err != nil {
 		return err
 	}
 	for _, table := range []string{"expenses", "recurring_expenses"} {
@@ -98,6 +105,10 @@ func (p *PostgresRepo) HandleJoin(ctx context.Context, tx *sql.Tx, h db.Handoff)
 			h.UserID, h.To); err != nil {
 			return err
 		}
+	}
+	if _, err := tx.ExecContext(ctx,
+		`UPDATE finance_cards SET household_id = $2 WHERE owner_id = $1 AND household_id <> $2`, h.UserID, h.To); err != nil {
+		return err
 	}
 	_, err := tx.ExecContext(ctx,
 		`UPDATE finance_incomes SET household_id = $2 WHERE user_id = $1 AND household_id <> $2`, h.UserID, h.To)

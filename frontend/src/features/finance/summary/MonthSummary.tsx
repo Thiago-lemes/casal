@@ -5,7 +5,7 @@ import { Button, Card, ChoiceGroup, EmptyState, Skeleton } from '@/design-system
 import { errorMessage } from '@/shared/api/errorMessage'
 import { categoryName } from '../categories'
 import { formatMonth, monthOf, shiftMonth, todayIn } from '@/shared/lib/dates'
-import { useCategories, useModuleGuard, useSummary } from '../hooks'
+import { useCards, useCategories, useModuleGuard, useSummary } from '../hooks'
 import { formatBRL } from '@/shared/lib/money'
 import { nameOf } from '../types'
 import type { Ctx } from '../types'
@@ -23,6 +23,7 @@ export function MonthSummary({ ctx }: { ctx: Ctx }) {
   const [scope, setScope] = useState<'household' | 'mine'>('household')
   const summary = useSummary(month, scope)
   const categories = useCategories(true)
+  const cards = useCards(true)
   useModuleGuard(summary.error)
   const lang = i18n.language
 
@@ -97,6 +98,26 @@ export function MonthSummary({ ctx }: { ctx: Ctx }) {
                 ))}
               </ul>
               {scope === 'household' && <p className={styles.hint}>{t('summary.installmentsHint')}</p>}
+            </Card>
+          )}
+
+          {(s.cards.length > 0 || (cards.data ?? []).length > 0) && (
+            <Card title={t('summary.byCard')}>
+              <ul className={styles.list}>
+                {s.cards.map((c) => (
+                  <li key={c.card_id} className={styles.item}>
+                    <span className={styles.itemTitle}>{cards.data?.find((x) => x.id === c.card_id)?.name ?? ''}</span>
+                    <span className={styles.money}>{formatBRL(c.total_cents, lang)}</span>
+                  </li>
+                ))}
+                {s.without_card_cents > 0 && (
+                  <li className={styles.item}>
+                    <span className={styles.itemTitle}>{t('summary.withoutCard')}</span>
+                    <span className={styles.money}>{formatBRL(s.without_card_cents, lang)}</span>
+                  </li>
+                )}
+              </ul>
+              {scope === 'household' && <p className={styles.hint}>{t('summary.byCardHint')}</p>}
             </Card>
           )}
 

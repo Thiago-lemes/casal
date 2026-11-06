@@ -5,11 +5,14 @@
     "title": "Your name",
     "label": "Name"
   },
-  "city": {
-    "title": "City and time",
-    "lead": "Pick your city. It sets the time for your reminders, routine and free time.",
-    "label": "City",
-    "useDevice": "Use this device's city ({{city}})"
+  "zone": {
+    "title": "Time zone",
+    "lead": "Pick the time zone you want to get alerts in. It sets the time for your reminders, routine and free time.",
+    "label": "Time zone",
+    "other": "Other time zone…",
+    "otherLabel": "Time zone name",
+    "invalid": "I don't know that time zone. Pick one from the list, like America/Lima.",
+    "useDevice": "Use this device's time zone ({{zone}})"
   },
   "leave": {
     "title": "Leave the couple",

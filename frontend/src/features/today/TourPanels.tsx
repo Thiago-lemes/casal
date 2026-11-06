@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/design-system'
 import { useUpdateProfile } from '@/features/auth/hooks'
 import { useCreateInvite } from '@/features/household/hooks'
-import { CITIES, cityForZone, cityName, deviceZone } from '@/features/profile/cities'
+import { isValidZone, zoneLabel } from '@/features/profile/timezones'
+import { ZonePicker } from '@/features/profile/ZonePicker'
 import { errorMessage } from '@/shared/api/errorMessage'
 import styles from './TourPanels.module.css'
 
@@ -28,15 +29,12 @@ function Done({ children }: { children: string }) {
   )
 }
 
-/** Mostra a cidade que o app tem e deixa confirmar com um toque, ou trocar ali mesmo. */
+/** Mostra o fuso que o app tem e deixa confirmar com um toque, ou trocar ali mesmo. */
 export function CityPanel({ timezone, done, onChecked }: { timezone: string; done: boolean; onChecked: () => void }) {
   const { t, i18n } = useTranslation('onboarding')
   const update = useUpdateProfile()
   const [changing, setChanging] = useState(false)
   const [zone, setZone] = useState(timezone)
-  const known = cityForZone(timezone)
-  const device = deviceZone()
-  const deviceCity = device ? cityForZone(device) : undefined
 
   if (done) return <Done>{t('panels.city.done')}</Done>
 
@@ -49,7 +47,7 @@ export function CityPanel({ timezone, done, onChecked }: { timezone: string; don
     return (
       <>
         <p>
-          {t('panels.city.current')} <strong>{known ? cityName(known, i18n.language) : timezone}</strong>
+          {t('panels.city.current')} <strong>{zoneLabel(timezone, i18n.language)}</strong>
         </p>
         <div className={styles.row}>
           <Button variant="primary" onClick={onChecked}>
@@ -63,25 +61,8 @@ export function CityPanel({ timezone, done, onChecked }: { timezone: string; don
 
   return (
     <form className={styles.form} onSubmit={save}>
-      <div className={styles.select}>
-        <label htmlFor="tour-city" className={styles.label}>
-          {t('panels.city.label')}
-        </label>
-        <select id="tour-city" value={zone} onChange={(e) => setZone(e.target.value)} className={styles.control}>
-          {!known && <option value={timezone}>{timezone}</option>}
-          {CITIES.map((c) => (
-            <option key={c.id} value={c.tz}>
-              {cityName(c, i18n.language)}
-            </option>
-          ))}
-        </select>
-      </div>
-      {deviceCity && device !== zone && (
-        <Button variant="quiet" onClick={() => setZone(device!)}>
-          {t('panels.city.useDevice', { city: cityName(deviceCity, i18n.language) })}
-        </Button>
-      )}
-      <Button type="submit" variant="primary" loading={update.isPending}>
+      <ZonePicker label={t('panels.city.label')} value={zone} onChange={setZone} />
+      <Button type="submit" variant="primary" loading={update.isPending} disabled={zone === timezone || !isValidZone(zone)}>
         {t('panels.city.save')}
       </Button>
       <Failure error={update.error} />

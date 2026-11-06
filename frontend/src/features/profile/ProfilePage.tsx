@@ -3,14 +3,15 @@ import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, Button, ButtonLink, Card, Dialog, DialogClose, TextField } from '@/design-system'
 import { errorMessage } from '@/shared/api/errorMessage'
-import { CITIES, cityForZone, cityName, deviceZone } from './cities'
 import styles from './ProfilePage.module.css'
+import { isValidZone } from './timezones'
+import { ZonePicker } from './ZonePicker'
 
 type Mutation<V> = { mutate: (vars: V, o?: { onSuccess?: () => void }) => void; isPending: boolean; error: unknown; isSuccess: boolean }
 
 type Props = {
   me: { name: string; email: string; timezone: string }
-  /** vem de `useUpdateProfile`; o fuso é o nome IANA da cidade escolhida */
+  /** vem de `useUpdateProfile`; o fuso é o nome IANA escolhido */
   update: Mutation<{ name?: string; timezone?: string }>
   /** vem de `useLeaveHousehold`; sem casal, a pessoa não tem o que sair */
   leave?: Mutation<void>
@@ -21,15 +22,11 @@ type Props = {
 }
 
 export function ProfilePage({ me, update, leave, exportHref, goalsExportHref }: Props) {
-  const { t, i18n } = useTranslation('profile')
+  const { t } = useTranslation('profile')
   const { t: tc } = useTranslation('common')
   const [name, setName] = useState(me.name)
   const [zone, setZone] = useState(me.timezone)
   const [confirming, setConfirming] = useState(false)
-
-  const known = cityForZone(zone)
-  const device = deviceZone()
-  const deviceCity = device ? cityForZone(device) : undefined
 
   function saveName(e: FormEvent) {
     e.preventDefault()
@@ -62,35 +59,12 @@ export function ProfilePage({ me, update, leave, exportHref, goalsExportHref }: 
         </form>
       </Card>
 
-      <Card title={t('city.title')}>
+      <Card title={t('zone.title')}>
         <form className={styles.form} onSubmit={saveZone}>
-          <p className={styles.lead}>{t('city.lead')}</p>
-          <div className={styles.select}>
-            <label htmlFor="city" className={styles.label}>
-              {t('city.label')}
-            </label>
-            <select
-              id="city"
-              value={zone}
-              onChange={(e) => setZone(e.target.value)}
-              className={styles.control}
-            >
-              {/* um fuso que não está na lista (ex.: escolhido antes) continua selecionável */}
-              {!known && <option value={zone}>{zone}</option>}
-              {CITIES.map((city) => (
-                <option key={city.id} value={city.tz}>
-                  {cityName(city, i18n.language)}
-                </option>
-              ))}
-            </select>
-          </div>
-          {deviceCity && device !== zone && (
-            <Button variant="quiet" onClick={() => setZone(device!)}>
-              {t('city.useDevice', { city: cityName(deviceCity, i18n.language) })}
-            </Button>
-          )}
+          <p className={styles.lead}>{t('zone.lead')}</p>
+          <ZonePicker label={t('zone.label')} value={zone} onChange={setZone} />
           <div>
-            <Button type="submit" variant="primary" loading={update.isPending} disabled={zone === me.timezone}>
+            <Button type="submit" variant="primary" loading={update.isPending} disabled={zone === me.timezone || !isValidZone(zone)}>
               {t('save')}
             </Button>
           </div>

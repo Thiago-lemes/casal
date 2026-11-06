@@ -6,7 +6,7 @@ Este documento diz como o frontend vai crescer: o que já existe, as convençõe
 
 ## Estado atual
 
-PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), as páginas **Tarefas** (F1), **Anotações** (F2), **Semana** com a rotina (F3), **Lembretes** (F4) e **Compras** (F5), **Finanças** (FF0 a FF6, módulo opcional), o **Perfil** (nome, cidade e fuso, sair do casal), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
+PWA em React 19, Vite e TypeScript, dentro de `frontend/`. Hoje tem login e cadastro, criação ou entrada em um casal, a tela **Hoje** com lembretes (criar, resolver, adiar, cancelar), as páginas **Tarefas** (F1), **Anotações** (F2), **Semana** com a rotina (F3), **Lembretes** (F4) e **Compras** (F5), **Finanças** (FF0 a FF6, módulo opcional), o **Perfil** (nome, fuso horário, sair do casal), a ativação dos avisos e as preferências de tema e idioma (no menu do avatar).
 
 | Tema | Como está hoje |
 | --- | --- |
@@ -156,7 +156,7 @@ Namespace novo `tasks` em `pt-BR` e `en`. O backend agora envia `code` em todo e
 
 ## Itens transversais
 
-**Fuso horário.** `GET /v1/me` já devolve `timezone` e a tela Hoje o usa. O fluxo decidido no produto é a pessoa informar a cidade e o app deduzir o fuso: o backend já aceita `PATCH /v1/me` com `timezone` (nome IANA), e falta a lista de cidades com fuso no frontend. Entra na F4, mas **antes da rotina (F3)**, porque a rotina depende do fuso certo.
+**Fuso horário.** `GET /v1/me` já devolve `timezone` e a tela Hoje o usa. A pessoa escolhe o fuso (rótulo "Brasília (GMT−3)"): o backend aceita `PATCH /v1/me` com `timezone` (nome IANA). Entra na F4, mas **antes da rotina (F3)**, porque a rotina depende do fuso certo.
 
 **Privacidade por item.** Blocos de rotina, anotações e metas pessoais terão visibilidade escolhida pelo dono (compartilhado, só "ocupado" ou privado). Criar um componente único `VisibilityPicker` em `shared/` e reutilizá-lo nas três telas, com o padrão no valor mais restrito.
 
@@ -190,7 +190,7 @@ Toda resposta de erro é `{"error": "frase em português", "code": "..."}`. **Tr
 
 ### Perfil
 
-`PATCH /v1/me` com `name` e/ou `timezone` (campo ausente fica como está). O fuso é um nome IANA válido (`America/Sao_Paulo`); a lista de cidades fica no frontend. `Local` e nomes inventados dão `400`. Os horários da rotina e as janelas livres usam o fuso do perfil.
+`PATCH /v1/me` com `name` e/ou `timezone` (campo ausente fica como está). O fuso é um nome IANA válido (`America/Sao_Paulo`); a lista de fusos fica no frontend. `Local` e nomes inventados dão `400`. Os horários da rotina e as janelas livres usam o fuso do perfil.
 
 ### Tarefas (novidades)
 
@@ -227,7 +227,7 @@ Item: `name`, `quantity` (opcional), `unit`, `category` (`produce`, `grocery`, `
 - ~~O criador deve ver na aba Recusadas só as tarefas que ele criou, ou todas do casal?~~ Decidido na F1: mostra todas; as ações só aparecem para o criador.
 - ~~A página de tarefas entra na barra principal já agora?~~ Decidido na F1: entrou na barra (Hoje · Rotina em breve · Tarefas · Casa; com o avatar são cinco itens no celular).
 - ~~Tarefa recorrente e rodízio: mesma tela ou segunda entrega?~~ Decidido: **na mesma tela de criar tarefa**. O rodízio só aparece quando a tarefa se repete, tem responsável e há duas pessoas.
-- ~~Lista de cidades com fuso: curta ou completa do `Intl`?~~ Decidido: **lista curta embutida** em `features/profile/cities.ts` (capitais brasileiras e algumas cidades do exterior), com teste que valida cada fuso contra o `Intl`. Um fuso que não está na lista continua selecionável.
+- ~~Lista de fusos: curta ou completa do `Intl`?~~ Decidido: **lista curta embutida** em `features/profile/timezones.ts` (fusos do Brasil e alguns do exterior, com o deslocamento no rótulo) mais "Outro fuso" com busca em todos os do `Intl`. Um fuso fora da lista continua selecionável.
 
 ## Decisões tomadas na implementação
 

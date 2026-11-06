@@ -44,29 +44,6 @@
   max-width: 52ch;
 }
 
-.select {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.label {
-  font-size: var(--text-sm);
-  font-weight: 600;
-}
-
-.control {
-  min-height: var(--tap);
-  padding: 0 var(--space-3);
-  background: var(--color-surface);
-  border: 2px solid var(--color-line);
-  border-radius: var(--radius-m);
-}
-
-.control:focus-visible {
-  border-color: var(--color-accent);
-  outline-offset: 0;
-}
-
 .error {
   color: var(--color-danger);
   font-weight: 500;

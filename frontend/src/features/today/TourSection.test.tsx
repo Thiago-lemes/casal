@@ -109,16 +109,16 @@ describe('TourSection', () => {
     expect(screen.getByRole('dialog', { name: 'Crie o primeiro lembrete' })).toBeInTheDocument()
   })
 
-  it('o passo da cidade confirma com um toque e guarda', async () => {
+  it('o passo do fuso confirma com um toque e guarda', async () => {
     reminders = [{ id: 'r' }]
     setup({ hasPartner: true })
     await screen.findByText('Passo 1 de 5')
     await userEvent.click(screen.getByRole('button', { name: 'Continuar' })) // lista
     await userEvent.click(screen.getByRole('button', { name: 'Continuar' })) // cidade
-    expect(screen.getByRole('dialog', { name: 'Sua cidade está certa?' })).toBeInTheDocument()
-    expect(screen.getByText(/São Paulo/)).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Está certa' }))
-    expect(screen.getByText('Cidade conferida.')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Seu fuso horário está certo?' })).toBeInTheDocument()
+    expect(screen.getByText(/Brasília \(GMT−3\)/)).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Está certo' }))
+    expect(screen.getByText('Fuso conferido.')).toBeInTheDocument()
     expect(readSaved('ana').cityChecked).toBe(true)
     expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument()
   })

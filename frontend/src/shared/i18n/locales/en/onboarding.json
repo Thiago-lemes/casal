@@ -22,7 +22,7 @@
       "body": "Everything set for today shows up in this list. When the time comes, you complete, snooze or cancel with one tap."
     },
     "city": {
-      "title": "Is your city right?",
+      "title": "Is your time zone right?",
       "body": "It sets the time of your reminders and routine. If it is wrong, the 8am alert arrives at the wrong hour."
     },
     "invite": {
@@ -41,13 +41,12 @@
   },
   "panels": {
     "city": {
-      "current": "Your city right now:",
+      "current": "Your time zone right now:",
       "right": "It's right",
-      "change": "Change city",
-      "label": "City",
-      "useDevice": "Use {{city}} (from this device)",
-      "save": "Save city",
-      "done": "City checked."
+      "change": "Change time zone",
+      "label": "Time zone",
+      "save": "Save time zone",
+      "done": "Time zone checked."
     },
     "invite": {
       "generate": "Generate invite code",

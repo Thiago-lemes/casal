@@ -22,8 +22,8 @@
       "body": "Tudo o que está marcado para hoje aparece nesta lista. Na hora certa, você conclui, adia ou cancela com um toque."
     },
     "city": {
-      "title": "Sua cidade está certa?",
-      "body": "É ela que define a hora dos lembretes e da rotina. Se estiver errada, o aviso das 8h chega fora de hora."
+      "title": "Seu fuso horário está certo?",
+      "body": "É ele que define a hora dos lembretes e da rotina. Se estiver errado, o aviso das 8h chega fora de hora."
     },
     "invite": {
       "title": "Convide a outra pessoa",
@@ -41,13 +41,12 @@
   },
   "panels": {
     "city": {
-      "current": "Sua cidade agora:",
-      "right": "Está certa",
-      "change": "Mudar de cidade",
-      "label": "Cidade",
-      "useDevice": "Usar {{city}} (deste aparelho)",
-      "save": "Salvar cidade",
-      "done": "Cidade conferida."
+      "current": "Seu fuso agora:",
+      "right": "Está certo",
+      "change": "Mudar de fuso",
+      "label": "Fuso horário",
+      "save": "Salvar fuso",
+      "done": "Fuso conferido."
     },
     "invite": {
       "generate": "Gerar código do convite",

@@ -5,11 +5,14 @@
     "title": "Seu nome",
     "label": "Nome"
   },
-  "city": {
-    "title": "Cidade e horário",
-    "lead": "Escolha a sua cidade. É ela que define o horário dos lembretes, da rotina e dos horários livres.",
-    "label": "Cidade",
-    "useDevice": "Usar a cidade deste aparelho ({{city}})"
+  "zone": {
+    "title": "Fuso horário",
+    "lead": "Escolha o fuso em que você quer receber os avisos. Ele define o horário dos lembretes, da rotina e dos horários livres.",
+    "label": "Fuso horário",
+    "other": "Outro fuso…",
+    "otherLabel": "Nome do fuso",
+    "invalid": "Não conheço esse fuso. Escolha um da lista, como America/Lima.",
+    "useDevice": "Usar o fuso deste aparelho ({{zone}})"
   },
   "leave": {
     "title": "Sair do casal",

@@ -14,8 +14,8 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-5);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-hero);
+  color: var(--color-on-hero);
   border-radius: var(--radius-l);
 }
 
@@ -31,12 +31,18 @@
   overflow-wrap: anywhere;
 }
 
+.hero .cta {
+  background: var(--color-cta);
+  --cta-hover-bg: var(--color-cta-hover);
+  color: var(--color-on-cta);
+}
+
 .heroMeta {
   font-weight: 600;
 }
 
 .back {
-  color: var(--color-on-accent);
+  color: var(--color-on-hero);
   font-weight: 600;
 }
 
@@ -256,7 +262,7 @@
 .fill {
   height: 100%;
   border-radius: var(--radius-pill);
-  background: var(--color-accent);
+  background: var(--color-signal);
   transition: width var(--dur-base) var(--ease-out);
 }
 

@@ -36,7 +36,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 img, svg { display: block; max-width: 100%; }
 
-a { color: var(--color-accent-text); text-underline-offset: 0.2em; }
+a { color: var(--color-link); text-underline-offset: 0.2em; }
 
 /* partes do navegador que também carregam o design */
 :focus-visible {
@@ -44,10 +44,10 @@ a { color: var(--color-accent-text); text-underline-offset: 0.2em; }
   outline-offset: 2px;
   border-radius: var(--radius-s);
 }
-::selection { background: var(--color-accent); color: var(--color-on-accent); }
+::selection { background: var(--color-signal); color: var(--color-on-signal); }
 ::placeholder { color: var(--color-text-soft); opacity: 1; }
 * { scrollbar-color: var(--color-line) transparent; scrollbar-width: thin; }
-input, textarea { caret-color: var(--color-accent); accent-color: var(--color-accent); }
+input, textarea { caret-color: var(--color-signal); accent-color: var(--color-signal); }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;

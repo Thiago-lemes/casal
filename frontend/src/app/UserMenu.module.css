@@ -21,7 +21,7 @@
   }
 
   .trigger:hover {
-    background: rgb(21 23 27 / 0.12);
+    background: var(--color-hero-hover);
   }
 
   .triggerName {

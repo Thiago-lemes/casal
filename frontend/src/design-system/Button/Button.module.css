@@ -37,7 +37,7 @@
   color: var(--color-on-accent);
 }
 .primary:hover:not(:disabled) {
-  background: var(--color-accent-press);
+  background: var(--cta-hover-bg, var(--color-accent-press));
 }
 
 .secondary {

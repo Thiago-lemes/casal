@@ -39,7 +39,7 @@ export function Shell() {
         </div>
         {/* celular: fundo claro, cores da marca; desktop: trilho laranja, versão para laranja */}
         <Logo className={styles.brandMobile} title={APP_NAME} />
-        <Logo className={styles.brandRail} tone="onAccent" title={APP_NAME} />
+        <Logo className={styles.brandRail} tone="onDark" title={APP_NAME} />
       </header>
 
       <nav className={styles.nav} aria-label={t('nav.main')}>

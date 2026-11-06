@@ -42,11 +42,11 @@ export function Shell() {
         <Logo className={styles.brandRail} tone="onDark" title={APP_NAME} />
       </header>
 
-      <nav className={styles.nav} aria-label={t('nav.main')}>
+      <nav className={styles.nav} aria-label={t('nav.main')} data-tour="nav">
         <ul className={styles.items}>
           {nav.map(({ to, key, icon: Icon, end, desktopOnly }) => (
             <li key={key} className={desktopOnly ? styles.desktopOnly : undefined}>
-              <NavLink to={to} end={end} className={styles.link}>
+              <NavLink to={to} end={end} className={styles.link} data-tour={key === 'home' ? 'home' : undefined}>
                 <Icon className={styles.icon} aria-hidden="true" />
                 <span className={styles.text}>{t(`nav.${key}`)}</span>
               </NavLink>

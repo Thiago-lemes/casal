@@ -5,9 +5,60 @@
   padding: var(--space-6) var(--space-5);
 }
 
+/* o campo azul da marca: a logo, a promessa e o que o app faz */
 .hero {
   display: grid;
+  justify-items: start;
   gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-hero);
+  color: var(--color-on-hero);
+  border-radius: var(--radius-l);
+}
+
+.mascot {
+  width: 7rem;
+  margin-bottom: var(--space-2);
+}
+
+.heroLead {
+  max-width: 46ch;
+  opacity: 0.85;
+}
+
+.pillars {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pillar {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.pillarIcon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-m);
+  background: rgb(255 255 255 / 0.12);
+}
+
+.pillarTitle {
+  display: block;
+  font-weight: 600;
+}
+
+.pillarBody {
+  display: block;
+  font-size: var(--text-sm);
+  opacity: 0.78;
 }
 
 /* cada caminho é um bloco com o seu próprio botão */

@@ -15,7 +15,7 @@ import { useReminderActions, useReminders } from '@/features/reminders/hooks'
 import { busyDays, dayStats, weekSeries } from '@/features/reminders/stats'
 import { formatLongDate } from '@/shared/lib/time'
 import { useModuleEnabled } from '@/shared/modules/hooks'
-import { FirstStepsSection } from './FirstStepsSection'
+import { TourSection } from './TourSection'
 import { TodayTasks } from './widgets/TodayTasks'
 import { DayRing } from './widgets/DayRing'
 import { MonthCalendar } from './widgets/MonthCalendar'
@@ -54,7 +54,7 @@ export function TodayPage() {
 
   return (
     <>
-      <FirstStepsSection meId={me.id} hasPartner={Boolean(partner)} onNewReminder={() => setComposing(true)} />
+      <TourSection me={me} hasPartner={Boolean(partner)} composing={composing} />
       <div className={styles.page}>
       <header className={styles.day}>
         <div className={styles.dayTop}>
@@ -63,7 +63,7 @@ export function TodayPage() {
             <br />
             {day} {month}
           </p>
-          <Button variant="primary" className={styles.cta} onClick={() => setComposing(true)}>
+          <Button variant="primary" className={styles.cta} data-tour="new-reminder" onClick={() => setComposing(true)}>
             {t('newReminder')}
           </Button>
         </div>
@@ -88,7 +88,7 @@ export function TodayPage() {
         <DayRing progress={stats.progress} done={stats.doneToday} total={dueTotal} />
       </div>
 
-      <section className={styles.list} aria-live="polite" aria-label={t('listTitle')}>
+      <section className={styles.list} data-tour="today-list" aria-live="polite" aria-label={t('listTitle')}>
         <div className={styles.listHead}>
           <h2 className={styles.listTitle}>{t('listTitle')}</h2>
           <Link to="/reminders">{t('seeAll')}</Link>

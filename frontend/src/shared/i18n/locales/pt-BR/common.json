@@ -98,7 +98,8 @@
   "userMenu": {
     "label": "Menu da conta de {{name}}",
     "profile": "Perfil",
-    "feedback": "Enviar feedback"
+    "feedback": "Enviar feedback",
+    "tour": "Ver o tour de novo"
   },
   "visibility": {
     "legend": "Quem vê",

@@ -98,7 +98,8 @@
   "userMenu": {
     "label": "Account menu for {{name}}",
     "profile": "Profile",
-    "feedback": "Send feedback"
+    "feedback": "Send feedback",
+    "tour": "See the tour again"
   },
   "visibility": {
     "legend": "Who sees it",

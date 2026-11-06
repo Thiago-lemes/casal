@@ -1,14 +1,28 @@
 {
   "setup": {
     "title": "Boas-vindas ao {{app}}",
-    "lead": "O {{app}} organiza a vida a dois num só lugar: lembretes, tarefas, a rotina da semana e a lista de compras. Finanças e Metas entram quando vocês quiserem.",
+    "lead": "A vida a dois num só lugar. Finanças e Metas entram quando vocês quiserem.",
     "createTitle": "Começar um casal",
     "createLead": "Crie o casal agora e convide a outra pessoa quando quiser. Até lá, o app funciona só com você.",
     "create": "Criar o casal",
     "joinTitle": "Recebeu um convite?",
     "joinLead": "Cole o código que a outra pessoa mandou para entrar no casal que já existe.",
     "token": "Código do convite",
-    "join": "Entrar no casal"
+    "join": "Entrar no casal",
+    "pillars": {
+      "reminders": {
+        "title": "Lembretes",
+        "body": "Um recado com hora marcada, para você ou para a outra pessoa."
+      },
+      "tasks": {
+        "title": "Tarefas e rotina",
+        "body": "Quem faz o quê, na semana de vocês."
+      },
+      "shopping": {
+        "title": "Compras",
+        "body": "Uma lista só, com modo mercado."
+      }
+    }
   },
   "invite": {
     "action": "Convidar a outra pessoa",

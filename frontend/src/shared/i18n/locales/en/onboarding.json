@@ -1,35 +1,63 @@
 {
-  "title": "First steps",
-  "progress": "{{done}} of {{total}}",
-  "dismiss": "Dismiss",
-  "dismissLabel": "Dismiss the first steps",
-  "done": "Done",
+  "tour": {
+    "step": "Step {{n}} of {{total}}",
+    "next": "Continue",
+    "back": "Back",
+    "skipStep": "Skip",
+    "skipTour": "Skip the tour",
+    "finish": "Start using it"
+  },
   "steps": {
-    "city": {
-      "title": "Check your city",
-      "hint": "It sets the time of your reminders and routine.",
-      "action": "Open profile"
+    "nav": {
+      "title": "The app map",
+      "body": "Here are the areas: Today (what matters now), Tasks, Finance and Home. Finance and Goals are optional: turn them on and off any time, nothing is lost."
     },
     "reminder": {
       "title": "Create your first reminder",
-      "hint": "Leave a note for yourself or for the other person. It arrives as an alert at the set time.",
-      "action": "New reminder"
+      "body": "A reminder arrives as an alert at the set time, for you or for the other person.",
+      "hint": "Tap “New reminder”, the highlighted button."
+    },
+    "list": {
+      "title": "Your reminders live here",
+      "body": "Everything set for today shows up in this list. When the time comes, you complete, snooze or cancel with one tap."
+    },
+    "city": {
+      "title": "Is your city right?",
+      "body": "It sets the time of your reminders and routine. If it is wrong, the 8am alert arrives at the wrong hour."
     },
     "invite": {
       "title": "Invite the other person",
-      "hint": "Until then, the app works just for you. Reminders, tasks and shopping are better together.",
-      "action": "Create invite"
+      "body": "Reminders, tasks and shopping are better together: what one person writes, the other sees. Until then, the app works for you alone."
     },
     "push": {
-      "title": "Turn on alerts",
-      "hint": "Get reminders at the right time, even with the app closed.",
-      "hintInstall": "On iPhone, alerts only work with the app on the home screen.",
-      "action": "Turn on alerts"
+      "title": "Get alerts",
+      "body": "Turn them on so reminders arrive on time, even with the app closed. Your browser will ask for permission.",
+      "bodyInstall": "On iPhone, alerts only work with the app on the home screen. Do this:"
     },
-    "modules": {
-      "title": "Pick what you'll use most",
-      "hint": "Finance and Goals are optional. You can turn them on and off any time.",
-      "action": "See modules"
+    "end": {
+      "title": "All set!",
+      "body": "Just use it now. What you agree on shows up in Today, and alerts arrive on time. To see the tour again, open the account menu."
+    }
+  },
+  "panels": {
+    "city": {
+      "current": "Your city right now:",
+      "right": "It's right",
+      "change": "Change city",
+      "label": "City",
+      "useDevice": "Use {{city}} (from this device)",
+      "save": "Save city",
+      "done": "City checked."
+    },
+    "invite": {
+      "generate": "Generate invite code",
+      "lead": "Send this code to the other person. They paste it on the “Got an invite?” screen. It is valid for 7 days and only one person can use it.",
+      "copy": "Copy code",
+      "copied": "Code copied"
+    },
+    "push": {
+      "action": "Turn on alerts",
+      "done": "Alerts turned on for this device."
     }
   }
 }

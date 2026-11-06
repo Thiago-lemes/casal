@@ -1,35 +1,63 @@
 {
-  "title": "Primeiros passos",
-  "progress": "{{done}} de {{total}}",
-  "dismiss": "Dispensar",
-  "dismissLabel": "Dispensar os primeiros passos",
-  "done": "Feito",
+  "tour": {
+    "step": "Passo {{n}} de {{total}}",
+    "next": "Continuar",
+    "back": "Voltar",
+    "skipStep": "Pular",
+    "skipTour": "Pular o tour",
+    "finish": "Começar a usar"
+  },
   "steps": {
-    "city": {
-      "title": "Confira a sua cidade",
-      "hint": "É ela que define a hora dos lembretes e da rotina.",
-      "action": "Abrir o perfil"
+    "nav": {
+      "title": "O mapa do app",
+      "body": "Aqui ficam as áreas: Hoje (o que importa agora), Tarefas, Finanças e Casa. Finanças e Metas são opcionais: dá para ligar e desligar quando quiser, sem perder nada."
     },
     "reminder": {
       "title": "Crie o primeiro lembrete",
-      "hint": "Deixe um recado para você ou para a outra pessoa. Ele chega como aviso na hora marcada.",
-      "action": "Novo lembrete"
+      "body": "Um lembrete chega como aviso na hora marcada, para você ou para a outra pessoa.",
+      "hint": "Toque em “Novo lembrete”, o botão destacado."
+    },
+    "list": {
+      "title": "Seus lembretes ficam aqui",
+      "body": "Tudo o que está marcado para hoje aparece nesta lista. Na hora certa, você conclui, adia ou cancela com um toque."
+    },
+    "city": {
+      "title": "Sua cidade está certa?",
+      "body": "É ela que define a hora dos lembretes e da rotina. Se estiver errada, o aviso das 8h chega fora de hora."
     },
     "invite": {
       "title": "Convide a outra pessoa",
-      "hint": "Até lá, o app funciona só com você. Lembretes, tarefas e compras ficam melhores a dois.",
-      "action": "Gerar convite"
+      "body": "Lembretes, tarefas e compras ficam melhores a dois: o que uma pessoa anota, a outra vê. Até lá, o app funciona só com você."
     },
     "push": {
-      "title": "Ative os avisos",
-      "hint": "Receba os lembretes na hora certa, mesmo com o app fechado.",
-      "hintInstall": "No iPhone, os avisos só funcionam com o app na tela inicial.",
-      "action": "Ativar avisos"
+      "title": "Receba os avisos",
+      "body": "Ative para o lembrete chegar na hora certa, mesmo com o app fechado. O navegador vai pedir a sua permissão.",
+      "bodyInstall": "No iPhone, os avisos só funcionam com o app na tela inicial. Faça assim:"
     },
-    "modules": {
-      "title": "Escolha o que mais vai usar",
-      "hint": "Finanças e Metas são opcionais. Dá para ligar e desligar quando quiser.",
-      "action": "Ver módulos"
+    "end": {
+      "title": "Tudo pronto!",
+      "body": "Agora é só usar. O que vocês combinarem aparece em Hoje, e os avisos chegam na hora certa. Para ver o tour de novo, abra o menu da conta."
+    }
+  },
+  "panels": {
+    "city": {
+      "current": "Sua cidade agora:",
+      "right": "Está certa",
+      "change": "Mudar de cidade",
+      "label": "Cidade",
+      "useDevice": "Usar {{city}} (deste aparelho)",
+      "save": "Salvar cidade",
+      "done": "Cidade conferida."
+    },
+    "invite": {
+      "generate": "Gerar código do convite",
+      "lead": "Mande este código para a outra pessoa. Ela o cola na tela “Recebeu um convite?”. Vale por 7 dias e só uma pessoa pode usá-lo.",
+      "copy": "Copiar código",
+      "copied": "Código copiado"
+    },
+    "push": {
+      "action": "Ativar avisos",
+      "done": "Avisos ativados neste aparelho."
     }
   }
 }

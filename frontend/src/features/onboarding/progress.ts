@@ -1,41 +1,39 @@
-export type StepId = 'city' | 'reminder' | 'invite' | 'push' | 'modules'
+export type TourStepId = 'nav' | 'reminder' | 'list' | 'city' | 'invite' | 'push' | 'end'
 
-export type Step = { id: StepId; done: boolean }
-
-export type StepInput = {
+export type PlanInput = {
   /** a outra pessoa já entrou no casal */
   hasPartner: boolean
   /** existe algum lembrete no casal */
   hasReminder: boolean
+  /** a pessoa já conferiu a cidade neste aparelho */
+  cityChecked: boolean
   /** estado dos avisos neste aparelho (`undefined` enquanto não se sabe) */
   push: 'unsupported' | 'install' | 'denied' | 'off' | 'on' | undefined
-  /** Finanças ou Metas ligados */
-  hasModule: boolean
-  /** a pessoa já abriu o perfil para conferir a cidade */
-  cityChecked: boolean
-  /** passos que já foram vistos como feitos neste aparelho: o que se cumpriu não volta a pendente (ex.: apagou os lembretes) */
-  remembered?: StepId[]
 }
 
 /**
- * Os primeiros passos e quais já foram dados, a partir do que o app já sabe.
- * Avisos bloqueados ou sem suporte não viram passo: não dá para cumpri-lo, então não cobramos.
+ * Os passos do tour para esta pessoa, na ordem da conversa. Só entra o que ainda faz sentido:
+ * quem já tem lembrete, a outra pessoa no casal ou os avisos ligados não é mandado fazer de novo.
+ * Avisos bloqueados ou sem suporte não viram passo (não dá para cumpri-lo). O plano é montado uma vez,
+ * quando o tour começa: um passo não some do meio só porque a pessoa o cumpriu.
  */
-export function buildSteps(i: StepInput): Step[] {
-  const steps: Step[] = [
-    { id: 'city', done: i.cityChecked },
-    { id: 'reminder', done: i.hasReminder },
-    { id: 'invite', done: i.hasPartner },
-  ]
-  if (i.push === 'on' || i.push === 'off' || i.push === 'install') steps.push({ id: 'push', done: i.push === 'on' })
-  steps.push({ id: 'modules', done: i.hasModule })
-  return steps.map((s) => ({ ...s, done: s.done || (i.remembered?.includes(s.id) ?? false) }))
+export function planTour(i: PlanInput): TourStepId[] {
+  const steps: TourStepId[] = ['nav']
+  if (!i.hasReminder) steps.push('reminder')
+  steps.push('list')
+  if (!i.cityChecked) steps.push('city')
+  if (!i.hasPartner) steps.push('invite')
+  if (i.push === 'off' || i.push === 'install') steps.push('push')
+  steps.push('end')
+  return steps
 }
 
-export const allDone = (steps: Step[]) => steps.every((s) => s.done)
-
 /** O que fica guardado neste aparelho, por pessoa (duas contas no mesmo aparelho não se misturam). */
-export type Saved = { cityChecked?: boolean; dismissed?: boolean; done?: StepId[] }
+export type Saved = {
+  cityChecked?: boolean
+  /** o tour terminou ou foi pulado; "ver o tour de novo" volta a falso */
+  dismissed?: boolean
+}
 
 const key = (userId: string) => `casal.onboarding.${userId}`
 
@@ -53,6 +51,14 @@ export function writeSaved(userId: string, patch: Saved) {
   try {
     localStorage.setItem(key(userId), JSON.stringify({ ...readSaved(userId), ...patch }))
   } catch {
-    /* sem armazenamento: o passo volta a aparecer na próxima visita */
+    /* sem armazenamento: o tour volta a aparecer na próxima visita */
   }
+}
+
+export const RESTART_EVENT = 'casal:restart-tour'
+
+/** "Ver o tour de novo": o tour reaparece em Hoje, já aberto se a pessoa estiver lá. */
+export function restartTour(userId: string) {
+  writeSaved(userId, { dismissed: false })
+  window.dispatchEvent(new Event(RESTART_EVENT))
 }

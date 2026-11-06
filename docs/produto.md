@@ -78,9 +78,9 @@ O produto gira em torno do **casal** (a casa), e cada funcionalidade vive em um 
 | Módulo | O que resolve | Quando entra |
 | --- | --- | --- |
 | Base | Rotina, lembretes, anotações, compras e tarefas da casa | Sempre ativo |
-| Marmita | Receitas, cardápio, dia de cozinhar e freezer | Opcional, fase 2 |
-| Finanças | Gastos compartilhados e individuais, acerto de contas | Opcional, fase 3 |
-| Metas | Metas financeiras, de hábitos, do casal e projetos com etapas | Opcional, fase 4 |
+| Marmita | Receitas, cardápio, dia de cozinhar e freezer | Opcional, fase 4 |
+| Finanças | Gastos compartilhados e individuais, acerto de contas | Opcional, fase 2 |
+| Metas | Metas financeiras, de hábitos, do casal e projetos com etapas | Opcional, fase 3 |
 
 **Como os módulos se ligam**
 
@@ -281,11 +281,12 @@ O módulo Finanças dá ao casal clareza sobre quanto gasta, quem pagou o quê e
 - Categorias padrão (moradia, mercado, transporte, lazer, saúde, contas fixas e outras), editáveis pelo casal.
 - Gastos do casal ficam visíveis aos dois; gastos pessoais só para quem os registrou, salvo escolha em contrário.
 - Gastos recorrentes (aluguel, internet, assinaturas) são cadastrados uma vez e aparecem todo mês.
+- Gastos parcelados: a pessoa informa o número de parcelas e a data da primeira, e o app cria uma parcela por mês, já com a divisão de cada uma.
 
 **Acerto de contas**
 
 - O app calcula, a cada período, quanto cada um gastou pelo casal e quanto um deve ao outro.
-- A divisão padrão pode ser igual ou proporcional (por exemplo, pela renda de cada um, informada de forma opcional).
+- A divisão padrão pode ser igual, um percentual combinado ou proporcional à renda de cada um. A renda é informada de forma opcional, guardada de forma privada (só quem a informa a vê), e a divisão proporcional só vale com a concordância dos dois.
 - O acerto é registrado como um "pagamento entre nós", e o saldo volta a zero.
 
 **Orçamento e metas**
@@ -531,9 +532,9 @@ O produto avança em cinco fases, e cada fase só começa quando a anterior cump
 
 1. **Fase 0: validar o essencial.** Provar que os lembretes chegam de forma confiável no celular dos dois, incluindo iPhone. *Saída:* um lembrete criado por um chega ao outro no horário, de forma repetida, durante uma semana.
 2. **Fase 1: base para o casal.** Conta, vínculo do casal, rotina semanal com horários livres, tarefas (inclusive para o outro), anotações, lembretes e lista de compras. A ordem de construção é rotina, tarefas e anotações primeiro. *Saída:* o casal criador usa a rotina, as tarefas e os lembretes todos os dias por duas semanas.
-3. **Fase 2: módulo Marmita.** Receitas, cardápio, lista automática, dia de cozinhar e freezer. *Saída:* o casal faz pelo menos duas semanas de marmitas usando o app do início ao fim.
-4. **Fase 3: módulo Finanças.** Gastos, acerto de contas, orçamento, metas e contas a pagar. *Saída:* o casal fecha um mês de acerto de contas pelo app.
-5. **Fase 4: módulo Metas.** Metas financeiras, de hábitos, do casal e projetos com etapas. *Saída:* o casal acompanha pelo app ao menos uma meta de cada tipo por um mês.
+3. **Fase 2: módulo Finanças.** Gastos, acerto de contas, contas a pagar e orçamento (spec em `docs/spec-fase-2-financas.md`). As metas financeiras ficam no módulo Metas. *Saída:* o casal fecha um mês de acerto de contas pelo app.
+4. **Fase 3: módulo Metas.** Metas financeiras (que leem os gastos da Fase 2), de hábitos, do casal e projetos com etapas. *Saída:* o casal acompanha pelo app ao menos uma meta de cada tipo por um mês.
+5. **Fase 4: módulo Marmita.** Receitas, cardápio, lista automática, dia de cozinhar e freezer (spec em `docs/spec-fase-4-marmita.md`). Fica por último por decisão do casal. *Saída:* o casal faz pelo menos duas semanas de marmitas usando o app do início ao fim.
 6. **Fase 5: abrir para outros casais.** Convite de teste para 5 a 10 casais, ajustes e definição dos planos pagos. *Saída:* a maioria dos casais de teste continua usando após quatro semanas.
 
 **O que fica de fora até a Fase 5**
@@ -580,8 +581,10 @@ Os maiores riscos são o uso real dos avisos no celular e o tamanho do público 
 - [ ] Qual será o nome do produto?
 - [ ] Quais celulares o casal usa hoje, para planejar os avisos?
 - [ ] Quais refeições o casal quer planejar (almoço, jantar, lanche)?
-- [ ] A divisão de gastos será igual ou proporcional à renda?- [ ] Quem entra no teste da Fase 5 (amigos, colegas, comunidade de meal prep)?
+- [x] A divisão de gastos será igual ou proporcional à renda? Decidido: os dois. O padrão é igual; o casal pode combinar um percentual fixo ou usar a divisão proporcional, que exige a concordância dos dois. A renda é guardada, mas só a própria pessoa a vê.
+- [ ] Quem entra no teste da Fase 5 (amigos, colegas, comunidade de meal prep)?
 - [ ] Uma nota pessoal pode ser compartilhada com o parceiro só para leitura ou também para edição?
-- [ ] Metas de hábito: marcação manual a cada ocorrência basta, ou o app deve sugerir a marcação pela rotina?- [ ] Haverá receitas prontas no início ou o catálogo começa vazio?
+- [ ] Metas de hábito: marcação manual a cada ocorrência basta, ou o app deve sugerir a marcação pela rotina?
+- [x] Haverá receitas prontas no início ou o catálogo começa vazio? Decidido: começa vazio, e o casal cadastra as próprias receitas.
 - [ ] Qual o limite do plano gratuito?
 - [ ] Quanto tempo por semana o casal pode dedicar ao desenvolvimento?

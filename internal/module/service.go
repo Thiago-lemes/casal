@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"casal/internal/apperr"
+	"casal/internal/event"
 )
 
 // Nomes dos módulos que existem. A tabela só aceita estes.
@@ -28,10 +29,14 @@ type Status struct {
 }
 
 type Service struct {
-	repo  Repository
-	hooks map[string][]Hook
-	after map[string][]func(ctx context.Context, householdID string, enabled bool)
+	repo   Repository
+	hooks  map[string][]Hook
+	after  map[string][]func(ctx context.Context, householdID string, enabled bool)
+	events event.Func
 }
+
+// OnEvent registra quem guarda os eventos de produto (módulo ligado ou desligado). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 func NewService(repo Repository) *Service {
 	return &Service{repo: repo, hooks: map[string][]Hook{}, after: map[string][]func(context.Context, string, bool){}}
@@ -78,6 +83,11 @@ func (s *Service) Set(ctx context.Context, householdID, name string, enabled boo
 	}
 	for _, f := range s.after[name] {
 		f(ctx, householdID, enabled)
+	}
+	if enabled {
+		s.events.Emit(ctx, event.ModuleEnabled, "", householdID)
+	} else {
+		s.events.Emit(ctx, event.ModuleDisabled, "", householdID)
 	}
 	return s.status(ctx, householdID, name)
 }

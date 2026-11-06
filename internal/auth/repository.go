@@ -76,10 +76,22 @@ func (r *PostgresRepo) CreateSession(ctx context.Context, userID, tokenHash stri
 
 func (r *PostgresRepo) UserBySession(ctx context.Context, tokenHash string, now time.Time) (User, error) {
 	var u User
+	// Uma ida só ao banco: acha a sessão e, no máximo uma vez por hora, marca o último uso e o dia de atividade
+	// da pessoa (base das métricas de ativos e retenção). Nas demais requisições o UPDATE não toca em nada.
 	err := r.db.QueryRowContext(ctx, `
+		WITH s AS (
+			SELECT id, user_id FROM sessions WHERE token_hash = $1 AND expires_at > $2
+		), touched AS (
+			UPDATE sessions SET last_used_at = $2
+			WHERE id IN (SELECT id FROM s) AND (last_used_at IS NULL OR last_used_at < $2 - interval '1 hour')
+			RETURNING user_id
+		), activity AS (
+			INSERT INTO user_activity (user_id, day)
+			SELECT user_id, ($2 AT TIME ZONE 'UTC')::date FROM touched
+			ON CONFLICT DO NOTHING
+		)
 		SELECT u.id, u.email, u.name, u.timezone
-		FROM sessions s JOIN users u ON u.id = s.user_id
-		WHERE s.token_hash = $1 AND s.expires_at > $2`, tokenHash, now).
+		FROM s JOIN users u ON u.id = s.user_id`, tokenHash, now).
 		Scan(&u.ID, &u.Email, &u.Name, &u.Timezone)
 	if errors.Is(err, sql.ErrNoRows) {
 		return User{}, ErrNotFound

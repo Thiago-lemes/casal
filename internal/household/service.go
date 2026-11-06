@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"casal/internal/db"
+	"casal/internal/event"
 	"casal/internal/token"
 )
 
@@ -17,14 +18,22 @@ type Service struct {
 	onLeave []db.Hook
 	onJoin  []db.Hook
 	now     func() time.Time
+	events  event.Func
 }
+
+// OnEvent registra quem guarda os eventos de produto (casal criado, parceiro que entrou). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 func NewService(repo Repository) *Service {
 	return &Service{repo: repo, now: time.Now}
 }
 
 func (s *Service) Create(ctx context.Context, userID string) (string, error) {
-	return s.repo.CreateHousehold(ctx, userID, s.onJoin...)
+	id, err := s.repo.CreateHousehold(ctx, userID, s.onJoin...)
+	if err == nil {
+		s.events.Emit(ctx, event.HouseholdCreated, userID, id)
+	}
+	return id, err
 }
 
 func (s *Service) HouseholdOf(ctx context.Context, userID string) (string, error) {
@@ -68,7 +77,11 @@ func (s *Service) Invite(ctx context.Context, householdID, userID string) (strin
 }
 
 func (s *Service) Accept(ctx context.Context, userID, rawToken string) (string, error) {
-	return s.repo.AcceptInvite(ctx, token.Hash(rawToken), userID, s.now(), s.onJoin...)
+	id, err := s.repo.AcceptInvite(ctx, token.Hash(rawToken), userID, s.now(), s.onJoin...)
+	if err == nil {
+		s.events.Emit(ctx, event.PartnerJoined, userID, id)
+	}
+	return id, err
 }
 
 // PurgeStaleInvites apaga os convites que já não servem para nada (usados ou vencidos há 30 dias).

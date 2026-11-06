@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"casal/internal/event"
 )
 
 // Members é o que este pacote precisa da feature household.
@@ -23,7 +25,11 @@ type Service struct {
 	notifier Notifier
 	log      *slog.Logger
 	now      func() time.Time
+	events   event.Func
 }
+
+// OnEvent registra quem guarda os eventos de produto (lembrete criado para o parceiro). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 func NewService(repo Repository, members Members, notifier Notifier, log *slog.Logger) *Service {
 	return &Service{repo: repo, members: members, notifier: notifier, log: log, now: time.Now}
@@ -59,6 +65,9 @@ func (s *Service) Create(ctx context.Context, householdID, creatorID, recipientI
 	})
 	if err != nil {
 		return Reminder{}, err
+	}
+	if recipientID != creatorID {
+		s.events.Emit(ctx, event.ReminderCreatedForPartner, creatorID, householdID)
 	}
 	s.notifyCreated(ctx, r)
 	return r, nil

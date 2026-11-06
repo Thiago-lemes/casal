@@ -105,3 +105,54 @@ func TestMetricsExigeTokenENaoLevaConteudo(t *testing.T) {
 		return bytes.Contains([]byte(out), []byte(`reminder_send_total{result="`))
 	})
 }
+
+// Os eventos de produto nascem das ações reais e, junto com as views de agregados, nunca carregam o que a pessoa escreveu.
+func TestEventosDeProdutoSemConteudo(t *testing.T) {
+	const segredo = "segredo-de-teste-eventos"
+	srv, _ := startApp(t)
+	conn := testutil.OpenDB(t)
+
+	ana, bia := newClient(t, srv.URL), newClient(t, srv.URL)
+	anaID := ana.register("ev-ana")
+	ana.mustStatus(201, "POST", "/v1/household", nil)
+	invite := ana.mustStatus(201, "POST", "/v1/household/invites", nil)["token"].(string)
+	biaID := bia.register("ev-bia")
+	bia.mustStatus(200, "POST", "/v1/household/invites/accept", map[string]string{"token": invite})
+	ana.mustStatus(201, "POST", "/v1/reminders", map[string]any{
+		"recipient_id": biaID, "body": segredo, "remind_at": time.Now().UTC().Add(time.Hour).Format(time.RFC3339),
+	})
+	ana.mustStatus(201, "POST", "/v1/notes", map[string]any{"title": segredo, "kind": "text", "body": segredo})
+	ana.mustStatus(200, "PUT", "/v1/modules/finance", map[string]any{"enabled": true})
+	ana.mustStatus(200, "PUT", "/v1/modules/finance", map[string]any{"enabled": false})
+
+	got := map[string]int{}
+	for _, name := range testutil.SystemStrings(t, conn,
+		`SELECT name FROM product_events WHERE user_id IN ($1, $2)`, anaID, biaID) {
+		got[name]++
+	}
+	for name, want := range map[string]int{
+		"user_registered": 2, "household_created": 1, "partner_joined": 1,
+		"reminder_created_for_partner": 1, "module_enabled": 1, "module_disabled": 1,
+	} {
+		if got[name] != want {
+			t.Errorf("evento %s: %d, esperado %d (todos: %v)", name, got[name], want, got)
+		}
+	}
+
+	// o que chega ao Grafana: nenhuma view devolve o texto digitado
+	ops := testutil.OpenOpsDB(t)
+	for _, view := range []string{"daily_activation", "weekly_active", "module_adoption", "module_usage", "retention", "push_coverage"} {
+		rows, err := ops.Query(`SELECT row_to_json(v)::text FROM ops.` + view + ` v`)
+		if err != nil {
+			t.Fatalf("ops.%s: %v", view, err)
+		}
+		for rows.Next() {
+			var line string
+			_ = rows.Scan(&line)
+			if strings.Contains(line, segredo) || strings.Contains(line, anaID) || strings.Contains(line, "@e2e") {
+				t.Errorf("ops.%s vazou conteúdo: %s", view, line)
+			}
+		}
+		rows.Close()
+	}
+}

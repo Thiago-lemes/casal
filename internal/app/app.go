@@ -56,16 +56,20 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	if err != nil {
 		return nil, nil, err
 	}
+	events := ops.NewEvents(conn, log)
+	authSvc.OnEvent(events.Record)
 	auth.NewHandler(authSvc, log, auth.Options{CookieSecure: cfg.CookieSecure, TrustProxy: cfg.TrustProxy}).Routes(mux)
 	requireUser := auth.Require(authSvc)
 
 	// casal e convite
 	householdSvc := household.NewService(household.NewPostgresRepo(conn))
+	householdSvc.OnEvent(events.Record)
 	household.NewHandler(householdSvc, log).Routes(mux, requireUser)
 	requireHousehold := household.RequireHousehold(householdSvc, log)
 
 	// módulos opcionais do casal; as features de cada módulo usam module.Require(moduleSvc, log, nome) nas rotas
 	moduleSvc := module.NewService(module.NewPostgresRepo(conn))
+	moduleSvc.OnEvent(events.Record)
 	module.NewHandler(moduleSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// push, com o notificador de log como alternativa quando o VAPID não está configurado
@@ -77,6 +81,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 			log,
 		)
 		pushSvc.Observe(obs.observePush)
+		pushSvc.OnEvent(events.Record)
 		push.NewHandler(pushSvc, cfg.VAPIDPublicKey, log).Routes(mux, requireUser)
 		notifier = pushSvc
 	} else {
@@ -87,6 +92,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	reminderRepo := reminder.NewPostgresRepo(conn)
 	obs.watchQueue(reminderRepo, log)
 	reminderSvc := reminder.NewService(reminderRepo, householdSvc, notifier, log)
+	reminderSvc.OnEvent(events.Record)
 	reminder.NewHandler(reminderSvc, log).Routes(mux, requireUser, requireHousehold)
 
 	// tarefas
@@ -161,7 +167,7 @@ func New(cfg config.Config, conn *sql.DB, log *slog.Logger) (http.Handler, []Job
 	)
 	jobs := []Job{
 		reminderWorker.Run,
-		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought),
+		maintenance(log, "limpeza", obs.markMaintenance, authSvc.PurgeExpired, householdSvc.PurgeStaleInvites, shoppingSvc.PurgeBought, events.Purge),
 		maintenance(log, "financas", obs.markMaintenance, financeSvc.GenerateRecurring, financeSvc.ReconcileReminders),
 		maintenance(log, "metas", obs.markMaintenance, goalSvc.ReconcileHabitReminders, goalSvc.ReconcileSteps),
 	}

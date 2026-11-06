@@ -11,6 +11,7 @@ import (
 	_ "time/tzdata" // fusos embutidos: não dependem do sistema (no Windows e em contêineres mínimos faltam)
 	"unicode/utf8"
 
+	"casal/internal/event"
 	"casal/internal/token"
 )
 
@@ -20,7 +21,11 @@ type Service struct {
 	now        func() time.Time
 	dummyHash  string        // usado para gastar o mesmo tempo quando o e-mail não existe
 	hashSlots  chan struct{} // limita quantos hashes de senha rodam ao mesmo tempo
+	events     event.Func
 }
+
+// OnEvent registra quem guarda os eventos de produto (cadastro). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 func NewService(repo Repository, sessionTTL time.Duration) (*Service, error) {
 	dummy, err := HashPassword("senha-que-nunca-sera-usada")
@@ -55,6 +60,9 @@ func (s *Service) Register(ctx context.Context, email, name, password string) (U
 		return User{}, "", err
 	}
 	session, err := s.openSession(ctx, u.ID)
+	if err == nil {
+		s.events.Emit(ctx, event.UserRegistered, u.ID, "")
+	}
 	return u, session, err
 }
 

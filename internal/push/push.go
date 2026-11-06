@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"casal/internal/apperr"
+	"casal/internal/event"
 )
 
 var (
@@ -41,7 +42,11 @@ type Service struct {
 	sender   Sender
 	log      *slog.Logger
 	observer func(status int, host string, err error)
+	events   event.Func
 }
+
+// OnEvent registra quem guarda os eventos de produto (avisos ativados). Opcional.
+func (s *Service) OnEvent(f event.Func) { s.events = f }
 
 // Observe registra uma função chamada a cada envio a um aparelho (status HTTP do serviço de push, host e erro de
 // rede). Alimenta as métricas; recebe só o host, nunca o endereço completo do aparelho.
@@ -56,7 +61,11 @@ func (s *Service) Subscribe(ctx context.Context, userID string, sub Subscription
 	if !validEndpoint(sub.Endpoint) || sub.P256dh == "" || sub.Auth == "" {
 		return ErrInvalidSubscription
 	}
-	return s.repo.Save(ctx, userID, sub, userAgent)
+	if err := s.repo.Save(ctx, userID, sub, userAgent); err != nil {
+		return err
+	}
+	s.events.Emit(ctx, event.PushEnabled, userID, "")
+	return nil
 }
 
 func (s *Service) Unsubscribe(ctx context.Context, userID, endpoint string) error {

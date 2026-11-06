@@ -71,7 +71,7 @@ describe('GoalsPage', () => {
     page()
     await userEvent.click(await screen.findByRole('tab', { name: 'Minhas' }))
     expect(await screen.findByRole('link', { name: /Correr/ })).toBeInTheDocument()
-    const shared = await screen.findByRole('region', { name: 'Compartilhadas pelo seu par' })
+    const shared = await screen.findByRole('region', { name: 'Compartilhadas pela outra pessoa' })
     expect(within(shared).getByRole('link', { name: /Yoga/ })).toBeInTheDocument()
     expect(within(shared).getByText('Compartilhada por Bia')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /Casa/ })).not.toBeInTheDocument()

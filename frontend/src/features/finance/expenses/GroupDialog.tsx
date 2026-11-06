@@ -51,7 +51,7 @@ function GroupBody({ group, ctx, lang, onClose }: { group: Group; ctx: Ctx; lang
   const [paidBy, setPaidBy] = useState(first?.paid_by ?? ctx.me.id)
   const [splitMode, setSplitMode] = useState<'keep' | 'equal' | 'custom'>('keep')
   const [custom, setCustom] = useState<Split>(first?.split ?? equalSplit(ctx.people))
-  const [done, setDone] = useState<string>()
+  const [done, setDone] = useState<{ deleted: number; remaining: number }>()
 
   const list = selectable(categories.data ?? [], first?.category_id)
 
@@ -71,7 +71,7 @@ function GroupBody({ group, ctx, lang, onClose }: { group: Group; ctx: Ctx; lang
         if (res.remaining === 0) onClose()
         else {
           setConfirming(false)
-          setDone(t('group.deleted', { deleted: res.deleted, remaining: res.remaining }))
+          setDone({ deleted: res.deleted, remaining: res.remaining })
         }
       },
     })
@@ -98,9 +98,10 @@ function GroupBody({ group, ctx, lang, onClose }: { group: Group; ctx: Ctx; lang
       </ul>
 
       {done && (
-        <p className={styles.notice} role="status">
-          {done}
-        </p>
+        <div className={styles.notice} role="status">
+          <p>{t('group.deleted', { count: done.deleted })}</p>
+          <p>{t('group.remaining', { count: done.remaining })}</p>
+        </div>
       )}
       {error != null && (
         <p className={styles.error} role="alert">
@@ -156,7 +157,8 @@ function GroupBody({ group, ctx, lang, onClose }: { group: Group; ctx: Ctx; lang
         </div>
       ) : confirming ? (
         <div className={styles.form}>
-          <p>{t('group.confirmDelete', { open: openCount, settled: group.settled })}</p>
+          <p>{t('group.confirmDelete', { count: openCount })}</p>
+          {group.settled > 0 && <p>{t('group.confirmKept', { count: group.settled })}</p>}
           <div className={styles.footer}>
             <Button variant="quiet" onClick={() => setConfirming(false)}>
               {tc('actions.cancel')}

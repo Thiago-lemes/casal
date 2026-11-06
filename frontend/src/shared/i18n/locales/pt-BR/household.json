@@ -1,14 +1,17 @@
 {
   "setup": {
-    "title": "Monte o casal",
-    "lead": "Os lembretes vivem no casal. Crie o seu agora e convide a outra pessoa depois, ou entre com um convite.",
+    "title": "Boas-vindas ao {{app}}",
+    "lead": "O {{app}} organiza a vida a dois num só lugar: lembretes, tarefas, a rotina da semana e a lista de compras. Finanças e Metas entram quando vocês quiserem.",
+    "createTitle": "Começar um casal",
+    "createLead": "Crie o casal agora e convide a outra pessoa quando quiser. Até lá, o app funciona só com você.",
     "create": "Criar o casal",
     "joinTitle": "Recebeu um convite?",
+    "joinLead": "Cole o código que a outra pessoa mandou para entrar no casal que já existe.",
     "token": "Código do convite",
     "join": "Entrar no casal"
   },
   "invite": {
-    "action": "Convidar parceiro",
+    "action": "Convidar a outra pessoa",
     "title": "Convite para o casal",
     "lead": "Mande este código. Ele vale por 7 dias e só uma pessoa pode usá-lo.",
     "copy": "Copiar código",

@@ -1,9 +1,12 @@
 {
   "setup": {
-    "title": "Set up your couple",
-    "lead": "Reminders live in your couple. Create yours now and invite your partner later, or join with an invite.",
+    "title": "Welcome to {{app}}",
+    "lead": "{{app}} keeps life as a couple in one place: reminders, tasks, the weekly routine and the shopping list. Finance and Goals join in when you want them.",
+    "createTitle": "Start a couple",
+    "createLead": "Create the couple now and invite the other person whenever you like. Until then, the app works just for you.",
     "create": "Create the couple",
     "joinTitle": "Got an invite?",
+    "joinLead": "Paste the code the other person sent to join the couple that already exists.",
     "token": "Invite code",
     "join": "Join the couple"
   },

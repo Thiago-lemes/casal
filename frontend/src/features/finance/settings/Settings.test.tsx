@@ -109,6 +109,6 @@ describe('renda', () => {
       'GET /v1/finance/settings': settings({ split_mode: 'proportional' }),
     })
     renderWithQuery(<IncomeField />)
-    expect(await screen.findByText(/seu parceiro será avisado/)).toBeInTheDocument()
+    expect(await screen.findByText(/a outra pessoa será avisada/)).toBeInTheDocument()
   })
 })

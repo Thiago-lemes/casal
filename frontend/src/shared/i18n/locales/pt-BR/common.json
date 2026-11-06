@@ -82,7 +82,7 @@
     "goal_not_found": "Essa meta não está mais disponível. Volte à lista e atualize.",
     "step_not_found": "Essa etapa mudou ou não está mais disponível. Atualize a meta.",
     "contribution_not_found": "Esse aporte mudou ou não está mais disponível. Atualize a meta.",
-    "goal_forbidden": "Só quem é dono da meta pode alterá-la.",
+    "goal_forbidden": "Só quem criou a meta pode alterá-la.",
     "goal_conflict": "Outra pessoa mudou esta meta antes de você. Veja a versão atual e salve de novo.",
     "goal_closed": "Reabra a meta para registrar ou editar.",
     "goal_kind_mismatch": "Essa ação não vale para esse tipo de meta.",
@@ -108,8 +108,8 @@
         "hint": "Ninguém mais vê esta anotação."
       },
       "view": {
-        "title": "Meu parceiro lê",
-        "hint": "Ele vê, mas só você edita."
+        "title": "A outra pessoa lê",
+        "hint": "Só você edita; a outra pessoa apenas lê."
       },
       "household": {
         "title": "Do casal",
@@ -119,15 +119,15 @@
     "routine": {
       "private": {
         "title": "Só eu",
-        "hint": "O parceiro não vê este bloco, nem nos horários livres."
+        "hint": "A outra pessoa não vê este bloco, nem nos horários livres."
       },
       "busy": {
         "title": "Só ocupado",
-        "hint": "O parceiro vê o horário como ocupado, sem detalhes."
+        "hint": "A outra pessoa vê o horário como ocupado, sem detalhes."
       },
       "view": {
-        "title": "Meu parceiro vê",
-        "hint": "Ele vê os detalhes, mas só você edita."
+        "title": "A outra pessoa vê",
+        "hint": "Vê os detalhes, mas só você edita."
       },
       "household": {
         "title": "Do casal",

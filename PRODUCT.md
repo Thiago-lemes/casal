@@ -33,14 +33,14 @@ O produto une o que os concorrentes resolvem em separado (agenda e tarefas, fina
 ## Capabilities and Constraints
 
 - Idiomas: pt-BR (padrão) e inglês desde o início. Todo texto passa por chaves de tradução; o backend deve devolver códigos de erro estáveis, não frases.
-- O nome do app é indefinido; deve existir em um único lugar de configuração para ser trocado depois.
+- O nome do app é Zoog e fica em um único lugar de configuração (`APP_NAME`), para o caso de mudar.
 - Módulos são opcionais e ligáveis por casal; a navegação precisa aceitar módulos que ainda não existem sem parecer vazia.
 - O app não é rede social, não tem jogos nem ranking entre o casal, e não é um banco.
 - O app nunca afirma que um alimento é seguro para consumo (módulo Marmita).
 
 ## Brand Commitments
 
-Preferência declarada pelo usuário: tons de laranja, tema escuro e claro, experiência fluida. Nome provisório "Casal". Sem logo ainda; os ícones atuais em `web/` são provisórios.
+Preferência declarada pelo usuário: tons de laranja, tema escuro e claro, experiência fluida. Nome: Zoog, com logo própria (dois "o" meio azul, meio laranja, com rosto). Os ícones antigos em `web/` são provisórios.
 
 ## Evidence on Hand
 

@@ -71,7 +71,7 @@ describe('NoteEditor', () => {
     setup({ note: note({ owner_id: 'other', visibility: 'view' }), isOwner: false, readOnly: true })
     expect(screen.queryByRole('button', { name: 'Salvar' })).not.toBeInTheDocument()
     expect(screen.getByLabelText('Título')).toHaveAttribute('readonly')
-    expect(screen.getByRole('radio', { name: /Meu parceiro lê/ })).toBeDisabled()
+    expect(screen.getByRole('radio', { name: /A outra pessoa lê/ })).toBeDisabled()
   })
 
   it('em anotação do casal que não é minha, não muda a visibilidade nem apaga', () => {

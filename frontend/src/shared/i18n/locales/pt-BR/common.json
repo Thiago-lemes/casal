@@ -90,11 +90,15 @@
     "contribution_negative": "A retirada é maior que o valor guardado.",
     "checkin_date_invalid": "Marque até hoje e no máximo 31 dias atrás.",
     "goal_invalid": "Confira os dados da meta: título, período, valor e prazo.",
-    "step_has_task": "Essa etapa tem uma tarefa: conclua ou reatribua pela tela de Tarefas."
+    "step_has_task": "Essa etapa tem uma tarefa: conclua ou reatribua pela tela de Tarefas.",
+    "signup_code_invalid": "Esse código de convite não vale: confira se digitou certo, ou peça um novo.",
+    "account_blocked": "Esta conta está bloqueada. Fale com o time do Zoog.",
+    "feedback_rate_limited": "Você já enviou muitas mensagens hoje. Tente de novo amanhã."
   },
   "userMenu": {
     "label": "Menu da conta de {{name}}",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "feedback": "Enviar feedback"
   },
   "visibility": {
     "legend": "Quem vê",

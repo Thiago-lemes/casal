@@ -21,6 +21,16 @@ export function useMe() {
   })
 }
 
+/** Se o cadastro pede código de convite. Enquanto não responde (ou se falhar) assume aberto: o servidor decide de verdade. */
+export function useSignupMode() {
+  return useQuery({
+    queryKey: ['auth-config'],
+    queryFn: authApi.config,
+    staleTime: 60 * 60 * 1000,
+    retry: false,
+  })
+}
+
 export function useLogin() {
   const qc = useQueryClient()
   return useMutation({
@@ -32,7 +42,8 @@ export function useLogin() {
 export function useRegister() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (v: { email: string; name: string; password: string }) => authApi.register(v.email, v.name, v.password),
+    mutationFn: (v: { email: string; name: string; password: string; signupCode?: string }) =>
+      authApi.register(v.email, v.name, v.password, v.signupCode),
     onSuccess: (user) => qc.setQueryData(meKey, user),
   })
 }

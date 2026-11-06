@@ -1,0 +1,117 @@
+{
+  "brand": "Zoog · suporte",
+  "loading": "Carregando",
+  "signOut": "Sair",
+  "nav": {
+    "label": "Painel de suporte",
+    "households": "Casais",
+    "codes": "Convites",
+    "feedback": "Feedback",
+    "audit": "Auditoria"
+  },
+  "login": {
+    "title": "Painel de suporte",
+    "email": "E-mail",
+    "password": "Senha",
+    "code": "Código do autenticador",
+    "codeHint": "6 dígitos do aplicativo autenticador",
+    "submit": "Entrar"
+  },
+  "households": {
+    "search": "Buscar casal",
+    "searchHint": "E-mail ou nome de uma das pessoas (mínimo de 2 letras)",
+    "searchButton": "Buscar",
+    "none": "Nenhum casal encontrado"
+  },
+  "household": {
+    "created": "Criado em",
+    "lastUsed": "Último uso",
+    "push": "Aparelhos com aviso",
+    "people": "Pessoas",
+    "modules": "Módulos",
+    "counts": "Itens por módulo",
+    "countsNote": "Só totais, sem separar o que é pessoal do que é do casal. O painel nunca mostra o conteúdo."
+  },
+  "modules": {
+    "finance": "Finanças",
+    "goals": "Metas"
+  },
+  "counts": {
+    "reminders": "Lembretes",
+    "tasks": "Tarefas",
+    "notes": "Anotações",
+    "shopping": "Compras",
+    "routine": "Rotina",
+    "finance": "Gastos",
+    "goals": "Metas"
+  },
+  "user": {
+    "email": "E-mail",
+    "status": "Situação",
+    "active": "Ativa",
+    "blockedSince": "Bloqueada desde {{date}}",
+    "openHousehold": "Abrir o casal",
+    "blockNote": "Bloquear derruba as sessões e impede o login. Nenhum dado é apagado.",
+    "block": "Bloquear conta",
+    "confirmBlock": "Confirmar bloqueio",
+    "unblock": "Desbloquear conta"
+  },
+  "codes": {
+    "new": "Novo código de cadastro",
+    "note": "Rótulo",
+    "noteHint": "Para você lembrar de quem é",
+    "uses": "Usos",
+    "days": "Validade (dias)",
+    "create": "Criar código",
+    "once": "Copie agora: este código não aparece de novo.",
+    "none": "Nenhum código criado",
+    "noNote": "Sem rótulo",
+    "usage": "{{uses}} de {{max}} usos",
+    "until": "até {{date}}",
+    "revoke": "Revogar",
+    "state": {
+      "active": "Ativo",
+      "used": "Esgotado",
+      "expired": "Vencido",
+      "revoked": "Revogado"
+    }
+  },
+  "feedback": {
+    "onlyUnread": "Só as não lidas",
+    "none": "Nenhuma mensagem",
+    "household": "Abrir o casal",
+    "markRead": "Marcar como lida",
+    "screens": {
+      "today": "Hoje",
+      "tasks": "Tarefas",
+      "notes": "Anotações",
+      "routine": "Rotina",
+      "shopping": "Compras",
+      "reminders": "Lembretes",
+      "house": "Casa",
+      "finance": "Finanças",
+      "goals": "Metas",
+      "profile": "Perfil",
+      "other": "Outra"
+    }
+  },
+  "audit": {
+    "none": "Nada registrado ainda",
+    "when": "Quando",
+    "who": "Quem",
+    "action": "Ação",
+    "change": "Mudança",
+    "actions": {
+      "admin_login": "Entrou no painel",
+      "household_viewed": "Abriu a ficha do casal",
+      "user_viewed": "Abriu a ficha da pessoa",
+      "module_enabled": "Ligou módulo",
+      "module_disabled": "Desligou módulo",
+      "user_blocked": "Bloqueou pessoa",
+      "user_unblocked": "Desbloqueou pessoa",
+      "invite_created": "Criou código de cadastro",
+      "invite_revoked": "Revogou código de cadastro",
+      "feedback_read": "Marcou feedback como lido"
+    }
+  }
+}

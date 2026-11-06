@@ -44,6 +44,11 @@ cd ~/casal && git pull && cd deploy && docker compose up -d --build
 ```
 As migrações rodam sozinhas (serviço `migrate`) antes da API subir.
 
+## 6. Beta: convites, painel e métricas
+Veja [operacao.md](operacao.md). Resumo: `SIGNUP_MODE=invite` já vem no compose; para o painel, crie as contas com
+`docker compose run --rm --entrypoint admin api admin create voce@email.com` e depois ponha `ADMIN_ENABLED=true` no `.env`.
+Códigos de cadastro: `docker compose run --rm --entrypoint admin api signup-code create --note "amiga da Carla"`.
+
 ## Notas
 - `db-init.sh` cria o papel `casal_app` só na **primeira** subida do volume. Se trocar `APP_DB_PASSWORD` depois, rode `ALTER ROLE casal_app PASSWORD '...'` no banco.
 - Zerar tudo: `docker compose down -v` (apaga o banco).

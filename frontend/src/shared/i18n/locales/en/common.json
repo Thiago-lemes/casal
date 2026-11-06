@@ -90,11 +90,15 @@
     "contribution_negative": "The withdrawal is larger than the amount saved.",
     "checkin_date_invalid": "Check in up to today and at most 31 days back.",
     "goal_invalid": "Check the goal's details: title, period, amount and due date.",
-    "step_has_task": "This step has a task: complete or reassign it in the Tasks screen."
+    "step_has_task": "This step has a task: complete or reassign it in the Tasks screen.",
+    "signup_code_invalid": "That invite code is not valid: check it for typos, or ask for a new one.",
+    "account_blocked": "This account is blocked. Please contact the Zoog team.",
+    "feedback_rate_limited": "You have sent a lot of messages today. Try again tomorrow."
   },
   "userMenu": {
     "label": "Account menu for {{name}}",
-    "profile": "Profile"
+    "profile": "Profile",
+    "feedback": "Send feedback"
   },
   "visibility": {
     "legend": "Who sees it",

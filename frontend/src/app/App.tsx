@@ -17,6 +17,7 @@ const ShoppingRoute = lazy(() => import('./ShoppingRoute').then((m) => ({ defaul
 const FinanceRoute = lazy(() => import('./FinanceRoute').then((m) => ({ default: m.FinanceRoute })))
 const GoalsRoute = lazy(() => import('./GoalsRoute').then((m) => ({ default: m.GoalsRoute })))
 const GoalRoute = lazy(() => import('./GoalsRoute').then((m) => ({ default: m.GoalRoute })))
+const AdminApp = lazy(() => import('@/features/admin/AdminApp').then((m) => ({ default: m.AdminApp })))
 const TasksRoute = lazy(() => import('./TasksRoute').then((m) => ({ default: m.TasksRoute })))
 
 const queryClient = new QueryClient({
@@ -36,6 +37,15 @@ export function App() {
         <Routes>
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
+          {/* painel de suporte: sessão própria, fora do app dos casais e carregado só por quem abre /admin */}
+          <Route
+            path="/admin/*"
+            element={
+              <Suspense fallback={null}>
+                <AdminApp />
+              </Suspense>
+            }
+          />
           <Route element={<RequireAuth />}>
             <Route element={<Shell />}>
               <Route

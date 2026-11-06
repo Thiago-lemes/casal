@@ -57,12 +57,16 @@ export function codeFromStatus(status: number): ErrorKind {
   return byStatus[status] ?? 'unknown'
 }
 
-export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function api<T>(
+  path: string,
+  init: { method?: string; body?: unknown; headers?: Record<string, string> } = {},
+): Promise<T> {
   let res: Response
   try {
+    const headers = { ...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }), ...init.headers }
     res = await fetch(path, {
       method: init.method ?? 'GET',
-      headers: init.body === undefined ? undefined : { 'Content-Type': 'application/json' },
+      headers: Object.keys(headers).length > 0 ? headers : undefined,
       body: init.body === undefined ? undefined : JSON.stringify(init.body),
       credentials: 'same-origin',
     })

@@ -1,0 +1,25 @@
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.lead {
+  color: var(--color-text-soft);
+}
+
+/* o aviso de que o time lê a mensagem fica sempre à vista, junto do botão de enviar */
+.notice {
+  font-size: var(--text-sm);
+  color: var(--color-text-soft);
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

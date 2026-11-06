@@ -1,0 +1,117 @@
+{
+  "brand": "Zoog · support",
+  "loading": "Loading",
+  "signOut": "Sign out",
+  "nav": {
+    "label": "Support panel",
+    "households": "Couples",
+    "codes": "Invites",
+    "feedback": "Feedback",
+    "audit": "Audit log"
+  },
+  "login": {
+    "title": "Support panel",
+    "email": "Email",
+    "password": "Password",
+    "code": "Authenticator code",
+    "codeHint": "6 digits from the authenticator app",
+    "submit": "Sign in"
+  },
+  "households": {
+    "search": "Find couple",
+    "searchHint": "Email or name of one of the people (at least 2 letters)",
+    "searchButton": "Search",
+    "none": "No couple found"
+  },
+  "household": {
+    "created": "Created",
+    "lastUsed": "Last used",
+    "push": "Devices with alerts",
+    "people": "People",
+    "modules": "Modules",
+    "counts": "Items per module",
+    "countsNote": "Totals only, not separating personal from shared. The panel never shows content."
+  },
+  "modules": {
+    "finance": "Finance",
+    "goals": "Goals"
+  },
+  "counts": {
+    "reminders": "Reminders",
+    "tasks": "Tasks",
+    "notes": "Notes",
+    "shopping": "Shopping",
+    "routine": "Routine",
+    "finance": "Expenses",
+    "goals": "Goals"
+  },
+  "user": {
+    "email": "Email",
+    "status": "Status",
+    "active": "Active",
+    "blockedSince": "Blocked since {{date}}",
+    "openHousehold": "Open the couple",
+    "blockNote": "Blocking ends all sessions and prevents sign-in. No data is deleted.",
+    "block": "Block account",
+    "confirmBlock": "Confirm block",
+    "unblock": "Unblock account"
+  },
+  "codes": {
+    "new": "New sign-up code",
+    "note": "Label",
+    "noteHint": "So you remember who it is for",
+    "uses": "Uses",
+    "days": "Valid for (days)",
+    "create": "Create code",
+    "once": "Copy it now: this code will not be shown again.",
+    "none": "No codes yet",
+    "noNote": "No label",
+    "usage": "{{uses}} of {{max}} uses",
+    "until": "until {{date}}",
+    "revoke": "Revoke",
+    "state": {
+      "active": "Active",
+      "used": "Used up",
+      "expired": "Expired",
+      "revoked": "Revoked"
+    }
+  },
+  "feedback": {
+    "onlyUnread": "Unread only",
+    "none": "No messages",
+    "household": "Open the couple",
+    "markRead": "Mark as read",
+    "screens": {
+      "today": "Today",
+      "tasks": "Tasks",
+      "notes": "Notes",
+      "routine": "Routine",
+      "shopping": "Shopping",
+      "reminders": "Reminders",
+      "house": "Home",
+      "finance": "Finance",
+      "goals": "Goals",
+      "profile": "Profile",
+      "other": "Other"
+    }
+  },
+  "audit": {
+    "none": "Nothing recorded yet",
+    "when": "When",
+    "who": "Who",
+    "action": "Action",
+    "change": "Change",
+    "actions": {
+      "admin_login": "Signed in",
+      "household_viewed": "Opened couple file",
+      "user_viewed": "Opened person file",
+      "module_enabled": "Enabled module",
+      "module_disabled": "Disabled module",
+      "user_blocked": "Blocked person",
+      "user_unblocked": "Unblocked person",
+      "invite_created": "Created sign-up code",
+      "invite_revoked": "Revoked sign-up code",
+      "feedback_read": "Marked feedback as read"
+    }
+  }
+}
